@@ -1,0 +1,366 @@
+<div class="min-h-screen bg-slate-100 text-slate-900 font-sans pb-20">
+
+  <!-- Toast Notification Alert Corporate -->
+  @if (toastMessage()) {
+    <div class="fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 bg-white border-l-4 border-[#00205B] rounded-lg shadow-xl border-y border-r border-slate-200 animate-in slide-in-from-top-3 duration-200">
+      <div class="p-1 rounded-full bg-sky-50 text-[#00205B]">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <span class="text-xs font-semibold text-slate-800">
+        {{ toastMessage() }}
+      </span>
+      <button (click)="toastMessage.set(null)" class="text-slate-400 hover:text-slate-600 ml-2 focus:outline-none">
+        ✕
+      </button>
+    </div>
+  }
+
+  <!-- Header Banner Safran Corporate & Defense Group -->
+  <header class="bg-[#00205B] text-white pt-8 pb-6 px-6 sm:px-12 shadow-md border-b border-[#00153D]">
+    <div class="max-w-6xl mx-auto space-y-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="flex items-center gap-3">
+            <span class="px-2.5 py-0.5 text-[10px] font-bold tracking-widest uppercase bg-white/10 text-white border border-white/20 rounded">
+              SAFRAN ELECTRONICS & DEFENSE
+            </span>
+            <span class="text-xs text-sky-200 font-semibold">Système de Drone Tactique (SDT) Patroller</span>
+          </div>
+          <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-3">
+            <span>BASL Patroller</span>
+            <span class="text-xs font-normal text-white/70 bg-white/10 px-2.5 py-1 rounded-full border border-white/10">
+              Base d'Analyse du Soutien Logistique (MIL-STD-1388 / S3000L)
+            </span>
+          </h1>
+        </div>
+
+        <button
+          type="button"
+          (click)="fetchMockBaslItems()"
+          [disabled]="isApiLoading()"
+          class="flex items-center gap-2 px-4 py-2 bg-[#009CDE] hover:bg-[#0082BD] disabled:bg-slate-500 text-white font-semibold text-xs rounded-lg shadow-xs transition-all self-start md:self-auto"
+        >
+          <svg [class.animate-spin]="isApiLoading()" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          <span>Recharger la BDD BASL</span>
+        </button>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex items-center gap-2 border-b border-white/10 pt-2 overflow-x-auto">
+        <button
+          type="button"
+          (click)="activeTab.set('basl-tree')"
+          [class.bg-white]="activeTab() === 'basl-tree'"
+          [class.text-[#00205B]]="activeTab() === 'basl-tree'"
+          [class.text-white/80]="activeTab() !== 'basl-tree'"
+          [class.hover:bg-white/10]="activeTab() !== 'basl-tree'"
+          class="px-5 py-2.5 rounded-t-lg font-bold text-xs transition-all focus:outline-none flex items-center gap-2"
+        >
+          <span>📂</span>
+          <span>Arborescence Logistique LCN & Inspection</span>
+        </button>
+
+        <button
+          type="button"
+          (click)="activeTab.set('basl-form')"
+          [class.bg-white]="activeTab() === 'basl-form'"
+          [class.text-[#00205B]]="activeTab() === 'basl-form'"
+          [class.text-white/80]="activeTab() !== 'basl-form'"
+          [class.hover:bg-white/10]="activeTab() !== 'basl-form'"
+          class="px-5 py-2.5 rounded-t-lg font-bold text-xs transition-all focus:outline-none flex items-center gap-2"
+        >
+          <span>📊</span>
+          <span>Formulaire Fiche LCN / BASL</span>
+        </button>
+
+        <button
+          type="button"
+          (click)="activeTab.set('basl-wizard')"
+          [class.bg-white]="activeTab() === 'basl-wizard'"
+          [class.text-[#00205B]]="activeTab() === 'basl-wizard'"
+          [class.text-white/80]="activeTab() !== 'basl-wizard'"
+          [class.hover:bg-white/10]="activeTab() !== 'basl-wizard'"
+          class="px-5 py-2.5 rounded-t-lg font-bold text-xs transition-all focus:outline-none flex items-center gap-2"
+        >
+          <span>🧙</span>
+          <span>Wizard d'Analyse Logistique MCO</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-6xl mx-auto px-6 sm:px-12 pt-8">
+
+    <!-- ── TAB 1: ARBORESCENCE LOGISTIQUE LCN BASL ────────────────────────── -->
+    @if (activeTab() === 'basl-tree') {
+      <div class="space-y-6 animate-in fade-in duration-200">
+        <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
+          <h2 class="text-sm font-bold text-[#00205B] uppercase tracking-wider">
+            Explorateur d'Arborescence Logistique LCN (PBS / WBS Safran Patroller)
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">
+            Cliquez sur un sous-dossier ou un composant LCN pour afficher ses caractéristiques logistiques, outillages MCO et références S1000D.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+          <!-- Left Column: Rich Multi-Level File Tree Component -->
+          <div class="lg:col-span-6 bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <span class="text-xs font-bold text-[#00205B] uppercase tracking-wider">Arborescence LCN Patroller</span>
+              <span class="text-[10px] font-semibold px-2 py-0.5 bg-slate-100 text-slate-600 rounded">
+                Norme S3000L
+              </span>
+            </div>
+
+            <app-safran-file-tree
+              [nodes]="safranFileTree"
+              [selectedNodeId]="selectedFileNode()?.id || null"
+              [nodeActions]="fileTreeActions"
+              (nodeSelect)="onFileNodeSelect($event)"
+              (nodeAction)="onFileNodeAction($event)"
+            ></app-safran-file-tree>
+          </div>
+
+          <!-- Right Column: Interactive Details Panel for Clicked Node -->
+          <div class="lg:col-span-6 space-y-5">
+
+            <!-- Fast LCN Dropdown Selector -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-3">
+              <label class="block text-xs font-bold text-[#00205B] uppercase tracking-wider">
+                🔍 Recherche Rapide Élément BASL (`SafranDropdown`) :
+              </label>
+              <app-safran-dropdown
+                [items]="baslItems()"
+                [adapterFn]="baslAdapter"
+                [selectedId]="selectedBaslItem()?.lcnCode || null"
+                [loading]="isApiLoading()"
+                [customActions]="dropdownActions"
+                placeholder="Tapez un code LCN ou une désignation..."
+                (selectionChange)="onBaslItemSelectionChange($event)"
+                (itemAction)="onDropdownItemAction($event)"
+              ></app-safran-dropdown>
+            </div>
+
+            @if (selectedFileNode()) {
+              <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-5 animate-in fade-in duration-150">
+
+                <!-- Header Badge Section -->
+                <div class="flex items-start justify-between gap-3 border-b border-slate-100 pb-4">
+                  <div class="space-y-1">
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-[#009CDE]">
+                      {{ selectedFileNode()?.type === 'folder' ? 'Dossier Logistique' : 'Composant LCN' }}
+                    </span>
+                    <h3 class="text-base font-bold text-[#00205B]">
+                      {{ selectedFileNode()?.name }}
+                    </h3>
+                  </div>
+
+                  @if (selectedFileNode()?.data?.criticalityLevel) {
+                    <span
+                      class="px-2.5 py-1 text-[11px] font-bold uppercase rounded-md shrink-0 border"
+                      [class.bg-rose-50]="selectedFileNode()?.data?.criticalityLevel === 'CRITICAL_A'"
+                      [class.text-rose-700]="selectedFileNode()?.data?.criticalityLevel === 'CRITICAL_A'"
+                      [class.border-rose-200]="selectedFileNode()?.data?.criticalityLevel === 'CRITICAL_A'"
+                      [class.bg-amber-50]="selectedFileNode()?.data?.criticalityLevel === 'HIGH_B'"
+                      [class.text-amber-700]="selectedFileNode()?.data?.criticalityLevel === 'HIGH_B'"
+                      [class.border-amber-200]="selectedFileNode()?.data?.criticalityLevel === 'HIGH_B'"
+                      [class.bg-emerald-50]="selectedFileNode()?.data?.criticalityLevel === 'STANDARD_C'"
+                      [class.text-emerald-700]="selectedFileNode()?.data?.criticalityLevel === 'STANDARD_C'"
+                      [class.border-emerald-200]="selectedFileNode()?.data?.criticalityLevel === 'STANDARD_C'"
+                    >
+                      {{ selectedFileNode()?.data?.criticalityLevel }}
+                    </span>
+                  }
+                </div>
+
+                <!-- If File Component clicked -->
+                @if (selectedFileNode()?.type === 'file' && selectedFileNode()?.data) {
+                  <div class="space-y-4 text-xs">
+
+                    <!-- LCN & Unit Grid -->
+                    <div class="grid grid-cols-2 gap-3 p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                      <div>
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Code LCN</span>
+                        <p class="font-mono font-bold text-[#00205B]">{{ selectedFileNode()?.data?.lcnCode }}</p>
+                      </div>
+                      <div>
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Unité Référente</span>
+                        <p class="font-semibold text-slate-800">{{ selectedFileNode()?.data?.leadUnit }}</p>
+                      </div>
+                    </div>
+
+                    <!-- Métriques MTBF & MTTR -->
+                    <div class="grid grid-cols-2 gap-3">
+                      <div class="p-3 bg-sky-50/70 border border-sky-200 rounded-lg">
+                        <span class="text-[10px] uppercase font-bold text-sky-800">MTBF (Fiabilité)</span>
+                        <p class="text-sm font-bold text-[#00205B]">{{ selectedFileNode()?.data?.mtbfHours }} heures</p>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Mean Time Between Failures</p>
+                      </div>
+
+                      <div class="p-3 bg-indigo-50/70 border border-indigo-200 rounded-lg">
+                        <span class="text-[10px] uppercase font-bold text-indigo-800">MTTR (Maintenabilité)</span>
+                        <p class="text-sm font-bold text-[#00205B]">{{ selectedFileNode()?.data?.mttrHours }} heures</p>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Mean Time To Repair</p>
+                      </div>
+                    </div>
+
+                    <!-- Documentation Ref -->
+                    <div class="space-y-1">
+                      <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Référence Documentation S1000D</span>
+                      <p class="font-mono font-semibold text-slate-800 bg-slate-100 p-2 rounded border border-slate-200 text-[11px]">
+                        {{ selectedFileNode()?.data?.documentationRef }}
+                      </p>
+                    </div>
+
+                    <!-- Tools required -->
+                    @if (selectedFileNode()?.data?.maintenanceTools?.length) {
+                      <div class="space-y-1.5">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Outillages MCO Requis</span>
+                        <div class="flex flex-wrap gap-1.5">
+                          @for (tool of selectedFileNode()?.data?.maintenanceTools; track tool) {
+                            <span class="px-2 py-1 text-[11px] font-semibold bg-slate-100 text-slate-700 rounded border border-slate-200">
+                              🛠️ {{ tool }}
+                            </span>
+                          }
+                        </div>
+                      </div>
+                    }
+
+                    <!-- Actions Panel -->
+                    <div class="pt-3 border-t border-slate-100 flex items-center gap-2">
+                      <button
+                        type="button"
+                        (click)="onBaslItemSelectionChange(selectedFileNode()!.data!)"
+                        class="flex-1 py-2 px-3 bg-[#00205B] hover:bg-[#00153D] text-white text-xs font-semibold rounded-lg shadow-xs transition-all text-center"
+                      >
+                        Charger dans le Formulaire BASL
+                      </button>
+                    </div>
+
+                  </div>
+                }
+
+                <!-- If Folder clicked -->
+                @else if (selectedFileNode()?.type === 'folder') {
+                  <div class="space-y-4 text-xs">
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+                      <div class="flex items-center justify-between">
+                        <span class="font-bold text-[#00205B]">Contenu du Dossier Logistique</span>
+                        <span class="px-2 py-0.5 text-[10px] font-bold bg-[#009CDE] text-white rounded">
+                          {{ countFolderFiles(selectedFileNode()!) }} sous-composants
+                        </span>
+                      </div>
+                      <p class="text-slate-600 text-[11px]">
+                        Ce dossier regroupe la sous-arborescence logistique de soutien pour le drone Patroller.
+                      </p>
+                    </div>
+                  </div>
+                }
+
+              </div>
+            } @else {
+              <div class="bg-white border border-slate-200 rounded-xl p-8 shadow-xs text-center space-y-3">
+                <span class="text-3xl">📂</span>
+                <h4 class="text-sm font-bold text-[#00205B]">Sélectionnez un élément dans l'arbre</h4>
+                <p class="text-xs text-slate-500 max-w-xs mx-auto">
+                  Cliquez sur n'importe quel dossier ou fichier de l'arborescence pour inspecter ses spécifications MCO.
+                </p>
+              </div>
+            }
+
+          </div>
+
+        </div>
+      </div>
+    }
+
+    <!-- ── TAB 2: FORMULAIRE DYNAMIQUE BASL PATROLLER ──────────────────────── -->
+    @if (activeTab() === 'basl-form') {
+      <div class="space-y-6 animate-in fade-in duration-200">
+        <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 class="text-sm font-bold text-[#00205B] uppercase tracking-wider">
+              Saisie & Édition des Éléments de Soutien BASL Patroller
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Formulaire réactif dynamique avec validation MTBF/MTTR et recherche autocomplete des unités.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              (click)="startCreateNewBaslItem()"
+              class="px-3.5 py-1.5 text-xs font-semibold bg-sky-50 text-[#00205B] hover:bg-sky-100 border border-sky-200 rounded-lg transition-all"
+            >
+              + Nouvel Élément LCN
+            </button>
+          </div>
+        </div>
+
+        <div class="max-w-4xl mx-auto">
+          <app-safran-dynamic-form
+            [fields]="baslFormFields"
+            [initialData]="baslInitialData()"
+            [recordId]="editingLcnCode()"
+            [loading]="isFormSubmitting()"
+            [showReset]="true"
+            title="Base d'Analyse du Soutien Logistique (BASL)"
+            subtitle="Spécifications Soutien Logistique Intégré (SLI) Drone Patroller"
+            (formSubmit)="onBaslFormSubmit($event)"
+            (formReset)="startCreateNewBaslItem()"
+          ></app-safran-dynamic-form>
+        </div>
+      </div>
+    }
+
+    <!-- ── TAB 3: WIZARD D'ANALYSE LOGISTIQUE MCO ───────────────────────────── -->
+    @if (activeTab() === 'basl-wizard') {
+      <div class="space-y-6 animate-in fade-in duration-200">
+        <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
+          <h2 class="text-sm font-bold text-[#00205B] uppercase tracking-wider">
+            Assistant de Validation d'Analyse du Soutien Logistique
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">
+            Processus d'homologation MCO pour composant Patroller (LCN, étude AMDEC, signature S1000D).
+          </p>
+        </div>
+
+        <div class="max-w-4xl mx-auto space-y-6">
+          <app-safran-form-wizard
+            [steps]="wizardSteps"
+            [config]="{
+              title: 'Homologation BASL — Drone Patroller Safran',
+              subtitle: 'Procédure d\'approbation logistique et d\'outillages de soutien',
+              submitLabel: 'Valider et Enregistrer l\'Analyse BASL'
+            }"
+            [loading]="isWizardSubmitting()"
+            (wizardSubmit)="onWizardSubmit($event)"
+          ></app-safran-form-wizard>
+
+          @if (wizardResultData()) {
+            <div class="bg-[#00205B] text-white rounded-xl p-6 shadow-md space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400">
+                  ✓ Payload d'Analyse BASL Enregistré en BDD :
+                </h3>
+                <button (click)="wizardResultData.set(null)" class="text-white/60 hover:text-white text-xs focus:outline-none">
+                  Fermer
+                </button>
+              </div>
+              <pre class="text-xs font-mono text-sky-200 bg-black/30 p-4 rounded-lg overflow-x-auto leading-5 max-h-80">{{ wizardResultData() | json }}</pre>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+  </main>
+</div>
