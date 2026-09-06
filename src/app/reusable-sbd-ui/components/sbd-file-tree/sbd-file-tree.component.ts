@@ -34,11 +34,7 @@ export class SbdFileTreeComponent<T = any> {
   @Input() title: string = 'Arborescence des Fichiers';
   @Input() searchable: boolean = true;
   @Input() selectedNodeId: string | null = null;
-  @Input() nodeActions: Array<{ action: string; label: string; icon: string }> = [
-    { action: 'download', label: 'Télécharger', icon: 'pi pi-download' },
-    { action: 'open', label: 'Ouvrir', icon: 'pi pi-external-link' },
-    { action: 'details', label: 'Détails', icon: 'pi pi-[#009CDE] pi-info-circle' }
-  ];
+  @Input() nodeActions: Array<{ action: string; label: string; icon: string }> = [];
 
   @Output() nodeSelect = new EventEmitter<SbdTreeNode<T>>();
   @Output() nodeToggle = new EventEmitter<SbdTreeNode<T>>();
@@ -46,58 +42,30 @@ export class SbdFileTreeComponent<T = any> {
 
   public searchQuery: WritableSignal<string> = signal('');
 
-  // Computed Signal for Filtered Tree Nodes
   public filteredNodes: Signal<SbdTreeNode<T>[]> = computed(() => {
     const rawNodes = this._nodesSignal();
     const query = this.searchQuery().trim().toLowerCase();
     if (!query) return rawNodes;
-
     return this.filterTreeNodes(rawNodes, query);
   });
 
   public onSearchInput(event: Event): void {
-    const val = (event.target as HTMLInputElement).value;
-    this.searchQuery.set(val);
-  }
-
-  public expandAll(): void {
-    this.setExpandState(this._nodesSignal(), true);
-    this._nodesSignal.set([...this._nodesSignal()]);
-  }
-
-  public collapseAll(): void {
-    this.setExpandState(this._nodesSignal(), false);
-    this._nodesSignal.set([...this._nodesSignal()]);
-  }
-
-  private setExpandState(nodes: SbdTreeNode<T>[], state: boolean): void {
-    nodes.forEach(node => {
-      if (node.type === 'folder') {
-        node.isExpanded = state;
-        if (node.children) {
-          this.setExpandState(node.children, state);
-        }
-      }
-    });
+    this.searchQuery.set((event.target as HTMLInputElement).value);
   }
 
   private filterTreeNodes(nodes: SbdTreeNode<T>[], query: string): SbdTreeNode<T>[] {
     return nodes.reduce<SbdTreeNode<T>[]>((acc, node) => {
-      const nameMatch = node.name.toLowerCase().includes(query);
-      const badgeMatch = (node.badge || node.extension || '').toLowerCase().includes(query);
-
+      const match = node.name.toLowerCase().includes(query);
       let filteredChildren: SbdTreeNode<T>[] = [];
       if (node.children && node.children.length > 0) {
         filteredChildren = this.filterTreeNodes(node.children, query);
       }
-
-      if (nameMatch || badgeMatch || filteredChildren.length > 0) {
-        const clonedNode: SbdTreeNode<T> = {
+      if (match || filteredChildren.length > 0) {
+        acc.push({
           ...node,
           isExpanded: filteredChildren.length > 0 ? true : (node.isExpanded ?? true),
           children: filteredChildren.length > 0 ? filteredChildren : node.children
-        };
-        acc.push(clonedNode);
+        });
       }
       return acc;
     }, []);
