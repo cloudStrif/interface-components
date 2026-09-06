@@ -1,4 +1,4 @@
-<div class="w-full bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden font-sans">
+﻿<div class="w-full bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden font-sans">
 
   <!-- ── Header ─────────────────────────────────────────────────────────── -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 bg-[#00205B] text-white">
@@ -309,7 +309,7 @@
                     @if ((formGroup.get(field.key)?.value || []).length > 0) {
                       @for (val of formGroup.get(field.key)?.value || []; track val) {
                         <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold bg-[#00205B] text-white rounded">
-                          {{ (resolvedOptions[field.key] || field.options || []) | safranOptLabel: val }}
+                          {{ (resolvedOptions[field.key] || field.options || []) | sbdOptLabel: val }}
                           <button type="button" (click)="toggleMultiOption(field.key, val)" class="hover:text-[#009CDE] ml-0.5">✕</button>
                         </span>
                       }

@@ -1,10 +1,10 @@
-import { Routes } from '@angular/router';
-import { SafranDemoComponent } from './components/safran-demo/safran-demo.component';
+﻿import { Routes } from '@angular/router';
+import { SbdDemoComponent } from './components/sbd-demo/sbd-demo.component';
 
 export const routes: Routes = [
   {
     path: '',
-    component: SafranDemoComponent,
+    component: SbdDemoComponent,
   },
   {
     path: '**',

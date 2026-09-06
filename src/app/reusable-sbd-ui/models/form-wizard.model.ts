@@ -1,8 +1,8 @@
-import { SafranFormFieldSchema, SafranFormSubmitEvent } from './form.model';
+﻿import { SbdFormFieldSchema, SbdFormSubmitEvent } from './form.model';
 
 // ─── Wizard Step Definition ───────────────────────────────────────────────────
 
-export interface SafranWizardStep {
+export interface SbdWizardStep {
   /** Unique identifier for the step */
   id: string;
   /** Step title displayed in the stepper header */
@@ -12,14 +12,14 @@ export interface SafranWizardStep {
   /** Optional icon name */
   icon?: string;
   /** Fields belonging to this step */
-  fields: SafranFormFieldSchema[];
+  fields: SbdFormFieldSchema[];
   /** If true, this step can be skipped */
   optional?: boolean;
 }
 
 // ─── Wizard Events ────────────────────────────────────────────────────────────
 
-export interface SafranWizardStepChangeEvent {
+export interface SbdWizardStepChangeEvent {
   previousStep: number;
   currentStep: number;
   stepId: string;
@@ -27,15 +27,15 @@ export interface SafranWizardStepChangeEvent {
   partialValue: Record<string, any>;
 }
 
-export interface SafranWizardSubmitEvent<T = Record<string, any>>
-  extends SafranFormSubmitEvent<T> {
+export interface SbdWizardSubmitEvent<T = Record<string, any>>
+  extends SbdFormSubmitEvent<T> {
   /** Total number of steps completed */
   totalSteps: number;
 }
 
 // ─── Wizard Config ────────────────────────────────────────────────────────────
 
-export interface SafranWizardConfig {
+export interface SbdWizardConfig {
   /** Title shown in the wizard header */
   title?: string;
   /** Subtitle shown in the wizard header */

@@ -1,4 +1,4 @@
-<div class="select-none font-sans">
+﻿<div class="select-none font-sans">
   <!-- Node Row Item -->
   <div
     (click)="onSelect($event)"
@@ -150,7 +150,7 @@
   @if (node.type === 'folder' && node.isExpanded && node.children && node.children.length > 0) {
     <div class="border-l border-slate-200 ml-2.5 pl-0.5 transition-all duration-150">
       @for (child of node.children; track child.id) {
-        <app-safran-file-tree-node
+        <app-sbd-file-tree-node
           [node]="child"
           [level]="level + 1"
           [selectedNodeId]="selectedNodeId"
@@ -159,7 +159,7 @@
           (nodeSelect)="nodeSelect.emit($event)"
           (nodeToggle)="nodeToggle.emit($event)"
           (nodeAction)="nodeAction.emit($event)"
-        ></app-safran-file-tree-node>
+        ></app-sbd-file-tree-node>
       }
     </div>
   }

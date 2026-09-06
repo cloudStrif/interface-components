@@ -2,26 +2,27 @@ import { Component, signal, WritableSignal, ChangeDetectionStrategy, OnInit, inj
 import { CommonModule } from '@angular/common';
 import { of, delay } from 'rxjs';
 import {
-  SafranDropdownComponent,
-  SafranFileTreeComponent,
-  SafranDynamicFormComponent,
-  SafranFormWizardComponent,
-  SafranFormBuilderService,
-  SafranDropdownOption,
-  SafranDropdownAdapter,
-  SafranDropdownActionEvent,
-  SafranTreeNode,
-  SafranNodeActionEvent,
-  SafranFormFieldSchema,
-  SafranFormSubmitEvent,
-  SafranFormFieldChangeEvent,
-  SafranWizardStep,
-  SafranWizardSubmitEvent
-} from '../../reusable-safran-ui';
+  SbdDropdownComponent,
+  SbdFileTreeComponent,
+  SbdCdkFileTreeComponent,
+  SbdDynamicFormComponent,
+  SbdFormWizardComponent,
+  SbdFormBuilderService,
+  SbdDropdownOption,
+  SbdDropdownAdapter,
+  SbdDropdownActionEvent,
+  SbdTreeNode,
+  SbdNodeActionEvent,
+  SbdFormFieldSchema,
+  SbdFormSubmitEvent,
+  SbdFormFieldChangeEvent,
+  SbdWizardStep,
+  SbdWizardSubmitEvent
+} from '../../reusable-sbd-ui';
 
-// ─── Modèles BASL Patroller (Base d'Analyse du Soutien Logistique) ───────────
+// ─── Modèles bobo Patroller (Base d'Analyse du Soutien Logistique) ───────────
 
-export interface BaslPatrollerItemPayload {
+export interface boboPatrollerItemPayload {
   lcnCode: string;             // Logistics Control Number (ex: LCN-PATROL-410)
   itemName: string;            // Désignation équipement
   systemCategory: 'OPTICAL_PAYLOAD' | 'AVIONICS_BUS' | 'GROUND_CONTROL' | 'PROPULSION' | 'DATA_LINK' | 'MCO_TOOLS';
@@ -35,55 +36,59 @@ export interface BaslPatrollerItemPayload {
 }
 
 @Component({
-  selector: 'app-safran-demo',
+  selector: 'app-sbd-demo',
   standalone: true,
   imports: [
     CommonModule,
-    SafranDropdownComponent,
-    SafranFileTreeComponent,
-    SafranDynamicFormComponent,
-    SafranFormWizardComponent
+    SbdDropdownComponent,
+    SbdFileTreeComponent,
+    SbdCdkFileTreeComponent,
+    SbdDynamicFormComponent,
+    SbdFormWizardComponent
   ],
-  templateUrl: './safran-demo.component.html',
+  templateUrl: './sbd-demo.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SafranDemoComponent implements OnInit {
-  private formBuilderService = inject(SafranFormBuilderService);
+export class SbdDemoComponent implements OnInit {
+  private formBuilderService = inject(SbdFormBuilderService);
 
-  // Active Tab Signal ('basl-form' | 'basl-wizard' | 'basl-tree')
-  public activeTab: WritableSignal<'basl-form' | 'basl-wizard' | 'basl-tree'> = signal('basl-tree');
+  // Active Tab Signal ('bobo-form' | 'bobo-wizard' | 'bobo-tree')
+  public activeTab: WritableSignal<'bobo-form' | 'bobo-wizard' | 'bobo-tree'> = signal('bobo-tree');
+
+  // Sub-tab for Tree comparison ('both' | 'custom' | 'cdk')
+  public treeMode: WritableSignal<'both' | 'custom' | 'cdk'> = signal('both');
 
   // Loading & State Signals
   public isApiLoading: WritableSignal<boolean> = signal(false);
   public isFormSubmitting: WritableSignal<boolean> = signal(false);
   public isWizardSubmitting: WritableSignal<boolean> = signal(false);
 
-  public baslItems: WritableSignal<BaslPatrollerItemPayload[]> = signal([]);
-  public selectedBaslItem: WritableSignal<BaslPatrollerItemPayload | null> = signal(null);
+  public boboItems: WritableSignal<boboPatrollerItemPayload[]> = signal([]);
+  public selectedboboItem: WritableSignal<boboPatrollerItemPayload | null> = signal(null);
   public editingLcnCode: WritableSignal<string | null> = signal(null);
-  public baslInitialData: WritableSignal<Record<string, any> | null> = signal(null);
+  public boboInitialData: WritableSignal<Record<string, any> | null> = signal(null);
 
   // Tree Node Selection Signal
-  public selectedFileNode: WritableSignal<SafranTreeNode<BaslPatrollerItemPayload> | null> = signal(null);
+  public selectedFileNode: WritableSignal<SbdTreeNode<boboPatrollerItemPayload> | null> = signal(null);
 
   public toastMessage: WritableSignal<string | null> = signal(null);
   public wizardResultData: WritableSignal<Record<string, any> | null> = signal(null);
 
-  // Actions pour le Dropdown BASL
+  // Actions pour le Dropdown bobo
   public dropdownActions = [
-    { action: 'view-details', label: 'Consulter Fiche BASL', icon: 'view-details' },
+    { action: 'view-details', label: 'Consulter Fiche bobo', icon: 'view-details' },
     { action: 'pin', label: 'Épingler au MCO', icon: 'pin' }
   ];
 
-  // Actions pour l'Arborescence Logistique BASL Patroller
+  // Actions pour l'Arborescence Logistique bobo Patroller
   public fileTreeActions = [
     { action: 'open', label: 'Consulter Notice S1000D', icon: 'open' },
-    { action: 'download', label: 'Exporter Données BASL', icon: 'download' }
+    { action: 'download', label: 'Exporter Données bobo', icon: 'download' }
   ];
 
-  // ─── Arborescence Hiérarchique Logistique BASL Safran Patroller ────────────
+  // ─── Arborescence Hiérarchique Logistique bobo Sbd Patroller ────────────
 
-  public safranFileTree: SafranTreeNode<BaslPatrollerItemPayload>[] = [
+  public sbdFileTree: SbdTreeNode<boboPatrollerItemPayload>[] = [
     {
       id: 'root-patroller',
       name: 'SDT_PATROLLER_SYSTEM_ROOT',
@@ -106,7 +111,7 @@ export class SafranDemoComponent implements OnInit {
               children: [
                 {
                   id: 'node-euroflir410',
-                  name: 'Euroflir_410_Capteur_Optronique_HD.basl',
+                  name: 'Euroflir_410_Capteur_Optronique_HD.bobo',
                   type: 'file',
                   extension: 'json',
                   size: '142 KB',
@@ -128,7 +133,7 @@ export class SafranDemoComponent implements OnInit {
                 },
                 {
                   id: 'node-laser',
-                  name: 'Laser_Designateur_Cible_STANAG_3733.basl',
+                  name: 'Laser_Designateur_Cible_STANAG_3733.bobo',
                   type: 'file',
                   extension: 'json',
                   size: '68 KB',
@@ -150,7 +155,7 @@ export class SafranDemoComponent implements OnInit {
                 },
                 {
                   id: 'node-radar-sar',
-                  name: 'Radar_SAR_GMTI_Imagerie_Meteo.basl',
+                  name: 'Radar_SAR_GMTI_Imagerie_Meteo.bobo',
                   type: 'file',
                   extension: 'json',
                   size: '115 KB',
@@ -182,7 +187,7 @@ export class SafranDemoComponent implements OnInit {
               children: [
                 {
                   id: 'node-fcc',
-                  name: 'FCC_Calculateur_Vol_Principal_MIL1553.basl',
+                  name: 'FCC_Calculateur_Vol_Principal_MIL1553.bobo',
                   type: 'file',
                   extension: 'json',
                   size: '96 KB',
@@ -194,7 +199,7 @@ export class SafranDemoComponent implements OnInit {
                     itemName: 'Flight Control Computer (FCC) Triples Redondances',
                     systemCategory: 'AVIONICS_BUS',
                     criticalityLevel: 'CRITICAL_A',
-                    leadUnit: 'Safran Electronics & Defense',
+                    leadUnit: 'Sbd Electronics & Defense',
                     mtbfHours: 5000,
                     mttrHours: 1.5,
                     documentationRef: 'S1000D-SAF-PATROL-FCC-10',
@@ -204,7 +209,7 @@ export class SafranDemoComponent implements OnInit {
                 },
                 {
                   id: 'node-sigma30',
-                  name: 'Centrale_Inertielle_SIGMA_30_GPS.basl',
+                  name: 'Centrale_Inertielle_SIGMA_30_GPS.bobo',
                   type: 'file',
                   extension: 'json',
                   size: '82 KB',
@@ -216,7 +221,7 @@ export class SafranDemoComponent implements OnInit {
                     itemName: 'Centrale d\'Navigation Inertielle SIGMA 30 Laser',
                     systemCategory: 'AVIONICS_BUS',
                     criticalityLevel: 'CRITICAL_A',
-                    leadUnit: 'Safran Electronics & Defense Montluçon',
+                    leadUnit: 'Sbd Electronics & Defense Montluçon',
                     mtbfHours: 7500,
                     mttrHours: 1.0,
                     documentationRef: 'S1000D-SAF-PATROL-SIGMA-04',
@@ -236,7 +241,7 @@ export class SafranDemoComponent implements OnInit {
               children: [
                 {
                   id: 'node-rotax',
-                  name: 'Moteur_Rotax_914_Turbo_Airflow.basl',
+                  name: 'Moteur_Rotax_914_Turbo_Airflow.bobo',
                   type: 'file',
                   extension: 'json',
                   size: '154 KB',
@@ -276,7 +281,7 @@ export class SafranDemoComponent implements OnInit {
               children: [
                 {
                   id: 'node-gcs-pilot',
-                  name: 'Console_Pilote_GCS_Ecran_Tactique.basl',
+                  name: 'Console_Pilote_GCS_Ecran_Tactique.bobo',
                   type: 'file',
                   extension: 'json',
                   size: '185 KB',
@@ -298,7 +303,7 @@ export class SafranDemoComponent implements OnInit {
                 },
                 {
                   id: 'node-gcs-roim',
-                  name: 'Console_Operateur_ROIM_Renseignement.basl',
+                  name: 'Console_Operateur_ROIM_Renseignement.bobo',
                   type: 'file',
                   extension: 'json',
                   size: '210 KB',
@@ -328,7 +333,7 @@ export class SafranDemoComponent implements OnInit {
               children: [
                 {
                   id: 'node-dl-los',
-                  name: 'Terminal_Liaison_LOS_Directe_KuBand.basl',
+                  name: 'Terminal_Liaison_LOS_Directe_KuBand.bobo',
                   type: 'file',
                   extension: 'json',
                   size: '98 KB',
@@ -340,7 +345,7 @@ export class SafranDemoComponent implements OnInit {
                     itemName: 'Antenne Suiveuse et Terminal LOS Ku-Band Direct',
                     systemCategory: 'DATA_LINK',
                     criticalityLevel: 'CRITICAL_A',
-                    leadUnit: 'Safran Electronics & Defense',
+                    leadUnit: 'Sbd Electronics & Defense',
                     mtbfHours: 4000,
                     mttrHours: 2.0,
                     documentationRef: 'S1000D-SAF-PATROL-DL-01',
@@ -362,7 +367,7 @@ export class SafranDemoComponent implements OnInit {
           children: [
             {
               id: 'node-ate-villaroche',
-              name: 'Banc_Test_Optronique_ATE_Villaroche.basl',
+              name: 'Banc_Test_Optronique_ATE_Villaroche.bobo',
               type: 'file',
               extension: 'json',
               size: '310 KB',
@@ -374,11 +379,11 @@ export class SafranDemoComponent implements OnInit {
                 itemName: 'Banc Automatique de Test (ATE) Euroflir Villaroche',
                 systemCategory: 'MCO_TOOLS',
                 criticalityLevel: 'STANDARD_C',
-                leadUnit: 'Safran Villaroche',
+                leadUnit: 'Sbd Villaroche',
                 mtbfHours: 8000,
                 mttrHours: 1.0,
                 documentationRef: 'S1000D-SAF-PATROL-MCO-01',
-                maintenanceTools: ['Calibration Annuelle Safran'],
+                maintenanceTools: ['Calibration Annuelle Sbd'],
                 isOperationalMco: true
               }
             }
@@ -388,78 +393,78 @@ export class SafranDemoComponent implements OnInit {
     }
   ];
 
-  public baslFormFields: SafranFormFieldSchema[] = [];
-  public wizardSteps: SafranWizardStep[] = [];
+  public boboFormFields: SbdFormFieldSchema[] = [];
+  public wizardSteps: SbdWizardStep[] = [];
 
   ngOnInit(): void {
-    this.fetchMockBaslItems();
-    this.initBaslFormFields();
+    this.fetchMockboboItems();
+    this.initboboFormFields();
     this.initWizardSteps();
     // Select first file node by default
-    const firstNode = this.safranFileTree[0]?.children?.[0]?.children?.[0]?.children?.[0];
+    const firstNode = this.sbdFileTree[0]?.children?.[0]?.children?.[0]?.children?.[0];
     if (firstNode) {
       this.selectedFileNode.set(firstNode);
     }
   }
 
-  // ─── Initialisation du Schéma de Formulaire BASL Patroller ────────────────
+  // ─── Initialisation du Schéma de Formulaire bobo Patroller ────────────────
 
-  private initBaslFormFields(): void {
-    this.baslFormFields = this.formBuilderService
+  private initboboFormFields(): void {
+    this.boboFormFields = this.formBuilderService
       .reset()
-      .heading('Fiche d\'Élément de Soutien Logistique — BASL Safran Patroller')
+      .heading('Fiche d\'Élément de Soutien Logistique — bobo Sbd Patroller')
       .text('lcnCode', 'Code LCN (Logistics Control Number)').required().minLength(4).half()
-        .placeholder('ex: LCN-PATROLLER-410-A1')
-        .helpText('Code de contrôle logistique norme MIL-STD-1388 / S3000L')
-        .build()
+      .placeholder('ex: LCN-PATROLLER-410-A1')
+      .helpText('Code de contrôle logistique norme MIL-STD-1388 / S3000L')
+      .build()
       .text('itemName', 'Désignation de l\'Équipement').required().half()
-        .placeholder('ex: Boule Optronique Euroflir 410')
-        .build()
+      .placeholder('ex: Boule Optronique Euroflir 410')
+      .build()
       .select('systemCategory', 'Sous-Système Drone Patroller').required().third()
-        .options([
-          { label: 'Charge Utile Optronique (Euroflir)', value: 'OPTICAL_PAYLOAD' },
-          { label: 'Bus Avionique & Calculateur de Vol', value: 'AVIONICS_BUS' },
-          { label: 'Station Sol de Contrôle GCS', value: 'GROUND_CONTROL' },
-          { label: 'Groupe Motopropulseur & Fuel', value: 'PROPULSION' },
-          { label: 'Liaison de Données Sécurisée (Datalink)', value: 'DATA_LINK' }
-        ])
-        .build()
+      .options([
+        { label: 'Charge Utile Optronique (Euroflir)', value: 'OPTICAL_PAYLOAD' },
+        { label: 'Bus Avionique & Calculateur de Vol', value: 'AVIONICS_BUS' },
+        { label: 'Station Sol de Contrôle GCS', value: 'GROUND_CONTROL' },
+        { label: 'Groupe Motopropulseur & Fuel', value: 'PROPULSION' },
+        { label: 'Liaison de Données Sécurisée (Datalink)', value: 'DATA_LINK' }
+      ])
+      .build()
       .select('criticalityLevel', 'Niveau de Criticité MCO').required().third()
-        .options([
-          { label: 'CRITIQUE A (Immobilisation vecteur)', value: 'CRITICAL_A' },
-          { label: 'HAUTE B (Dégradation opérationnelle)', value: 'HIGH_B' },
-          { label: 'STANDARD C (Soutien préventif)', value: 'STANDARD_C' }
-        ])
-        .build()
+      .options([
+        { label: 'CRITIQUE A (Immobilisation vecteur)', value: 'CRITICAL_A' },
+        { label: 'HAUTE B (Dégradation opérationnelle)', value: 'HIGH_B' },
+        { label: 'STANDARD C (Soutien préventif)', value: 'STANDARD_C' }
+      ])
+      .build()
       .autocomplete('leadUnit', 'Unité / Organisme Référent').required().third()
-        .placeholder('Rechercher une unité...')
-        .options([
-          { label: '61e Régiment d\'Artillerie (61e RA - Chaumont)', value: '61RA' },
-          { label: 'DGA Essais de Vol (Cazaux)', value: 'DGA_EV' },
-          { label: 'Safran Electronics & Defense (Montluçon)', value: 'SAF_SED' },
-          { label: 'SIMMT - Structure du Soutien Terrestre', value: 'SIMMT' }
-        ])
-        .build()
+      .placeholder('Rechercher une unité...')
+      .options([
+        { label: '61e Régiment d\'Artillerie (61e RA - Chaumont)', value: '61RA' },
+        { label: 'DGA Essais de Vol (Cazaux)', value: 'DGA_EV' },
+        { label: 'Sbd Electronics & Defense (Montluçon)', value: 'SAF_SED' },
+        { label: 'SIMMT - Structure du Soutien Terrestre', value: 'SIMMT' }
+      ])
+      .build()
       .divider('Analyse de Maintenabilité & Fiabilité (AMDEC / FMEA)')
       .number('mtbfHours', 'MTBF — Mean Time Between Failures (heures)').required().half()
-        .placeholder('ex: 2500')
-        .min(10)
-        .build()
+      .placeholder('ex: 2500')
+      .min(10)
+      .build()
       .number('mttrHours', 'MTTR — Mean Time To Repair (heures)').required().half()
-        .placeholder('ex: 3.5')
-        .min(0.5)
-        .build()
+      .placeholder('ex: 3.5')
+      .min(0.5)
+      .build()
       .tags('maintenanceTools', 'Outillages & Bancs MCO Spécifiques').full()
-        .placeholder('Ajoutez un outillage et appuyez sur Entrée...')
-        .tagConfig({ suggestions: ['Banc Optronique ATE', 'Analyseur Bus MIL-1553', 'Valise Télémétrie Ku', 'Outillage Moteur Rotax'] })
-        .helpText('Outillages de soutien logistique nécessaires pour la maintenance')
-        .build()
+      .placeholder('Ajoutez un outillage et appuyez sur Entrée...')
+      .tagConfig({ suggestions: ['Banc Optronique ATE', 'Analyseur Bus MIL-1553', 'Valise Télémétrie Ku', 'Outillage Moteur Rotax'] })
+      .helpText('Outillages de soutien logistique nécessaires pour la maintenance')
+      .build()
       .text('documentationRef', 'Référence Documentation S1000D / DTM').required().half()
-        .placeholder('ex: S1000D-SAF-PATROLLER-61-00-00')
-        .build()
+      .placeholder('ex: S1000D-SAF-PATROLLER-61-00-00')
+      .build()
       .toggle('isOperationalMco', 'Élément Qualifié MCO Armée de Terre').half()
-        .defaultValue(true)
-        .build()
+      .defaultValue(true)
+      .build()
       .getFields();
   }
 
@@ -470,60 +475,60 @@ export class SafranDemoComponent implements OnInit {
       .text('lcnCode', 'Code LCN (Logistics Control Number)').required().half().placeholder('ex: LCN-PATROL-04-A').build()
       .text('itemName', 'Nom de l\'Équipement Patroller').required().half().placeholder('ex: Calculateur de Vol Avionique FCC').build()
       .select('systemCategory', 'Sous-Système Drone').required().half()
-        .options([
-          { label: 'Optronique Euroflir 410', value: 'OPTICAL_PAYLOAD' },
-          { label: 'Calculateur FCC / Avionique', value: 'AVIONICS_BUS' },
-          { label: 'Station Sol GCS', value: 'GROUND_CONTROL' },
-          { label: 'Motopropulseur', value: 'PROPULSION' }
-        ]).build()
+      .options([
+        { label: 'Optronique Euroflir 410', value: 'OPTICAL_PAYLOAD' },
+        { label: 'Calculateur FCC / Avionique', value: 'AVIONICS_BUS' },
+        { label: 'Station Sol GCS', value: 'GROUND_CONTROL' },
+        { label: 'Motopropulseur', value: 'PROPULSION' }
+      ]).build()
       .autocomplete('leadUnit', 'Affectation Unité').required().half()
-        .options([
-          { label: '61e Régiment d\'Artillerie (Drone Tactique)', value: '61RA' },
-          { label: 'DGA Essais de Vol', value: 'DGA_EV' },
-          { label: 'Safran Defense Support MCO', value: 'SAF_SED' }
-        ]).build()
+      .options([
+        { label: '61e Régiment d\'Artillerie (Drone Tactique)', value: '61RA' },
+        { label: 'DGA Essais de Vol', value: 'DGA_EV' },
+        { label: 'Sbd Defense Support MCO', value: 'SAF_SED' }
+      ]).build()
       .getFields();
 
     // Étape 2 : Évaluation Fiabilité & MCO
     const step2 = this.formBuilderService
       .reset()
       .rating('criticalityRating', 'Niveau de Sévérité de Défaillance AMDEC (1 à 5)').required().half()
-        .ratingConfig({ maxStars: 5 })
-        .helpText('Évaluation de la criticité opérationnelle')
-        .build()
+      .ratingConfig({ maxStars: 5 })
+      .helpText('Évaluation de la criticité opérationnelle')
+      .build()
       .color('lcnBadgeColor', 'Code Couleur Marquage Logistique').half()
-        .defaultValue('#00205B')
-        .build()
+      .defaultValue('#00205B')
+      .build()
       .number('mtbfHours', 'MTBF Évalué (heures)').required().half().placeholder('ex: 1800').build()
       .number('mttrHours', 'MTTR Cible (heures)').required().half().placeholder('ex: 2.0').build()
       .tags('maintenanceTools', 'Bancs & Testeurs MCO').full()
-        .tagConfig({ suggestions: ['Banc Optronique ATE', 'Testeur Bus 1553'] })
-        .build()
+      .tagConfig({ suggestions: ['Banc Optronique ATE', 'Testeur Bus 1553'] })
+      .build()
       .getFields();
 
     // Étape 3 : Signature & Conformité S1000D
     const step3 = this.formBuilderService
       .reset()
-      .password('signatureCode', 'Code d\'Approbation Ingénieur BASL').required().minLength(6).half().placeholder('••••••••').build()
+      .password('signatureCode', 'Code d\'Approbation Ingénieur bobo').required().minLength(6).half().placeholder('••••••••').build()
       .password('signatureCodeConfirm', 'Confirmer le Code').required().matchField('signatureCode').half().placeholder('••••••••').build()
       .checkbox('acceptS1000DCharter', 'Valider la conformité aux spécifications S3000L / S1000D Soutien Logistique').required().full().build()
       .getFields();
 
     this.wizardSteps = [
       {
-        id: 'step-basl-lcn',
+        id: 'step-bobo-lcn',
         label: '1. Article & LCN',
         description: 'Identification du composant Patroller',
         fields: step1
       },
       {
-        id: 'step-basl-amdec',
+        id: 'step-bobo-amdec',
         label: '2. Fiabilité & MCO',
         description: 'AMDEC, MTBF et outillages de soutien',
         fields: step2
       },
       {
-        id: 'step-basl-signature',
+        id: 'step-bobo-signature',
         label: '3. Conformité S1000D',
         description: 'Approbation logistique et signature',
         fields: step3
@@ -531,8 +536,8 @@ export class SafranDemoComponent implements OnInit {
     ];
   }
 
-  // Adapter function mapping raw BaslPatrollerItemPayload into SafranDropdownOption
-  public baslAdapter: SafranDropdownAdapter<BaslPatrollerItemPayload> = (item) => {
+  // Adapter function mapping raw boboPatrollerItemPayload into SbdDropdownOption
+  public boboAdapter: SbdDropdownAdapter<boboPatrollerItemPayload> = (item) => {
     let badgeColor: 'blue' | 'cyan' | 'green' | 'amber' | 'purple' | 'red' = 'cyan';
     if (item.criticalityLevel === 'CRITICAL_A') badgeColor = 'red';
     if (item.criticalityLevel === 'HIGH_B') badgeColor = 'amber';
@@ -547,10 +552,10 @@ export class SafranDemoComponent implements OnInit {
     };
   };
 
-  public fetchMockBaslItems(): void {
+  public fetchMockboboItems(): void {
     this.isApiLoading.set(true);
     setTimeout(() => {
-      this.baslItems.set([
+      this.boboItems.set([
         {
           lcnCode: 'PATROL-OPT-410',
           itemName: 'Boule Optronique Euroflir 410 HD/IR/Laser',
@@ -568,7 +573,7 @@ export class SafranDemoComponent implements OnInit {
           itemName: 'Calculateur de Vol Avionique FCC Principal',
           systemCategory: 'AVIONICS_BUS',
           criticalityLevel: 'CRITICAL_A',
-          leadUnit: 'Safran Electronics & Defense',
+          leadUnit: 'Sbd Electronics & Defense',
           mtbfHours: 5000,
           mttrHours: 1.5,
           documentationRef: 'S1000D-SAF-PATROL-FCC-10',
@@ -589,26 +594,26 @@ export class SafranDemoComponent implements OnInit {
         }
       ]);
       this.isApiLoading.set(false);
-      this.showToast('Base BASL Patroller actualisée !');
+      this.showToast('Base bobo Patroller actualisée !');
     }, 400);
   }
 
-  public onBaslItemSelectionChange(item: BaslPatrollerItemPayload | null): void {
-    this.selectedBaslItem.set(item);
+  public onboboItemSelectionChange(item: boboPatrollerItemPayload | null): void {
+    this.selectedboboItem.set(item);
     if (item) {
       this.editingLcnCode.set(item.lcnCode);
-      this.baslInitialData.set({ ...item });
-      this.showToast(`Élément BASL chargé: ${item.lcnCode}`);
+      this.boboInitialData.set({ ...item });
+      this.showToast(`Élément bobo chargé: ${item.lcnCode}`);
     } else {
-      this.startCreateNewBaslItem();
+      this.startCreateNewboboItem();
     }
   }
 
-  public startCreateNewBaslItem(): void {
-    this.selectedBaslItem.set(null);
+  public startCreateNewboboItem(): void {
+    this.selectedboboItem.set(null);
     this.editingLcnCode.set(null);
-    this.baslInitialData.set({
-      lcnCode: `PATROL-NEW-0${this.baslItems().length + 1}`,
+    this.boboInitialData.set({
+      lcnCode: `PATROL-NEW-0${this.boboItems().length + 1}`,
       itemName: '',
       systemCategory: 'OPTICAL_PAYLOAD',
       criticalityLevel: 'HIGH_B',
@@ -618,61 +623,61 @@ export class SafranDemoComponent implements OnInit {
       documentationRef: 'S1000D-SAF-PATROL-NEW',
       isOperationalMco: true
     });
-    this.showToast('Nouveau composant BASL en cours de création.');
+    this.showToast('Nouveau composant bobo en cours de création.');
   }
 
-  public onDropdownItemAction(event: SafranDropdownActionEvent<BaslPatrollerItemPayload>): void {
+  public onDropdownItemAction(event: SbdDropdownActionEvent<boboPatrollerItemPayload>): void {
     const raw = event.option.raw;
     if (event.action === 'view-details') {
-      this.onBaslItemSelectionChange(raw);
+      this.onboboItemSelectionChange(raw);
     } else if (event.action === 'pin') {
-      this.showToast(`Élément BASL "${raw.lcnCode}" épinglé au MCO !`);
+      this.showToast(`Élément bobo "${raw.lcnCode}" épinglé au MCO !`);
     }
   }
 
-  public onBaslFormSubmit(event: SafranFormSubmitEvent<any>): void {
+  public onboboFormSubmit(event: SbdFormSubmitEvent<any>): void {
     this.isFormSubmitting.set(true);
     setTimeout(() => {
       this.isFormSubmitting.set(false);
       const payload = event.value;
 
       if (event.mode === 'edit') {
-        this.baslItems.update(list =>
+        this.boboItems.update(list =>
           list.map(i => i.lcnCode === event.recordId ? { ...i, ...payload } : i)
         );
-        this.selectedBaslItem.set(payload);
-        this.showToast(`Fiche BASL ${event.recordId} mise à jour avec succès !`);
+        this.selectedboboItem.set(payload);
+        this.showToast(`Fiche bobo ${event.recordId} mise à jour avec succès !`);
       } else {
-        this.baslItems.update(list => [payload, ...list]);
-        this.selectedBaslItem.set(payload);
+        this.boboItems.update(list => [payload, ...list]);
+        this.selectedboboItem.set(payload);
         this.editingLcnCode.set(payload.lcnCode);
-        this.showToast(`Nouveau composant LCN "${payload.lcnCode}" enregistré dans la BASL Patroller !`);
+        this.showToast(`Nouveau composant LCN "${payload.lcnCode}" enregistré dans la bobo Patroller !`);
       }
     }, 600);
   }
 
-  public onWizardSubmit(event: SafranWizardSubmitEvent): void {
+  public onWizardSubmit(event: SbdWizardSubmitEvent): void {
     this.isWizardSubmitting.set(true);
     setTimeout(() => {
       this.isWizardSubmitting.set(false);
       this.wizardResultData.set(event.value);
-      this.showToast('Analyse BASL validée & enregistrée en BDD !');
-      console.log('[SafranDemoComponent] BASL Wizard payload:', event);
+      this.showToast('Analyse bobo validée & enregistrée en BDD !');
+      console.log('[SbdDemoComponent] bobo Wizard payload:', event);
     }, 800);
   }
 
-  public onFileNodeSelect(node: SafranTreeNode<BaslPatrollerItemPayload>): void {
+  public onFileNodeSelect(node: SbdTreeNode<boboPatrollerItemPayload>): void {
     this.selectedFileNode.set(node);
     const itemType = node.type === 'folder' ? 'Dossier' : 'Composant LCN';
     this.showToast(`${itemType} sélectionné: ${node.name}`);
   }
 
-  public onFileNodeAction(event: SafranNodeActionEvent<BaslPatrollerItemPayload>): void {
+  public onFileNodeAction(event: SbdNodeActionEvent<boboPatrollerItemPayload>): void {
     this.showToast(`Action "${event.action.toUpperCase()}" sur: ${event.node.name}`);
   }
 
   /** Count total descendant files in a tree folder node */
-  public countFolderFiles(node: SafranTreeNode<BaslPatrollerItemPayload>): number {
+  public countFolderFiles(node: SbdTreeNode<boboPatrollerItemPayload>): number {
     if (!node.children || node.children.length === 0) return 0;
     let count = 0;
     node.children.forEach(child => {

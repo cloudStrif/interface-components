@@ -1,4 +1,4 @@
-# 🚀 Safran Reusable UI Kit — Guide d'Export & Réutilisation
+﻿# 🚀 Sbd Reusable UI Kit — Guide d'Export & Réutilisation
 
 Bibliothèque de composants Angular Standalone réutilisables, **100% Tailwind CSS**, sans dépendances tierces complexes.
 
@@ -6,17 +6,17 @@ Bibliothèque de composants Angular Standalone réutilisables, **100% Tailwind C
 
 ## 📁 Structure du Dossier Réutilisable
 
-Pour exporter ces composants dans votre autre projet Angular, **copiez simplement ce dossier `reusable-safran-ui/`** dans le dossier `src/app/` de votre projet destination.
+Pour exporter ces composants dans votre autre projet Angular, **copiez simplement ce dossier `reusable-sbd-ui/`** dans le dossier `src/app/` de votre projet destination.
 
 ```text
-reusable-safran-ui/
+reusable-sbd-ui/
 ├── components/
-│   ├── safran-dropdown/       # Dropdown avec recherche & adapter API
-│   ├── safran-dynamic-form/   # Formulaire dynamique avec Angular Reactive Forms (FormGroup)
-│   ├── safran-file-tree/      # Arborescence hiérarchique (Tree)
-│   └── safran-form-wizard/    # Assistant / Stepper multi-étapes
+│   ├── sbd-dropdown/       # Dropdown avec recherche & adapter API
+│   ├── sbd-dynamic-form/   # Formulaire dynamique avec Angular Reactive Forms (FormGroup)
+│   ├── sbd-file-tree/      # Arborescence hiérarchique (Tree)
+│   └── sbd-form-wizard/    # Assistant / Stepper multi-étapes
 ├── models/                    # Interfaces TypeScript (Form, Dropdown, Tree, Wizard)
-├── services/                  # SafranFormBuilderService (DSL Fluent optionnel)
+├── services/                  # SbdFormBuilderService (DSL Fluent optionnel)
 └── index.ts                   # Exportations publiques
 ```
 
@@ -24,28 +24,28 @@ reusable-safran-ui/
 
 ## 🛠️ 1. Formulaire CRUD avec votre propre `FormGroup` & API
 
-Le composant `<app-safran-dynamic-form>` génère et gère automatiquement le `FormGroup` d'Angular Reactive Forms à partir d'un schéma simple.
+Le composant `<app-sbd-dynamic-form>` génère et gère automatiquement le `FormGroup` d'Angular Reactive Forms à partir d'un schéma simple.
 
 ### Exemple dans votre composant (`mon-crud.component.ts`) :
 
 ```ts
 import { Component, inject, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { SafranDynamicFormComponent, SafranFormFieldSchema, SafranFormSubmitEvent } from './reusable-safran-ui';
+import { SbdDynamicFormComponent, SbdFormFieldSchema, SbdFormSubmitEvent } from './reusable-sbd-ui';
 
 @Component({
   selector: 'app-mon-crud',
   standalone: true,
-  imports: [SafranDynamicFormComponent],
+  imports: [SbdDynamicFormComponent],
   template: `
-    <app-safran-dynamic-form
+    <app-sbd-dynamic-form
       [fields]="formFields"
       [initialData]="itemToEdit"
       [recordId]="itemId"
       [loading]="isSubmitting"
       title="Édition d'Équipement"
       (formSubmit)="onSaveToMyApi($event)"
-    ></app-safran-dynamic-form>
+    ></app-sbd-dynamic-form>
   `
 })
 export class MonCrudComponent implements OnInit {
@@ -56,7 +56,7 @@ export class MonCrudComponent implements OnInit {
   public itemId: string | null = null;
 
   // Définition des champs du formulaire
-  public formFields: SafranFormFieldSchema[] = [
+  public formFields: SbdFormFieldSchema[] = [
     { key: 'code', label: 'Code Référence', type: 'text', gridCols: 'half', validation: { required: true } },
     { key: 'nom', label: 'Nom du Composant', type: 'text', gridCols: 'half', validation: { required: true } },
     { key: 'categorie', label: 'Catégorie', type: 'select', gridCols: 'half', options: [
@@ -76,7 +76,7 @@ export class MonCrudComponent implements OnInit {
   }
 
   // Soumission vers votre API REST
-  onSaveToMyApi(event: SafranFormSubmitEvent) {
+  onSaveToMyApi(event: SbdFormSubmitEvent) {
     this.isSubmitting = true;
     const payload = event.value; // Données brutes du FormGroup
 
@@ -95,16 +95,16 @@ export class MonCrudComponent implements OnInit {
 
 ## 🔍 2. Dropdown avec Recherche & Données de votre API
 
-Le composant `<app-safran-dropdown>` s'adapte automatiquement à la structure des objets de votre API :
+Le composant `<app-sbd-dropdown>` s'adapte automatiquement à la structure des objets de votre API :
 
 ```html
-<app-safran-dropdown
+<app-sbd-dropdown
   [items]="mesDonneesApi"
   labelKey="designation"
   valueKey="idEquipement"
   placeholder="Sélectionnez un élément..."
   (selectionChange)="onItemSelect($event)"
-></app-safran-dropdown>
+></app-sbd-dropdown>
 ```
 
 ---
@@ -112,10 +112,10 @@ Le composant `<app-safran-dropdown>` s'adapte automatiquement à la structure de
 ## 📂 3. Arborescence Logistique (Tree)
 
 ```html
-<app-safran-file-tree
+<app-sbd-file-tree
   [nodes]="arborescenceData"
   (nodeSelect)="onNodeClick($event)"
-></app-safran-file-tree>
+></app-sbd-file-tree>
 ```
 
 ---

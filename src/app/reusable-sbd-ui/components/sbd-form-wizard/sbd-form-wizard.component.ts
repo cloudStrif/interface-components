@@ -1,4 +1,4 @@
-import {
+﻿import {
   Component,
   Input,
   Output,
@@ -11,41 +11,41 @@ import {
   ViewChild
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SafranDynamicFormComponent } from '../safran-dynamic-form/safran-dynamic-form.component';
+import { SbdDynamicFormComponent } from '../sbd-dynamic-form/sbd-dynamic-form.component';
 import {
-  SafranWizardStep,
-  SafranWizardStepChangeEvent,
-  SafranWizardSubmitEvent,
-  SafranWizardConfig
+  SbdWizardStep,
+  SbdWizardStepChangeEvent,
+  SbdWizardSubmitEvent,
+  SbdWizardConfig
 } from '../../models/form-wizard.model';
-import { SafranFormSubmitEvent } from '../../models/form.model';
+import { SbdFormSubmitEvent } from '../../models/form.model';
 
 @Component({
-  selector: 'app-safran-form-wizard',
+  selector: 'app-sbd-form-wizard',
   standalone: true,
-  imports: [CommonModule, SafranDynamicFormComponent],
-  templateUrl: './safran-form-wizard.component.html',
+  imports: [CommonModule, SbdDynamicFormComponent],
+  templateUrl: './sbd-form-wizard.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SafranFormWizardComponent {
+export class SbdFormWizardComponent {
   private cdr = inject(ChangeDetectorRef);
 
-  @ViewChild(SafranDynamicFormComponent) dynamicFormComponent?: SafranDynamicFormComponent;
+  @ViewChild(SbdDynamicFormComponent) dynamicFormComponent?: SbdDynamicFormComponent;
 
   // ─── Required Inputs ────────────────────────────────────────────────────────
 
-  @Input({ required: true }) steps: SafranWizardStep[] = [];
+  @Input({ required: true }) steps: SbdWizardStep[] = [];
 
   // ─── Optional Inputs ────────────────────────────────────────────────────────
 
   @Input() initialData: Record<string, any> | null = null;
-  @Input() config: SafranWizardConfig = {};
+  @Input() config: SbdWizardConfig = {};
   @Input() loading: boolean = false;
 
   // ─── Outputs ────────────────────────────────────────────────────────────────
 
-  @Output() wizardSubmit = new EventEmitter<SafranWizardSubmitEvent>();
-  @Output() stepChange = new EventEmitter<SafranWizardStepChangeEvent>();
+  @Output() wizardSubmit = new EventEmitter<SbdWizardSubmitEvent>();
+  @Output() stepChange = new EventEmitter<SbdWizardStepChangeEvent>();
   @Output() wizardCancel = new EventEmitter<void>();
 
   // ─── Internal State ─────────────────────────────────────────────────────────
@@ -55,7 +55,7 @@ export class SafranFormWizardComponent {
 
   // ─── Getters ────────────────────────────────────────────────────────────────
 
-  get currentStep(): SafranWizardStep | undefined {
+  get currentStep(): SbdWizardStep | undefined {
     return this.steps[this.currentStepIndex()];
   }
 
@@ -159,7 +159,7 @@ export class SafranFormWizardComponent {
     this.cdr.markForCheck();
   }
 
-  public onStepFormSubmit(event: SafranFormSubmitEvent): void {
+  public onStepFormSubmit(event: SbdFormSubmitEvent): void {
     // Intercept form submit inside the step
     this.nextStep();
   }

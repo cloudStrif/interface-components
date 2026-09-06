@@ -1,4 +1,4 @@
-import {
+﻿import {
   Component,
   Input,
   Output,
@@ -17,24 +17,24 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  SafranDropdownOption,
-  SafranDropdownAdapter,
-  SafranDropdownActionEvent
+  SbdDropdownOption,
+  SbdDropdownAdapter,
+  SbdDropdownActionEvent
 } from '../../models/dropdown.model';
 
 @Component({
-  selector: 'app-safran-dropdown',
+  selector: 'app-sbd-dropdown',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './safran-dropdown.component.html',
+  templateUrl: './sbd-dropdown.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SafranDropdownComponent<T = any> implements OnChanges {
+export class SbdDropdownComponent<T = any> implements OnChanges {
   private elementRef = inject(ElementRef);
 
   // Inputs
   @Input() items: T[] = [];
-  @Input() adapterFn?: SafranDropdownAdapter<T>;
+  @Input() adapterFn?: SbdDropdownAdapter<T>;
   @Input() labelKey: string = 'label';
   @Input() valueKey: string = 'id';
   @Input() subLabelKey?: string = 'subLabel';
@@ -54,17 +54,17 @@ export class SafranDropdownComponent<T = any> implements OnChanges {
 
   // Outputs
   @Output() selectionChange = new EventEmitter<T | null>();
-  @Output() optionSelect = new EventEmitter<SafranDropdownOption<T>>();
-  @Output() itemAction = new EventEmitter<SafranDropdownActionEvent<T>>();
+  @Output() optionSelect = new EventEmitter<SbdDropdownOption<T>>();
+  @Output() itemAction = new EventEmitter<SbdDropdownActionEvent<T>>();
   @Output() cleared = new EventEmitter<void>();
 
   // State Signals
   public isOpen: WritableSignal<boolean> = signal(false);
   public searchQuery: WritableSignal<string> = signal('');
-  public selectedOption: WritableSignal<SafranDropdownOption<T> | null> = signal(null);
+  public selectedOption: WritableSignal<SbdDropdownOption<T> | null> = signal(null);
 
   // Adapted options computed signal
-  public adaptedOptions: Signal<SafranDropdownOption<T>[]> = computed(() => {
+  public adaptedOptions: Signal<SbdDropdownOption<T>[]> = computed(() => {
     const rawItems = this.items || [];
     if (!rawItems.length) return [];
 
@@ -93,7 +93,7 @@ export class SafranDropdownComponent<T = any> implements OnChanges {
   });
 
   // Filtered options based on search query
-  public filteredOptions: Signal<SafranDropdownOption<T>[]> = computed(() => {
+  public filteredOptions: Signal<SbdDropdownOption<T>[]> = computed(() => {
     const options = this.adaptedOptions();
     const query = this.searchQuery().toLowerCase().trim();
 
@@ -130,7 +130,7 @@ export class SafranDropdownComponent<T = any> implements OnChanges {
     }
   }
 
-  public selectOption(option: SafranDropdownOption<T>, event?: MouseEvent): void {
+  public selectOption(option: SbdDropdownOption<T>, event?: MouseEvent): void {
     if (event) {
       event.stopPropagation();
     }
@@ -151,7 +151,7 @@ export class SafranDropdownComponent<T = any> implements OnChanges {
     this.cleared.emit();
   }
 
-  public onActionClick(action: string, option: SafranDropdownOption<T>, event: MouseEvent): void {
+  public onActionClick(action: string, option: SbdDropdownOption<T>, event: MouseEvent): void {
     event.stopPropagation();
     this.itemAction.emit({
       action,

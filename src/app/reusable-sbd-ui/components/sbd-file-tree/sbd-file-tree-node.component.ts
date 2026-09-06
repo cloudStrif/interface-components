@@ -1,4 +1,4 @@
-import {
+﻿import {
   Component,
   Input,
   Output,
@@ -6,25 +6,25 @@ import {
   ChangeDetectionStrategy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SafranTreeNode, SafranNodeActionEvent } from '../../models/file-tree.model';
+import { SbdTreeNode, SbdNodeActionEvent } from '../../models/file-tree.model';
 
 @Component({
-  selector: 'app-safran-file-tree-node',
+  selector: 'app-sbd-file-tree-node',
   standalone: true,
-  imports: [CommonModule, SafranTreeNodeComponent],
-  templateUrl: './safran-file-tree-node.component.html',
+  imports: [CommonModule, SbdTreeNodeComponent],
+  templateUrl: './sbd-file-tree-node.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SafranTreeNodeComponent<T = any> {
-  @Input({ required: true }) node!: SafranTreeNode<T>;
+export class SbdTreeNodeComponent<T = any> {
+  @Input({ required: true }) node!: SbdTreeNode<T>;
   @Input() level: number = 0;
   @Input() selectedNodeId: string | null = null;
   @Input() searchQuery: string = '';
   @Input() nodeActions: Array<{ action: string; label: string; icon: string }> = [];
 
-  @Output() nodeSelect = new EventEmitter<SafranTreeNode<T>>();
-  @Output() nodeToggle = new EventEmitter<SafranTreeNode<T>>();
-  @Output() nodeAction = new EventEmitter<SafranNodeActionEvent<T>>();
+  @Output() nodeSelect = new EventEmitter<SbdTreeNode<T>>();
+  @Output() nodeToggle = new EventEmitter<SbdTreeNode<T>>();
+  @Output() nodeAction = new EventEmitter<SbdNodeActionEvent<T>>();
 
   public toggleFolder(event: MouseEvent): void {
     event.stopPropagation();
@@ -82,7 +82,7 @@ export class SafranTreeNodeComponent<T = any> {
     }
   }
 
-  public getFileIconType(node: SafranTreeNode<T>): string {
+  public getFileIconType(node: SbdTreeNode<T>): string {
     if (node.icon) return node.icon;
     if (node.type === 'folder') {
       return node.isExpanded ? 'folder-open' : 'folder';

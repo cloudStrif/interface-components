@@ -1,8 +1,8 @@
-import { Observable } from 'rxjs';
+﻿import { Observable } from 'rxjs';
 
 // ─── Field Types ───────────────────────────────────────────────────────────────
 
-export type SafranFormFieldType =
+export type SbdFormFieldType =
   | 'text'
   | 'number'
   | 'email'
@@ -26,11 +26,11 @@ export type SafranFormFieldType =
 
 // ─── Grid Layout ──────────────────────────────────────────────────────────────
 
-export type SafranFormGridCols = 'full' | 'half' | 'third' | 'quarter' | 'two-thirds';
+export type SbdFormGridCols = 'full' | 'half' | 'third' | 'quarter' | 'two-thirds';
 
 // ─── Validation ───────────────────────────────────────────────────────────────
 
-export interface SafranFormFieldValidation {
+export interface SbdFormFieldValidation {
   required?: boolean;
   min?: number;
   max?: number;
@@ -48,7 +48,7 @@ export interface SafranFormFieldValidation {
 
 // ─── Options ──────────────────────────────────────────────────────────────────
 
-export interface SafranFormFieldOption {
+export interface SbdFormFieldOption {
   label: string;
   value: any;
   disabled?: boolean;
@@ -60,7 +60,7 @@ export interface SafranFormFieldOption {
 
 // ─── Conditional Display ──────────────────────────────────────────────────────
 
-export interface SafranFormFieldCondition {
+export interface SbdFormFieldCondition {
   /** The key of the other field to watch */
   watchKey: string;
   /** The value(s) that triggers visibility */
@@ -69,7 +69,7 @@ export interface SafranFormFieldCondition {
 
 // ─── File Config ──────────────────────────────────────────────────────────────
 
-export interface SafranFormFileConfig {
+export interface SbdFormFileConfig {
   accept?: string;
   multiple?: boolean;
   maxSizeMb?: number;
@@ -77,7 +77,7 @@ export interface SafranFormFileConfig {
 
 // ─── Range Config ─────────────────────────────────────────────────────────────
 
-export interface SafranFormRangeConfig {
+export interface SbdFormRangeConfig {
   min?: number;
   max?: number;
   step?: number;
@@ -86,7 +86,7 @@ export interface SafranFormRangeConfig {
 
 // ─── Rating Config ────────────────────────────────────────────────────────────
 
-export interface SafranFormRatingConfig {
+export interface SbdFormRatingConfig {
   /** Maximum number of stars (default: 5) */
   maxStars?: number;
   /** Allow half-star selection (default: false) */
@@ -97,7 +97,7 @@ export interface SafranFormRatingConfig {
 
 // ─── Autocomplete Config ──────────────────────────────────────────────────────
 
-export interface SafranFormAutocompleteConfig {
+export interface SbdFormAutocompleteConfig {
   /** Minimum characters before suggestions appear (default: 1) */
   minChars?: number;
   /** Max suggestions to display (default: 10) */
@@ -108,7 +108,7 @@ export interface SafranFormAutocompleteConfig {
 
 // ─── Tag Input Config ─────────────────────────────────────────────────────────
 
-export interface SafranFormTagConfig {
+export interface SbdFormTagConfig {
   /** Separator keys that trigger tag creation (default: ['Enter', ',']) */
   separators?: string[];
   /** Max number of tags (default: unlimited) */
@@ -123,25 +123,25 @@ export interface SafranFormTagConfig {
 
 // ─── Main Field Schema ────────────────────────────────────────────────────────
 
-export interface SafranFormFieldSchema {
+export interface SbdFormFieldSchema {
   /** Unique key — maps directly to API payload property */
   key: string;
   /** Display label */
   label: string;
   /** Input type */
-  type: SafranFormFieldType;
+  type: SbdFormFieldType;
   /** Input placeholder */
   placeholder?: string;
   /** Default value used when no initialData is provided */
   defaultValue?: any;
   /** Static options (for select, multiselect, radio, autocomplete) */
-  options?: SafranFormFieldOption[];
+  options?: SbdFormFieldOption[];
   /** Observable providing async options (for select, multiselect, autocomplete) */
-  asyncOptions$?: Observable<SafranFormFieldOption[]>;
+  asyncOptions$?: Observable<SbdFormFieldOption[]>;
   /** Validation constraints */
-  validation?: SafranFormFieldValidation;
+  validation?: SbdFormFieldValidation;
   /** Grid layout sizing */
-  gridCols?: SafranFormGridCols;
+  gridCols?: SbdFormGridCols;
   /** Disable the field */
   disabled?: boolean;
   /** Small helper text displayed below the field */
@@ -149,17 +149,17 @@ export interface SafranFormFieldSchema {
   /** Icon name hint for rendering */
   icon?: string;
   /** Only display this field when condition is met */
-  condition?: SafranFormFieldCondition;
+  condition?: SbdFormFieldCondition;
   /** File input config */
-  fileConfig?: SafranFormFileConfig;
+  fileConfig?: SbdFormFileConfig;
   /** Range slider config */
-  rangeConfig?: SafranFormRangeConfig;
+  rangeConfig?: SbdFormRangeConfig;
   /** Rating stars config */
-  ratingConfig?: SafranFormRatingConfig;
+  ratingConfig?: SbdFormRatingConfig;
   /** Autocomplete config */
-  autocompleteConfig?: SafranFormAutocompleteConfig;
+  autocompleteConfig?: SbdFormAutocompleteConfig;
   /** Tag input config */
-  tagConfig?: SafranFormTagConfig;
+  tagConfig?: SbdFormTagConfig;
   /** Used for divider/heading types */
   content?: string;
   /** Section grouping label */
@@ -168,14 +168,14 @@ export interface SafranFormFieldSchema {
 
 // ─── Form Events ──────────────────────────────────────────────────────────────
 
-export interface SafranFormSubmitEvent<T = Record<string, any>> {
+export interface SbdFormSubmitEvent<T = Record<string, any>> {
   mode: 'create' | 'edit';
   recordId: string | number | null;
   value: T;
   rawEvent: Event;
 }
 
-export interface SafranFormFieldChangeEvent {
+export interface SbdFormFieldChangeEvent {
   key: string;
   value: any;
   formValue: Record<string, any>;
@@ -183,7 +183,7 @@ export interface SafranFormFieldChangeEvent {
 
 // ─── Form Config ──────────────────────────────────────────────────────────────
 
-export interface SafranFormConfig {
+export interface SbdFormConfig {
   title?: string;
   subtitle?: string;
   submitLabel?: string;

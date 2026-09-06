@@ -1,4 +1,4 @@
-<div class="w-full bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden font-sans">
+﻿<div class="w-full bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden font-sans">
 
   <!-- ── Header Banner ────────────────────────────────────────────────── -->
   <div class="px-6 py-5 bg-[#00205B] text-white">
@@ -84,7 +84,7 @@
   <!-- ── Current Step Form ────────────────────────────────────────────── -->
   @if (currentStep) {
     <div class="p-6">
-      <app-safran-dynamic-form
+      <app-sbd-dynamic-form
         [fields]="currentStep.fields"
         [initialData]="accumulatedData"
         [config]="{
@@ -96,7 +96,7 @@
         }"
         [loading]="loading"
         (formSubmit)="onStepFormSubmit($event)"
-      ></app-safran-dynamic-form>
+      ></app-sbd-dynamic-form>
     </div>
   }
 

@@ -1,7 +1,7 @@
-/**
+﻿/**
  * Standard File Tree Node interface.
  */
-export interface SafranTreeNode<T = unknown> {
+export interface SbdTreeNode<T = unknown> {
   id: string;
   name: string;
   type: 'folder' | 'file';
@@ -11,7 +11,7 @@ export interface SafranTreeNode<T = unknown> {
   badge?: string;
   badgeColor?: 'blue' | 'cyan' | 'green' | 'amber' | 'purple' | 'red';
   icon?: string;
-  children?: SafranTreeNode<T>[];
+  children?: SbdTreeNode<T>[];
   isExpanded?: boolean;
   disabled?: boolean;
   data?: T;
@@ -20,8 +20,8 @@ export interface SafranTreeNode<T = unknown> {
 /**
  * Event payload emitted when a tree node action button is clicked.
  */
-export interface SafranNodeActionEvent<T = unknown> {
+export interface SbdNodeActionEvent<T = unknown> {
   action: 'open' | 'download' | 'preview' | 'delete' | 'details' | string;
-  node: SafranTreeNode<T>;
+  node: SbdTreeNode<T>;
   event: MouseEvent;
 }

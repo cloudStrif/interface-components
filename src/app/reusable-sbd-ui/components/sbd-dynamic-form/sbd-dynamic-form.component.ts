@@ -1,4 +1,4 @@
-import {
+﻿import {
   Component,
   Input,
   Output,
@@ -12,7 +12,7 @@ import {
   ChangeDetectorRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SafranOptLabelPipe } from '../../pipes/safran-opt-label.pipe';
+import { SbdOptLabelPipe } from '../../pipes/sbd-opt-label.pipe';
 import {
   ReactiveFormsModule,
   FormsModule,
@@ -25,12 +25,12 @@ import {
 } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import {
-  SafranFormFieldSchema,
-  SafranFormSubmitEvent,
-  SafranFormFieldChangeEvent,
-  SafranFormFieldValidation,
-  SafranFormConfig,
-  SafranFormFieldOption
+  SbdFormFieldSchema,
+  SbdFormSubmitEvent,
+  SbdFormFieldChangeEvent,
+  SbdFormFieldValidation,
+  SbdFormConfig,
+  SbdFormFieldOption
 } from '../../models/form.model';
 
 // ─── Cross-field validator factory ───────────────────────────────────────────
@@ -56,26 +56,26 @@ function matchFieldValidator(
 }
 
 @Component({
-  selector: 'app-safran-dynamic-form',
+  selector: 'app-sbd-dynamic-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, SafranOptLabelPipe],
-  templateUrl: './safran-dynamic-form.component.html',
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, SbdOptLabelPipe],
+  templateUrl: './sbd-dynamic-form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SafranDynamicFormComponent implements OnInit, OnChanges, OnDestroy {
+export class SbdDynamicFormComponent implements OnInit, OnChanges, OnDestroy {
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
   private destroy$ = new Subject<void>();
 
   // ─── Required Inputs ────────────────────────────────────────────────────────
 
-  @Input({ required: true }) fields: SafranFormFieldSchema[] = [];
+  @Input({ required: true }) fields: SbdFormFieldSchema[] = [];
 
   // ─── Optional Inputs ────────────────────────────────────────────────────────
 
   @Input() initialData: Record<string, any> | null = null;
   @Input() recordId: string | number | null = null;
-  @Input() config: SafranFormConfig = {};
+  @Input() config: SbdFormConfig = {};
 
   // ─── Legacy flat inputs (kept for backward compat) ──────────────────────────
 
@@ -90,15 +90,15 @@ export class SafranDynamicFormComponent implements OnInit, OnChanges, OnDestroy 
 
   // ─── Outputs ────────────────────────────────────────────────────────────────
 
-  @Output() formSubmit = new EventEmitter<SafranFormSubmitEvent>();
+  @Output() formSubmit = new EventEmitter<SbdFormSubmitEvent>();
   @Output() formCancel = new EventEmitter<void>();
   @Output() formReset = new EventEmitter<void>();
-  @Output() fieldChange = new EventEmitter<SafranFormFieldChangeEvent>();
+  @Output() fieldChange = new EventEmitter<SbdFormFieldChangeEvent>();
 
   // ─── Internal State ─────────────────────────────────────────────────────────
 
   public formGroup: FormGroup = this.fb.group({});
-  public resolvedOptions: Record<string, SafranFormFieldOption[]> = {};
+  public resolvedOptions: Record<string, SbdFormFieldOption[]> = {};
   public optionsLoading: Record<string, boolean> = {};
   public showPassword: Record<string, boolean> = {};
   public fileNames: Record<string, string> = {};
@@ -257,7 +257,7 @@ export class SafranDynamicFormComponent implements OnInit, OnChanges, OnDestroy 
   // ─── Validators ─────────────────────────────────────────────────────────────
 
   private getValidators(
-    validation: SafranFormFieldValidation | undefined,
+    validation: SbdFormFieldValidation | undefined,
     type?: string
   ): ValidatorFn[] {
     if (!validation) return type === 'email' ? [Validators.email] : [];
@@ -277,7 +277,7 @@ export class SafranDynamicFormComponent implements OnInit, OnChanges, OnDestroy 
 
   // ─── Conditional Display ────────────────────────────────────────────────────
 
-  public isFieldVisible(field: SafranFormFieldSchema): boolean {
+  public isFieldVisible(field: SbdFormFieldSchema): boolean {
     if (!field.condition) return true;
 
     const watchControl = this.formGroup.get(field.condition.watchKey);
@@ -401,7 +401,7 @@ export class SafranDynamicFormComponent implements OnInit, OnChanges, OnDestroy 
 
   // ─── Rating ─────────────────────────────────────────────────────────────────
 
-  public getRatingStars(field: SafranFormFieldSchema): number[] {
+  public getRatingStars(field: SbdFormFieldSchema): number[] {
     const max = field.ratingConfig?.maxStars ?? 5;
     return Array.from({ length: max }, (_, i) => i + 1);
   }
@@ -440,7 +440,7 @@ export class SafranDynamicFormComponent implements OnInit, OnChanges, OnDestroy 
     return this.formGroup.get(key)?.value ?? [];
   }
 
-  public onTagKeydown(event: KeyboardEvent, fieldKey: string, field: SafranFormFieldSchema): void {
+  public onTagKeydown(event: KeyboardEvent, fieldKey: string, field: SbdFormFieldSchema): void {
     if (this.resolvedReadOnly) return;
     const separators = field.tagConfig?.separators ?? ['Enter', ','];
     const isSeparator = separators.some(s => s === event.key || (s === ',' && event.key === ','));
@@ -454,7 +454,7 @@ export class SafranDynamicFormComponent implements OnInit, OnChanges, OnDestroy 
     }
   }
 
-  public addTag(fieldKey: string, field: SafranFormFieldSchema): void {
+  public addTag(fieldKey: string, field: SbdFormFieldSchema): void {
     const rawValue = (this.tagInputValues[fieldKey] ?? '').trim().replace(/,$/, '');
     if (!rawValue) return;
 
@@ -492,7 +492,7 @@ export class SafranDynamicFormComponent implements OnInit, OnChanges, OnDestroy 
 
   // ─── Autocomplete ────────────────────────────────────────────────────────────
 
-  public getAutocompleteFilteredOptions(fieldKey: string, field: SafranFormFieldSchema): SafranFormFieldOption[] {
+  public getAutocompleteFilteredOptions(fieldKey: string, field: SbdFormFieldSchema): SbdFormFieldOption[] {
     const inputText = this.autocompleteInputs[fieldKey] ?? '';
     const minChars = field.autocompleteConfig?.minChars ?? 1;
     if (inputText.length < minChars) return [];
@@ -507,7 +507,7 @@ export class SafranDynamicFormComponent implements OnInit, OnChanges, OnDestroy 
     return filtered.slice(0, max);
   }
 
-  public onAutocompleteInput(event: Event, fieldKey: string, field: SafranFormFieldSchema): void {
+  public onAutocompleteInput(event: Event, fieldKey: string, field: SbdFormFieldSchema): void {
     const input = event.target as HTMLInputElement;
     this.autocompleteInputs[fieldKey] = input.value;
     this.autocompleteOpen[fieldKey] = true;
@@ -525,7 +525,7 @@ export class SafranDynamicFormComponent implements OnInit, OnChanges, OnDestroy 
     this.cdr.markForCheck();
   }
 
-  public selectAutocompleteOption(fieldKey: string, option: SafranFormFieldOption): void {
+  public selectAutocompleteOption(fieldKey: string, option: SbdFormFieldOption): void {
     const control = this.formGroup.get(fieldKey);
     if (!control) return;
     control.setValue(option.value);

@@ -1,26 +1,26 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
-  SafranFormFieldSchema,
-  SafranFormFieldType,
-  SafranFormFieldOption,
-  SafranFormFieldValidation,
-  SafranFormGridCols,
-  SafranFormFileConfig,
-  SafranFormRangeConfig,
-  SafranFormRatingConfig,
-  SafranFormAutocompleteConfig,
-  SafranFormTagConfig,
-  SafranFormFieldCondition
+  SbdFormFieldSchema,
+  SbdFormFieldType,
+  SbdFormFieldOption,
+  SbdFormFieldValidation,
+  SbdFormGridCols,
+  SbdFormFileConfig,
+  SbdFormRangeConfig,
+  SbdFormRatingConfig,
+  SbdFormAutocompleteConfig,
+  SbdFormTagConfig,
+  SbdFormFieldCondition
 } from '../models/form.model';
 
 // ─── Field Builder (fluent DSL for a single field) ────────────────────────────
 
-export class SafranFieldBuilder {
-  private schema: Partial<SafranFormFieldSchema>;
-  private _parent: SafranFormBuilderService;
+export class SbdFieldBuilder {
+  private schema: Partial<SbdFormFieldSchema>;
+  private _parent: SbdFormBuilderService;
 
-  constructor(key: string, type: SafranFormFieldType, label: string, parent: SafranFormBuilderService) {
+  constructor(key: string, type: SbdFormFieldType, label: string, parent: SbdFormBuilderService) {
     this.schema = { key, type, label };
     this._parent = parent;
   }
@@ -87,12 +87,12 @@ export class SafranFieldBuilder {
     return this;
   }
 
-  options(opts: SafranFormFieldOption[]): this {
+  options(opts: SbdFormFieldOption[]): this {
     this.schema.options = opts;
     return this;
   }
 
-  asyncOptions(obs$: Observable<SafranFormFieldOption[]>): this {
+  asyncOptions(obs$: Observable<SbdFormFieldOption[]>): this {
     this.schema.asyncOptions$ = obs$;
     return this;
   }
@@ -113,31 +113,31 @@ export class SafranFieldBuilder {
   }
 
   showWhen(watchKey: string, showWhen: any | any[]): this {
-    this.schema.condition = { watchKey, showWhen } as SafranFormFieldCondition;
+    this.schema.condition = { watchKey, showWhen } as SbdFormFieldCondition;
     return this;
   }
 
-  fileConfig(cfg: SafranFormFileConfig): this {
+  fileConfig(cfg: SbdFormFileConfig): this {
     this.schema.fileConfig = cfg;
     return this;
   }
 
-  rangeConfig(cfg: SafranFormRangeConfig): this {
+  rangeConfig(cfg: SbdFormRangeConfig): this {
     this.schema.rangeConfig = cfg;
     return this;
   }
 
-  ratingConfig(cfg: SafranFormRatingConfig): this {
+  ratingConfig(cfg: SbdFormRatingConfig): this {
     this.schema.ratingConfig = cfg;
     return this;
   }
 
-  autocompleteConfig(cfg: SafranFormAutocompleteConfig): this {
+  autocompleteConfig(cfg: SbdFormAutocompleteConfig): this {
     this.schema.autocompleteConfig = cfg;
     return this;
   }
 
-  tagConfig(cfg: SafranFormTagConfig): this {
+  tagConfig(cfg: SbdFormTagConfig): this {
     this.schema.tagConfig = cfg;
     return this;
   }
@@ -155,27 +155,27 @@ export class SafranFieldBuilder {
   quarter(): this   { this.schema.gridCols = 'quarter';    return this; }
   twoThirds(): this { this.schema.gridCols = 'two-thirds'; return this; }
 
-  grid(cols: SafranFormGridCols): this {
+  grid(cols: SbdFormGridCols): this {
     this.schema.gridCols = cols;
     return this;
   }
 
   // ─── Finalize: go back to parent builder ──────────────────────────────────
 
-  build(): SafranFormBuilderService {
-    this._parent['_pushField'](this.schema as SafranFormFieldSchema);
+  build(): SbdFormBuilderService {
+    this._parent['_pushField'](this.schema as SbdFormFieldSchema);
     return this._parent;
   }
 }
 
-// ─── SafranFormBuilderService ─────────────────────────────────────────────────
+// ─── SbdFormBuilderService ─────────────────────────────────────────────────
 
 @Injectable({ providedIn: 'root' })
-export class SafranFormBuilderService {
-  private _fields: SafranFormFieldSchema[] = [];
+export class SbdFormBuilderService {
+  private _fields: SbdFormFieldSchema[] = [];
 
-  /** @internal used by SafranFieldBuilder */
-  private _pushField(field: SafranFormFieldSchema): void {
+  /** @internal used by SbdFieldBuilder */
+  private _pushField(field: SbdFormFieldSchema): void {
     this._fields.push(field);
   }
 
@@ -199,88 +199,88 @@ export class SafranFormBuilderService {
 
   // ─── Input field factories ─────────────────────────────────────────────────
 
-  text(key: string, label: string): SafranFieldBuilder {
-    return new SafranFieldBuilder(key, 'text', label, this);
+  text(key: string, label: string): SbdFieldBuilder {
+    return new SbdFieldBuilder(key, 'text', label, this);
   }
 
-  number(key: string, label: string): SafranFieldBuilder {
-    return new SafranFieldBuilder(key, 'number', label, this);
+  number(key: string, label: string): SbdFieldBuilder {
+    return new SbdFieldBuilder(key, 'number', label, this);
   }
 
-  email(key: string, label: string): SafranFieldBuilder {
-    return new SafranFieldBuilder(key, 'email', label, this);
+  email(key: string, label: string): SbdFieldBuilder {
+    return new SbdFieldBuilder(key, 'email', label, this);
   }
 
-  password(key: string, label: string): SafranFieldBuilder {
-    return new SafranFieldBuilder(key, 'password', label, this);
+  password(key: string, label: string): SbdFieldBuilder {
+    return new SbdFieldBuilder(key, 'password', label, this);
   }
 
-  textarea(key: string, label: string): SafranFieldBuilder {
-    return new SafranFieldBuilder(key, 'textarea', label, this);
+  textarea(key: string, label: string): SbdFieldBuilder {
+    return new SbdFieldBuilder(key, 'textarea', label, this);
   }
 
-  select(key: string, label: string): SafranFieldBuilder {
-    return new SafranFieldBuilder(key, 'select', label, this);
+  select(key: string, label: string): SbdFieldBuilder {
+    return new SbdFieldBuilder(key, 'select', label, this);
   }
 
-  multiselect(key: string, label: string): SafranFieldBuilder {
-    return new SafranFieldBuilder(key, 'multiselect', label, this);
+  multiselect(key: string, label: string): SbdFieldBuilder {
+    return new SbdFieldBuilder(key, 'multiselect', label, this);
   }
 
-  radio(key: string, label: string): SafranFieldBuilder {
-    return new SafranFieldBuilder(key, 'radio', label, this);
+  radio(key: string, label: string): SbdFieldBuilder {
+    return new SbdFieldBuilder(key, 'radio', label, this);
   }
 
-  checkbox(key: string, label: string): SafranFieldBuilder {
-    return new SafranFieldBuilder(key, 'checkbox', label, this);
+  checkbox(key: string, label: string): SbdFieldBuilder {
+    return new SbdFieldBuilder(key, 'checkbox', label, this);
   }
 
-  toggle(key: string, label: string): SafranFieldBuilder {
-    return new SafranFieldBuilder(key, 'toggle', label, this);
+  toggle(key: string, label: string): SbdFieldBuilder {
+    return new SbdFieldBuilder(key, 'toggle', label, this);
   }
 
-  date(key: string, label: string): SafranFieldBuilder {
-    return new SafranFieldBuilder(key, 'date', label, this);
+  date(key: string, label: string): SbdFieldBuilder {
+    return new SbdFieldBuilder(key, 'date', label, this);
   }
 
-  datetimeLocal(key: string, label: string): SafranFieldBuilder {
-    return new SafranFieldBuilder(key, 'datetime-local', label, this);
+  datetimeLocal(key: string, label: string): SbdFieldBuilder {
+    return new SbdFieldBuilder(key, 'datetime-local', label, this);
   }
 
-  range(key: string, label: string): SafranFieldBuilder {
-    return new SafranFieldBuilder(key, 'range', label, this);
+  range(key: string, label: string): SbdFieldBuilder {
+    return new SbdFieldBuilder(key, 'range', label, this);
   }
 
-  file(key: string, label: string): SafranFieldBuilder {
-    return new SafranFieldBuilder(key, 'file', label, this);
+  file(key: string, label: string): SbdFieldBuilder {
+    return new SbdFieldBuilder(key, 'file', label, this);
   }
 
-  color(key: string, label: string): SafranFieldBuilder {
-    return new SafranFieldBuilder(key, 'color', label, this);
+  color(key: string, label: string): SbdFieldBuilder {
+    return new SbdFieldBuilder(key, 'color', label, this);
   }
 
-  rating(key: string, label: string): SafranFieldBuilder {
-    return new SafranFieldBuilder(key, 'rating', label, this);
+  rating(key: string, label: string): SbdFieldBuilder {
+    return new SbdFieldBuilder(key, 'rating', label, this);
   }
 
-  autocomplete(key: string, label: string): SafranFieldBuilder {
-    return new SafranFieldBuilder(key, 'autocomplete', label, this);
+  autocomplete(key: string, label: string): SbdFieldBuilder {
+    return new SbdFieldBuilder(key, 'autocomplete', label, this);
   }
 
-  tags(key: string, label: string): SafranFieldBuilder {
-    return new SafranFieldBuilder(key, 'tag-input', label, this);
+  tags(key: string, label: string): SbdFieldBuilder {
+    return new SbdFieldBuilder(key, 'tag-input', label, this);
   }
 
   // ─── Output ───────────────────────────────────────────────────────────────
 
   /** Returns the accumulated field schemas and resets the builder */
-  getFields(): SafranFormFieldSchema[] {
+  getFields(): SbdFormFieldSchema[] {
     const result = [...this._fields];
     this._fields = [];
     return result;
   }
 
-  peekFields(): SafranFormFieldSchema[] {
+  peekFields(): SbdFormFieldSchema[] {
     return [...this._fields];
   }
 }
