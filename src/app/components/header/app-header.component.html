@@ -1,0 +1,147 @@
+<header class="h-16 bg-slate-900/90 border-b border-slate-800 px-4 lg:px-6 flex items-center justify-between sticky top-0 z-30 backdrop-blur-md">
+  <!-- Left Side: App Branding & Project Dropdown -->
+  <div class="flex items-center gap-6">
+    <!-- Brand Logo -->
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-cyan-500 to-emerald-400 flex items-center justify-center shadow-md shadow-cyan-500/10 border border-cyan-300/20">
+        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+      </div>
+      <div class="hidden md:block">
+        <span class="font-bold text-white tracking-wide text-sm flex items-center gap-2">
+          SL Data Engine
+        </span>
+        <span class="text-[10px] text-slate-400 block -mt-0.5">S3000L LSA &amp; Product Breakdown</span>
+      </div>
+    </div>
+
+    <!-- Project Dropdown Selector -->
+    <div class="relative">
+      <button (click)="toggleProjectDropdown()" 
+              class="flex items-center gap-3 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 rounded-xl px-3.5 py-1.5 transition-all text-left">
+        <div class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
+        <div class="flex flex-col">
+          <span class="text-xs font-semibold text-white truncate max-w-[180px] sm:max-w-[240px]">
+            {{ projectService.activeProject().name }}
+          </span>
+          <span class="text-[10px] text-slate-400 font-mono">
+            S3000L Version {{ projectService.activeProject().s3000lVersion }}
+          </span>
+        </div>
+        <span class="ml-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold" 
+              [class.bg-emerald-500\/20]="projectService.activeProject().s3000lVersion === '2.0'"
+              [class.text-emerald-400]="projectService.activeProject().s3000lVersion === '2.0'"
+              [class.bg-indigo-500\/20]="projectService.activeProject().s3000lVersion === '1.1'"
+              [class.text-indigo-400]="projectService.activeProject().s3000lVersion === '1.1'">
+          v{{ projectService.activeProject().s3000lVersion }}
+        </span>
+        <svg class="w-4 h-4 text-slate-400 ml-1 transition-transform" [class.rotate-180]="isProjectDropdownOpen" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      <!-- Project Dropdown Menu -->
+      <div *ngIf="isProjectDropdownOpen" 
+           class="absolute top-full left-0 mt-2 w-80 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 p-2 backdrop-blur-xl">
+        <div class="px-3 py-2 border-b border-slate-800 flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-400">Projets S3000L Disponibles</span>
+          <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full font-mono">{{ projectService.projects().length }} projets</span>
+        </div>
+
+        <div class="max-h-64 overflow-y-auto py-1 space-y-1">
+          <button *ngFor="let proj of projectService.projects()" 
+                  (click)="selectProject(proj.id)"
+                  [class.bg-slate-800]="proj.id === projectService.activeProjectId()"
+                  class="w-full text-left p-2.5 rounded-xl hover:bg-slate-800/60 transition-colors flex items-start justify-between group">
+            <div>
+              <div class="text-xs font-medium text-white group-hover:text-cyan-400 transition-colors flex items-center gap-1.5">
+                <span>{{ proj.name }}</span>
+              </div>
+              <p class="text-[10px] text-slate-400 mt-0.5 line-clamp-1">{{ proj.description }}</p>
+            </div>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold shrink-0 ml-2"
+                  [class.bg-emerald-500\/20]="proj.s3000lVersion === '2.0'"
+                  [class.text-emerald-400]="proj.s3000lVersion === '2.0'"
+                  [class.bg-indigo-500\/20]="proj.s3000lVersion === '1.1'"
+                  [class.text-indigo-400]="proj.s3000lVersion === '1.1'">
+              v{{ proj.s3000lVersion }}
+            </span>
+          </button>
+        </div>
+
+        <!-- Add Project Button in Dropdown -->
+        <div class="pt-2 border-t border-slate-800">
+          <button (click)="onNewProjectClick()" 
+                  class="w-full py-2 px-3 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/20 text-xs font-semibold flex items-center justify-center gap-2 transition-all">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Créer un nouveau projet S3000L</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side: User Profile & New Project Button -->
+  <div class="flex items-center gap-3">
+    <!-- Quick Create Button -->
+    <button (click)="onNewProjectClick()" 
+            class="hidden sm:flex items-center gap-1.5 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-md shadow-cyan-600/20 transition-all">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      <span>Nouveau Projet</span>
+    </button>
+
+    <!-- User Profile Dropdown -->
+    <div class="relative">
+      <button (click)="toggleUserDropdown()" 
+              class="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-slate-800/80 transition-all border border-transparent hover:border-slate-700">
+        <img [src]="authService.currentUser()?.avatarUrl" [alt]="authService.currentUser()?.name" class="w-8 h-8 rounded-full object-cover border border-slate-700">
+        <div class="hidden lg:block text-left">
+          <div class="text-xs font-semibold text-white leading-none">{{ authService.currentUser()?.name }}</div>
+          <div class="text-[10px] text-emerald-400 flex items-center gap-1 mt-0.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span>Darwin OIDC SSO</span>
+          </div>
+        </div>
+        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      <!-- User Menu -->
+      <div *ngIf="isUserDropdownOpen" 
+           class="absolute top-full right-0 mt-2 w-64 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 p-3 backdrop-blur-xl">
+        <div class="pb-3 mb-2 border-b border-slate-800">
+          <div class="text-xs font-bold text-white">{{ authService.currentUser()?.name }}</div>
+          <div class="text-[11px] text-slate-400">{{ authService.currentUser()?.role }}</div>
+          <div class="text-[10px] text-slate-500 mt-1 font-mono truncate">{{ authService.currentUser()?.email }}</div>
+        </div>
+
+        <div class="space-y-1">
+          <div class="px-2 py-1.5 rounded-lg bg-slate-950/60 border border-slate-800 text-[10px] font-mono text-slate-400 space-y-1">
+            <div class="flex justify-between">
+              <span>Fournisseur OIDC:</span>
+              <span class="text-cyan-400 font-bold">Darwin SSO</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Statut:</span>
+              <span class="text-emerald-400">Jeton Actif</span>
+            </div>
+          </div>
+
+          <button (click)="logout()" 
+                  class="w-full text-left px-3 py-2 rounded-xl text-xs font-medium text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors flex items-center justify-between mt-2">
+            <span>Se déconnecter de Darwin OIDC</span>
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

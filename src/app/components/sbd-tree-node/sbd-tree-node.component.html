@@ -1,0 +1,83 @@
+<div *ngIf="isMatchingFilter(node())" class="select-none">
+  <!-- Node Item Row -->
+  <div (click)="selectNode(node())" 
+       [style.padding-left.px]="level() * 16 + 12"
+       [class.bg-cyan-500\/10]="isNodeSelected(node())"
+       [class.border-cyan-500\/40]="isNodeSelected(node())"
+       [class.text-cyan-300]="isNodeSelected(node())"
+       [class.border-transparent]="!isNodeSelected(node())"
+       class="flex items-center justify-between py-1.5 pr-3 rounded-xl hover:bg-slate-800/60 cursor-pointer transition-colors border text-xs group my-0.5">
+    
+    <!-- Left: Expand Arrow, Icon & Name -->
+    <div class="flex items-center gap-2 min-w-0 flex-1">
+      <!-- Toggle Expand Button (if has children) -->
+      <button *ngIf="node().children && node().children.length > 0" 
+              (click)="toggleExpand($event, node())"
+              class="w-5 h-5 flex items-center justify-center rounded hover:bg-slate-700/60 text-slate-400 hover:text-white transition-colors">
+        <svg class="w-3.5 h-3.5 transform transition-transform duration-200" [class.rotate-90]="node().expanded" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+
+      <div *ngIf="!node().children || node().children.length === 0" class="w-5"></div>
+
+      <!-- Icon based on type -->
+      <span [ngSwitch]="node().type" class="shrink-0">
+        <!-- Root / Product -->
+        <svg *ngSwitchCase="'product'" class="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+        <!-- System -->
+        <svg *ngSwitchCase="'system'" class="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        <!-- Subsystem -->
+        <svg *ngSwitchCase="'subsystem'" class="w-4 h-4 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+        </svg>
+        <!-- LCI / Candidate -->
+        <svg *ngSwitchCase="'lci'" class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <!-- Task Requirement -->
+        <svg *ngSwitchCase="'task'" class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        <!-- Default Element -->
+        <svg *ngSwitchDefault class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        </svg>
+      </span>
+
+      <!-- Node Title -->
+      <span class="font-medium text-slate-200 truncate group-hover:text-white transition-colors">
+        {{ node().name }}
+      </span>
+    </div>
+
+    <!-- Right: LCN Badge & Child Count -->
+    <div class="flex items-center gap-2 shrink-0">
+      <!-- LCN (Logistics Control Number) Badge -->
+      <span *ngIf="node().lcn" class="px-1.5 py-0.5 rounded font-mono text-[10px] bg-slate-950 text-slate-400 border border-slate-800">
+        {{ node().lcn }}
+      </span>
+
+      <!-- LSA Indicator -->
+      <span *ngIf="node().lsaCandidate" class="w-1.5 h-1.5 rounded-full bg-emerald-400" title="Candidat LSA S3000L"></span>
+
+      <!-- Children Count Badge -->
+      <span *ngIf="node().children && node().children.length > 0" class="text-[10px] text-slate-500 font-mono">
+        ({{ node().children.length }})
+      </span>
+    </div>
+  </div>
+
+  <!-- Children Recursive Render -->
+  <div *ngIf="node().expanded && node().children && node().children.length > 0">
+    <app-sbd-tree-node *ngFor="let childNode of node().children" 
+                       [node]="childNode" 
+                       [level]="level() + 1"
+                       [filterQuery]="filterQuery()">
+    </app-sbd-tree-node>
+  </div>
+</div>
