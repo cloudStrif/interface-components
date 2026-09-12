@@ -2,7 +2,7 @@
 <app-login *ngIf="!authService.isAuthenticated()"></app-login>
 
 <!-- Show Main Application Workspace when authenticated -->
-<div *ngIf="authService.isAuthenticated()" class="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-slate-950">
+<div *ngIf="authService.isAuthenticated()" class="min-h-screen bg-[#f4f6f9] text-slate-900 flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
   
   <!-- Global Application Header -->
   <app-header (openNewProjectModal)="openCreateProjectModal()"></app-header>

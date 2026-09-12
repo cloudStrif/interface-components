@@ -9,6 +9,89 @@ export class S3000LParserService {
   public selectedNode = signal<S3000LTreeNode | null>(null);
   public searchQuery = signal<string>('');
 
+  // ─── Tree Mutation ────────────────────────────────────────────────────────
+
+  /**
+   * Add a new child node to a given parent node and refresh the tree signal.
+   */
+  public addChildNode(
+    parent: S3000LTreeNode,
+    name: string,
+    type: S3000LNodeType = 'element'
+  ): S3000LTreeNode {
+    const newNode: S3000LTreeNode = {
+      id: `node-new-${Date.now().toString(36)}`,
+      tagName: 'breakdownElement',
+      name: name.trim() || 'Nouvel élément',
+      lcn: this.generateNextLcn(parent),
+      type,
+      version: '2.0',
+      description: `Élément créé manuellement sous "${parent.name}"`,
+      attributes: [],
+      children: [],
+      expanded: false,
+      selected: false,
+      lsaCandidate: false,
+    };
+
+    parent.children = [...(parent.children ?? []), newNode];
+    parent.expanded = true;
+
+    // Force signal update by shallow-copying the root
+    this.currentTree.update(root => root ? { ...root } : root);
+    this.selectedNode.set(newNode);
+    return newNode;
+  }
+
+  /**
+   * Delete a node from the tree by its id. Selects the parent after deletion.
+   */
+  public deleteNode(nodeId: string): void {
+    const root = this.currentTree();
+    if (!root) return;
+
+    const parent = this.findParent(root, nodeId);
+    if (!parent) return; // cannot delete root
+
+    parent.children = parent.children.filter(c => c.id !== nodeId);
+    this.currentTree.update(r => r ? { ...r } : r);
+
+    // If the deleted node was selected, select parent instead
+    if (this.selectedNode()?.id === nodeId) {
+      this.selectedNode.set(parent);
+    }
+  }
+
+  /**
+   * Rename a node in place and refresh the tree signal.
+   */
+  public renameNode(node: S3000LTreeNode, newName: string): void {
+    node.name = newName.trim() || node.name;
+    this.currentTree.update(r => r ? { ...r } : r);
+    // refresh selected node reference
+    if (this.selectedNode()?.id === node.id) {
+      this.selectedNode.set({ ...node });
+    }
+  }
+
+  /** Find the parent of a node by child id (BFS). Returns null if nodeId is the root. */
+  private findParent(root: S3000LTreeNode, nodeId: string): S3000LTreeNode | null {
+    if (!root.children) return null;
+    for (const child of root.children) {
+      if (child.id === nodeId) return root;
+      const found = this.findParent(child, nodeId);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  /** Generate a plausible next LCN for a new child of parent. */
+  private generateNextLcn(parent: S3000LTreeNode): string {
+    const count = (parent.children?.length ?? 0) + 1;
+    const base = parent.lcn ?? 'N00-00';
+    return `${base}-${String(count).padStart(2, '0')}`;
+  }
+
   /**
    * Parse XML content string into S3000LTreeNode hierarchy
    */
