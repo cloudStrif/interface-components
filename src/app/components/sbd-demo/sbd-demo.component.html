@@ -1,19 +1,21 @@
-<!-- Show Login Screen if NOT authenticated via Darwin OIDC -->
-<app-login *ngIf="!authService.isAuthenticated()"></app-login>
+@if (!authService.isAuthenticated()) {
+  <!-- Show Login Screen if NOT authenticated via Darwin OIDC -->
+  <app-login />
+} @else {
+  <!-- Show Main Application Workspace when authenticated -->
+  <div class="min-h-screen bg-[#f4f6f9] text-slate-900 flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
+    
+    <!-- Global Application Header -->
+    <app-header (openNewProjectModal)="openCreateProjectModal()" />
 
-<!-- Show Main Application Workspace when authenticated -->
-<div *ngIf="authService.isAuthenticated()" class="min-h-screen bg-[#f4f6f9] text-slate-900 flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
-  
-  <!-- Global Application Header -->
-  <app-header (openNewProjectModal)="openCreateProjectModal()"></app-header>
+    <!-- Main S3000L XML Explorer Workspace -->
+    <main class="flex-1">
+      <app-sbd-explorer />
+    </main>
 
-  <!-- Main S3000L XML Explorer Workspace -->
-  <main class="flex-1">
-    <app-sbd-explorer></app-sbd-explorer>
-  </main>
-
-  <!-- Create Project Modal (Form with 2 fields: Name & S3000L Version 1.1 / 2.0) -->
-  <app-create-project-modal *ngIf="showCreateProjectModal" 
-                             (closeModal)="closeCreateProjectModal()">
-  </app-create-project-modal>
-</div>
+    <!-- Create Project Modal (Form with 2 fields: Name & S3000L Version 1.1 / 2.0) -->
+    @if (showCreateProjectModal()) {
+      <app-create-project-modal (closeModal)="closeCreateProjectModal()" />
+    }
+  </div>
+}

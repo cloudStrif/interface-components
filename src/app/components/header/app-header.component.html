@@ -1,7 +1,7 @@
 <header class="h-16 bg-[#001E38] border-b border-[#002d54] px-4 lg:px-6 flex items-center justify-between sticky top-0 z-30 shadow-md">
   <!-- Left Side: App Branding & Project Dropdown -->
   <div class="flex items-center gap-6">
-    <!-- Brand Logo Safran -->
+    <!-- Brand Logo -->
     <div class="flex items-center gap-3">
       <div class="w-9 h-9 rounded-lg bg-[#0055B8] flex items-center justify-center shadow-sm border border-blue-400/30">
         <!-- Aircraft Turbine / System Icon -->
@@ -12,7 +12,7 @@
       <div class="hidden md:block">
         <div class="flex items-center gap-2">
           <span class="font-bold text-white tracking-wide text-sm">
-            SAFRAN <span class="font-normal text-blue-200">| SL Data Engine</span>
+            SL Data Engine <span class="font-normal text-blue-200">| Aero LSA</span>
           </span>
           <span class="text-[10px] uppercase font-semibold bg-blue-500/20 text-blue-200 px-1.5 py-0.5 rounded border border-blue-400/30">LSA</span>
         </div>
@@ -46,47 +46,49 @@
       </button>
 
       <!-- Project Dropdown Menu (Clean White Card) -->
-      <div *ngIf="isProjectDropdownOpen" 
-           class="absolute top-full left-0 mt-2 w-80 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-50 p-2 text-slate-800">
-        <div class="px-3 py-2 border-b border-slate-100 flex items-center justify-between">
-          <span class="text-xs font-semibold text-slate-600">Projets S3000L Disponibles</span>
-          <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-mono">{{ projectService.projects().length }} projets</span>
-        </div>
+      @if (isProjectDropdownOpen) {
+        <div class="absolute top-full left-0 mt-2 w-80 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-50 p-2 text-slate-800">
+          <div class="px-3 py-2 border-b border-slate-100 flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-600">Projets S3000L Disponibles</span>
+            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-mono">{{ projectService.projects().length }} projets</span>
+          </div>
 
-        <div class="max-h-64 overflow-y-auto py-1 space-y-1">
-          <button *ngFor="let proj of projectService.projects()" 
-                  (click)="selectProject(proj.id)"
-                  [class.bg-blue-50]="proj.id === projectService.activeProjectId()"
-                  [class.border-l-4]="proj.id === projectService.activeProjectId()"
-                  [class.border-[#0055B8]]="proj.id === projectService.activeProjectId()"
-                  class="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 transition-colors flex items-start justify-between group">
-            <div>
-              <div class="text-xs font-semibold text-slate-900 group-hover:text-[#0055B8] transition-colors flex items-center gap-1.5">
-                <span>{{ proj.name }}</span>
-              </div>
-              <p class="text-[11px] text-slate-500 mt-0.5 line-clamp-1">{{ proj.description }}</p>
-            </div>
-            <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold shrink-0 ml-2"
-                  [class.bg-emerald-100]="proj.s3000lVersion === '2.0'"
-                  [class.text-emerald-800]="proj.s3000lVersion === '2.0'"
-                  [class.bg-blue-100]="proj.s3000lVersion === '1.1'"
-                  [class.text-blue-800]="proj.s3000lVersion === '1.1'">
-              v{{ proj.s3000lVersion }}
-            </span>
-          </button>
-        </div>
+          <div class="max-h-64 overflow-y-auto py-1 space-y-1">
+            @for (proj of projectService.projects(); track proj.id) {
+              <button (click)="selectProject(proj.id)"
+                      [class.bg-blue-50]="proj.id === projectService.activeProjectId()"
+                      [class.border-l-4]="proj.id === projectService.activeProjectId()"
+                      [class.border-[#0055B8]]="proj.id === projectService.activeProjectId()"
+                      class="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 transition-colors flex items-start justify-between group">
+                <div>
+                  <div class="text-xs font-semibold text-slate-900 group-hover:text-[#0055B8] transition-colors flex items-center gap-1.5">
+                    <span>{{ proj.name }}</span>
+                  </div>
+                  <p class="text-[11px] text-slate-500 mt-0.5 line-clamp-1">{{ proj.description }}</p>
+                </div>
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold shrink-0 ml-2"
+                      [class.bg-emerald-100]="proj.s3000lVersion === '2.0'"
+                      [class.text-emerald-800]="proj.s3000lVersion === '2.0'"
+                      [class.bg-blue-100]="proj.s3000lVersion === '1.1'"
+                      [class.text-blue-800]="proj.s3000lVersion === '1.1'">
+                  v{{ proj.s3000lVersion }}
+                </span>
+              </button>
+            }
+          </div>
 
-        <!-- Add Project Button in Dropdown -->
-        <div class="pt-2 border-t border-slate-100">
-          <button (click)="onNewProjectClick()" 
-                  class="w-full py-2 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#0055B8] border border-blue-200 text-xs font-semibold flex items-center justify-center gap-2 transition-all">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Créer un nouveau projet S3000L</span>
-          </button>
+          <!-- Add Project Button in Dropdown -->
+          <div class="pt-2 border-t border-slate-100">
+            <button (click)="onNewProjectClick()" 
+                    class="w-full py-2 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#0055B8] border border-blue-200 text-xs font-semibold flex items-center justify-center gap-2 transition-all">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              <span>Créer un nouveau projet S3000L</span>
+            </button>
+          </div>
         </div>
-      </div>
+      }
     </div>
   </div>
 
@@ -119,35 +121,36 @@
       </button>
 
       <!-- User Menu (Clean White Card) -->
-      <div *ngIf="isUserDropdownOpen" 
-           class="absolute top-full right-0 mt-2 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-50 p-3 text-slate-800">
-        <div class="pb-3 mb-2 border-b border-slate-100">
-          <div class="text-xs font-bold text-slate-900">{{ authService.currentUser()?.name }}</div>
-          <div class="text-[11px] text-slate-600">{{ authService.currentUser()?.role }}</div>
-          <div class="text-[10px] text-slate-500 mt-1 font-mono truncate">{{ authService.currentUser()?.email }}</div>
-        </div>
-
-        <div class="space-y-1">
-          <div class="px-2.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-[11px] font-mono text-slate-600 space-y-1">
-            <div class="flex justify-between">
-              <span>Fournisseur OIDC:</span>
-              <span class="text-[#0055B8] font-bold">Darwin SSO</span>
-            </div>
-            <div class="flex justify-between">
-              <span>Statut:</span>
-              <span class="text-emerald-700 font-semibold">Jeton Actif</span>
-            </div>
+      @if (isUserDropdownOpen) {
+        <div class="absolute top-full right-0 mt-2 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-50 p-3 text-slate-800">
+          <div class="pb-3 mb-2 border-b border-slate-100">
+            <div class="text-xs font-bold text-slate-900">{{ authService.currentUser()?.name }}</div>
+            <div class="text-[11px] text-slate-600">{{ authService.currentUser()?.role }}</div>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono truncate">{{ authService.currentUser()?.email }}</div>
           </div>
 
-          <button (click)="logout()" 
-                  class="w-full text-left px-3 py-2 rounded-xl text-xs font-medium text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition-colors flex items-center justify-between mt-2">
-            <span>Se déconnecter de Darwin OIDC</span>
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-          </button>
+          <div class="space-y-1">
+            <div class="px-2.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-[11px] font-mono text-slate-600 space-y-1">
+              <div class="flex justify-between">
+                <span>Fournisseur OIDC:</span>
+                <span class="text-[#0055B8] font-bold">Darwin SSO</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Statut:</span>
+                <span class="text-emerald-700 font-semibold">Jeton Actif</span>
+              </div>
+            </div>
+
+            <button (click)="logout()" 
+                    class="w-full text-left px-3 py-2 rounded-xl text-xs font-medium text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition-colors flex items-center justify-between mt-2">
+              <span>Se déconnecter de Darwin OIDC</span>
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </button>
+          </div>
         </div>
-      </div>
+      }
     </div>
   </div>
 </header>

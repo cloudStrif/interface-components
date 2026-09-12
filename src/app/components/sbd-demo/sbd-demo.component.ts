@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { LoginComponent } from '../login/login.component';
@@ -21,13 +21,13 @@ import { CreateProjectModalComponent } from '../create-project-modal/create-proj
 export class SbdDemoComponent {
   public authService = inject(AuthService);
 
-  public showCreateProjectModal = false;
+  public showCreateProjectModal = signal(false);
 
   public openCreateProjectModal(): void {
-    this.showCreateProjectModal = true;
+    this.showCreateProjectModal.set(true);
   }
 
   public closeCreateProjectModal(): void {
-    this.showCreateProjectModal = false;
+    this.showCreateProjectModal.set(false);
   }
 }

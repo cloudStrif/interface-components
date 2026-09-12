@@ -1,203 +1,221 @@
-<div *ngIf="parserService.selectedNode() as node" class="h-full flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
-  
-  <!-- Header Card -->
-  <div class="p-5 border-b border-slate-100 bg-slate-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-    <div>
-      <div class="flex items-center gap-2 mb-1.5 flex-wrap">
-        <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-blue-50 text-[#0055B8] border border-blue-200">
-          &lt;{{ node.tagName }}&gt;
-        </span>
-        <span *ngIf="node.lcn" class="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-100 text-slate-700 border border-slate-200">
-          LCN: {{ node.lcn }}
-        </span>
-        <span *ngIf="node.lsaCandidate" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-          LSA Candidate
-        </span>
-      </div>
-      <h2 class="text-xl font-bold text-[#001E38] tracking-tight">{{ node.name }}</h2>
-      <p class="text-xs text-slate-500 mt-0.5">{{ node.description }}</p>
-    </div>
-
-    <!-- Quick Action Buttons -->
-    <div class="flex items-center gap-2 shrink-0">
-      <button (click)="copyXmlSnippet(node.xmlSnippet)" 
-              class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-200 shadow-2xs">
-        <svg class="w-3.5 h-3.5 text-[#0055B8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-        </svg>
-        <span>{{ copiedXml ? 'Copié !' : 'Copier XML' }}</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- Navigation Tabs -->
-  <div class="flex border-b border-slate-200 px-5 gap-6 bg-white text-xs font-semibold">
-    <button (click)="activeTab = 'general'" 
-            [class.border-[#0055B8]]="activeTab === 'general'"
-            [class.text-[#0055B8]]="activeTab === 'general'"
-            [class.text-slate-500]="activeTab !== 'general'"
-            class="py-3.5 border-b-2 border-transparent transition-colors hover:text-[#0055B8]">
-      Informations Générales &amp; LSA
-    </button>
-    <button (click)="activeTab = 'attributes'" 
-            [class.border-[#0055B8]]="activeTab === 'attributes'"
-            [class.text-[#0055B8]]="activeTab === 'attributes'"
-            [class.text-slate-500]="activeTab !== 'attributes'"
-            class="py-3.5 border-b-2 border-transparent transition-colors hover:text-[#0055B8] flex items-center gap-1.5">
-      <span>Attributs XML</span>
-      <span class="px-1.5 py-0.2 rounded-full bg-slate-100 text-[10px] font-mono text-slate-600 border border-slate-200">{{ node.attributes.length }}</span>
-    </button>
-    <button (click)="activeTab = 'maintenance'" 
-            [class.border-[#0055B8]]="activeTab === 'maintenance'"
-            [class.text-[#0055B8]]="activeTab === 'maintenance'"
-            [class.text-slate-500]="activeTab !== 'maintenance'"
-            class="py-3.5 border-b-2 border-transparent transition-colors hover:text-[#0055B8]">
-      Maintenance &amp; Tâches
-    </button>
-    <button (click)="activeTab = 'xml'" 
-            [class.border-[#0055B8]]="activeTab === 'xml'"
-            [class.text-[#0055B8]]="activeTab === 'xml'"
-            [class.text-slate-500]="activeTab !== 'xml'"
-            class="py-3.5 border-b-2 border-transparent transition-colors hover:text-[#0055B8]">
-      Code XML Source
-    </button>
-  </div>
-
-  <!-- Tab Contents -->
-  <div class="p-6 overflow-y-auto flex-1 space-y-6 custom-scrollbar bg-white">
+@if (parserService.selectedNode(); as node) {
+  <div class="h-full flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
     
-    <!-- TAB 1: General Info -->
-    <div *ngIf="activeTab === 'general'" class="space-y-6">
-      <!-- Grid Summary -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-          <div class="text-[10px] text-slate-500 uppercase font-mono tracking-wider font-semibold">Logistics Control Number (LCN)</div>
-          <div class="text-base font-bold text-slate-900 font-mono mt-1">{{ node.lcn || 'Non attribué' }}</div>
-        </div>
-
-        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-          <div class="text-[10px] text-slate-500 uppercase font-mono tracking-wider font-semibold">Part Number (Réf. Pièce)</div>
-          <div class="text-base font-bold text-[#0055B8] font-mono mt-1">{{ node.partNumber || 'N/A' }}</div>
-        </div>
-
-        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-          <div class="text-[10px] text-slate-500 uppercase font-mono tracking-wider font-semibold">Éléments Enfants PBS</div>
-          <div class="text-base font-bold text-emerald-700 font-mono mt-1">{{ node.children.length }} sous-éléments</div>
-        </div>
-      </div>
-
-      <!-- Detail Properties Table -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 shadow-xs">
-        <h4 class="text-xs font-bold text-[#001E38] uppercase tracking-wider">Détails Spécification S3000L</h4>
-        
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6 text-xs">
-          <div class="flex justify-between py-2 border-b border-slate-100">
-            <span class="text-slate-500">Balise XML :</span>
-            <span class="font-mono text-[#0055B8] font-semibold">&lt;{{ node.tagName }}&gt;</span>
-          </div>
-          <div class="flex justify-between py-2 border-b border-slate-100">
-            <span class="text-slate-500">Type de Composant :</span>
-            <span class="font-bold text-slate-800 uppercase">{{ node.type }}</span>
-          </div>
-          <div class="flex justify-between py-2 border-b border-slate-100">
-            <span class="text-slate-500">Statut LSA Candidate :</span>
-            <span [class.text-emerald-700]="node.lsaCandidate" [class.text-slate-500]="!node.lsaCandidate" class="font-bold">
-              {{ node.lsaCandidate ? 'Oui (Candidat Éligible LSA)' : 'Non' }}
+    <!-- Header Card -->
+    <div class="p-5 border-b border-slate-100 bg-slate-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-blue-50 text-[#0055B8] border border-blue-200">
+            &lt;{{ node.tagName }}&gt;
+          </span>
+          @if (node.lcn) {
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-100 text-slate-700 border border-slate-200">
+              LCN: {{ node.lcn }}
             </span>
-          </div>
-          <div class="flex justify-between py-2 border-b border-slate-100">
-            <span class="text-slate-500">Niveau de Décomposition :</span>
-            <span class="font-mono text-slate-700">Découpage PBS Aéronautique</span>
-          </div>
+          }
+          @if (node.lsaCandidate) {
+            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              LSA Candidate
+            </span>
+          }
         </div>
-      </div>
-    </div>
-
-    <!-- TAB 2: Attributes Table -->
-    <div *ngIf="activeTab === 'attributes'" class="space-y-4">
-      <div *ngIf="node.attributes.length === 0" class="text-center py-12 text-slate-400 text-xs">
-        Aucun attribut XML spécifique détecté sur cette balise.
+        <h2 class="text-xl font-bold text-[#001E38] tracking-tight">{{ node.name }}</h2>
+        <p class="text-xs text-slate-500 mt-0.5">{{ node.description }}</p>
       </div>
 
-      <div *ngIf="node.attributes.length > 0" class="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-xs">
-        <table class="w-full text-left text-xs">
-          <thead class="bg-slate-50 text-slate-700 font-mono border-b border-slate-200">
-            <tr>
-              <th class="py-3 px-4 font-semibold">Nom de l'Attribut</th>
-              <th class="py-3 px-4 font-semibold">Valeur</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100 font-mono">
-            <tr *ngFor="let attr of node.attributes" class="hover:bg-slate-50 transition-colors">
-              <td class="py-3 px-4 text-[#0055B8] font-semibold">{{ attr.name }}</td>
-              <td class="py-3 px-4 text-slate-800">{{ attr.value }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- TAB 3: Maintenance & Tasks -->
-    <div *ngIf="activeTab === 'maintenance'" class="space-y-4">
-      <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-xs text-blue-900 flex items-start gap-3">
-        <svg class="w-5 h-5 text-[#0055B8] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <div>
-          <span class="font-bold text-[#001E38] block mb-0.5">Données de Maintien en Condition Opérationnelle (MCO Safran)</span>
-          Ces exigences de maintenance sont associées à l'élément LCN {{ node.lcn || node.name }}.
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-          <div class="text-xs font-bold text-slate-800 flex items-center gap-2">
-            <svg class="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Intervalle d'Inspection Préventive
-          </div>
-          <p class="text-xs text-slate-600">Contrôle visuel et boroscopique périodique selon spécification S3000L LSA.</p>
-          <div class="text-xs font-mono text-amber-700 font-bold">Intervalle: 150 FH (Flight Hours)</div>
-        </div>
-
-        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-          <div class="text-xs font-bold text-slate-800 flex items-center gap-2">
-            <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Outillage Spécialisé &amp; GSE
-          </div>
-          <p class="text-xs text-slate-600">Banc de test diagnostic et adaptateurs hydrauliques haute pression.</p>
-          <div class="text-xs font-mono text-emerald-700 font-bold">Réf GSE: GSE-S3000L-TOOL-09</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB 4: XML Snippet -->
-    <div *ngIf="activeTab === 'xml'" class="space-y-3">
-      <div class="flex items-center justify-between">
-        <span class="text-xs text-slate-500 font-mono">Extrait du document XML S3000L</span>
-        <button (click)="copyXmlSnippet(node.xmlSnippet)" class="text-xs text-[#0055B8] hover:underline font-medium">
-          {{ copiedXml ? 'Copié !' : 'Copier dans le presse-papier' }}
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center gap-2 shrink-0">
+        <button (click)="copyXmlSnippet(node.xmlSnippet)" 
+                class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-200 shadow-2xs">
+          <svg class="w-3.5 h-3.5 text-[#0055B8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          <span>{{ copiedXml ? 'Copié !' : 'Copier XML' }}</span>
         </button>
       </div>
-
-      <pre class="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-mono text-emerald-400 overflow-x-auto whitespace-pre-wrap leading-relaxed shadow-xs">
-{{ node.xmlSnippet || '&lt;' + node.tagName + ' /&gt;' }}
-      </pre>
     </div>
 
-  </div>
-</div>
+    <!-- Navigation Tabs -->
+    <div class="flex border-b border-slate-200 px-5 gap-6 bg-white text-xs font-semibold">
+      <button (click)="activeTab = 'general'" 
+              [class.border-[#0055B8]]="activeTab === 'general'"
+              [class.text-[#0055B8]]="activeTab === 'general'"
+              [class.text-slate-500]="activeTab !== 'general'"
+              class="py-3.5 border-b-2 border-transparent transition-colors hover:text-[#0055B8]">
+        Informations Générales &amp; LSA
+      </button>
+      <button (click)="activeTab = 'attributes'" 
+              [class.border-[#0055B8]]="activeTab === 'attributes'"
+              [class.text-[#0055B8]]="activeTab === 'attributes'"
+              [class.text-slate-500]="activeTab !== 'attributes'"
+              class="py-3.5 border-b-2 border-transparent transition-colors hover:text-[#0055B8] flex items-center gap-1.5">
+        <span>Attributs XML</span>
+        <span class="px-1.5 py-0.2 rounded-full bg-slate-100 text-[10px] font-mono text-slate-600 border border-slate-200">{{ node.attributes.length }}</span>
+      </button>
+      <button (click)="activeTab = 'maintenance'" 
+              [class.border-[#0055B8]]="activeTab === 'maintenance'"
+              [class.text-[#0055B8]]="activeTab === 'maintenance'"
+              [class.text-slate-500]="activeTab !== 'maintenance'"
+              class="py-3.5 border-b-2 border-transparent transition-colors hover:text-[#0055B8]">
+        Maintenance &amp; Tâches
+      </button>
+      <button (click)="activeTab = 'xml'" 
+              [class.border-[#0055B8]]="activeTab === 'xml'"
+              [class.text-[#0055B8]]="activeTab === 'xml'"
+              [class.text-slate-500]="activeTab !== 'xml'"
+              class="py-3.5 border-b-2 border-transparent transition-colors hover:text-[#0055B8]">
+        Code XML Source
+      </button>
+    </div>
 
-<div *ngIf="!parserService.selectedNode()" class="h-full flex items-center justify-center p-12 text-center text-slate-400 bg-white border border-slate-200 rounded-2xl shadow-xs">
-  <div>
-    <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
-    </svg>
-    <p class="text-sm font-bold text-slate-700">Aucun nœud sélectionné</p>
-    <p class="text-xs text-slate-500 mt-1">Sélectionnez un élément dans l'arborescence à gauche pour afficher ses détails S3000L.</p>
+    <!-- Tab Contents -->
+    <div class="p-6 overflow-y-auto flex-1 space-y-6 custom-scrollbar bg-white">
+      
+      <!-- TAB 1: General Info -->
+      @if (activeTab === 'general') {
+        <div class="space-y-6">
+          <!-- Grid Summary -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+              <div class="text-[10px] text-slate-500 uppercase font-mono tracking-wider font-semibold">Logistics Control Number (LCN)</div>
+              <div class="text-base font-bold text-slate-900 font-mono mt-1">{{ node.lcn || 'Non attribué' }}</div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+              <div class="text-[10px] text-slate-500 uppercase font-mono tracking-wider font-semibold">Part Number (Réf. Pièce)</div>
+              <div class="text-base font-bold text-[#0055B8] font-mono mt-1">{{ node.partNumber || 'N/A' }}</div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+              <div class="text-[10px] text-slate-500 uppercase font-mono tracking-wider font-semibold">Éléments Enfants PBS</div>
+              <div class="text-base font-bold text-emerald-700 font-mono mt-1">{{ node.children.length }} sous-éléments</div>
+            </div>
+          </div>
+
+          <!-- Detail Properties Table -->
+          <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 shadow-xs">
+            <h4 class="text-xs font-bold text-[#001E38] uppercase tracking-wider">Détails Spécification S3000L</h4>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6 text-xs">
+              <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">Balise XML :</span>
+                <span class="font-mono text-[#0055B8] font-semibold">&lt;{{ node.tagName }}&gt;</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">Type de Composant :</span>
+                <span class="font-bold text-slate-800 uppercase">{{ node.type }}</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">Statut LSA Candidate :</span>
+                <span [class.text-emerald-700]="node.lsaCandidate" [class.text-slate-500]="!node.lsaCandidate" class="font-bold">
+                  {{ node.lsaCandidate ? 'Oui (Candidat Éligible LSA)' : 'Non' }}
+                </span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">Niveau de Décomposition :</span>
+                <span class="font-mono text-slate-700">Découpage PBS Aéronautique</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- TAB 2: Attributes Table -->
+      @if (activeTab === 'attributes') {
+        <div class="space-y-4">
+          @if (node.attributes.length === 0) {
+            <div class="text-center py-12 text-slate-400 text-xs">
+              Aucun attribut XML spécifique détecté sur cette balise.
+            </div>
+          } @else {
+            <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-xs">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-700 font-mono border-b border-slate-200">
+                  <tr>
+                    <th class="py-3 px-4 font-semibold">Nom de l'Attribut</th>
+                    <th class="py-3 px-4 font-semibold">Valeur</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 font-mono">
+                  @for (attr of node.attributes; track attr.name) {
+                    <tr class="hover:bg-slate-50 transition-colors">
+                      <td class="py-3 px-4 text-[#0055B8] font-semibold">{{ attr.name }}</td>
+                      <td class="py-3 px-4 text-slate-800">{{ attr.value }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- TAB 3: Maintenance & Tasks -->
+      @if (activeTab === 'maintenance') {
+        <div class="space-y-4">
+          <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-xs text-blue-900 flex items-start gap-3">
+            <svg class="w-5 h-5 text-[#0055B8] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <span class="font-bold text-[#001E38] block mb-0.5">Données de Maintien en Condition Opérationnelle (MCO)</span>
+              Ces exigences de maintenance sont associées à l'élément LCN {{ node.lcn || node.name }}.
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+              <div class="text-xs font-bold text-slate-800 flex items-center gap-2">
+                <svg class="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Intervalle d'Inspection Préventive
+              </div>
+              <p class="text-xs text-slate-600">Contrôle visuel et boroscopique périodique selon spécification S3000L LSA.</p>
+              <div class="text-xs font-mono text-amber-700 font-bold">Intervalle: 150 FH (Flight Hours)</div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+              <div class="text-xs font-bold text-slate-800 flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Outillage Spécialisé &amp; GSE
+              </div>
+              <p class="text-xs text-slate-600">Banc de test diagnostic et adaptateurs hydrauliques haute pression.</p>
+              <div class="text-xs font-mono text-emerald-700 font-bold">Réf GSE: GSE-S3000L-TOOL-09</div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- TAB 4: XML Snippet -->
+      @if (activeTab === 'xml') {
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-slate-500 font-mono">Extrait du document XML S3000L</span>
+            <button (click)="copyXmlSnippet(node.xmlSnippet)" class="text-xs text-[#0055B8] hover:underline font-medium">
+              {{ copiedXml ? 'Copié !' : 'Copier dans le presse-papier' }}
+            </button>
+          </div>
+
+          <pre class="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-mono text-emerald-400 overflow-x-auto whitespace-pre-wrap leading-relaxed shadow-xs">
+{{ node.xmlSnippet || '&lt;' + node.tagName + ' /&gt;' }}
+          </pre>
+        </div>
+      }
+
+    </div>
   </div>
-</div>
+} @else {
+  <div class="h-full flex items-center justify-center p-12 text-center text-slate-400 bg-white border border-slate-200 rounded-2xl shadow-xs">
+    <div>
+      <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+      </svg>
+      <p class="text-sm font-bold text-slate-700">Aucun nœud sélectionné</p>
+      <p class="text-xs text-slate-500 mt-1">Sélectionnez un élément dans l'arborescence à gauche pour afficher ses détails S3000L.</p>
+    </div>
+  </div>
+}
