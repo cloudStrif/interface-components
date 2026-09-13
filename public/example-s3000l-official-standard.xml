@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+  Spécification Internationale ASD / AIA S3000L Issue 2.0
+  Product Breakdown Structure (PBS) — Système de Propulsion Turboréacteur M88-2
+  ============================================================================
+  Format : ASD S-Series S3000L Issue 2.0 (Chapitre 3 : PBS & LSA Breakdown)
+  Usage  : Fichier de test officiel pour SLICwave Web / Module PBS
+  ============================================================================
+-->
+<s3000l:productBreakdown
+  xmlns:s3000l="http://www.s3000l.org/s3000l"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  specVersion="2.0"
+  securityClassification="RESTRICTED"
+  documentNumber="BASL-M88-OFFICIAL-001"
+  issueDate="2026-09-13">
+
+  <!-- ===================================================================== -->
+  <!-- 1. Ensemble Moteur Complet (Racine Produit)                            -->
+  <!-- ===================================================================== -->
+  <breakdownElement id="BE_M00">
+    <breakdownElementIdentifier breakdownElementIdentifierClass="lcn">
+      <identifierValue>M00</identifierValue>
+    </breakdownElementIdentifier>
+    <breakdownElementName>
+      <nameString>Ensemble Turboréacteur M88-2 (Propulsion Complète)</nameString>
+    </breakdownElementName>
+    <breakdownElementType>product</breakdownElementType>
+    <breakdownElementRevision>
+      <revisionIdentifier>
+        <identifierValue>01</identifierValue>
+      </revisionIdentifier>
+      <lsaCandidateIndicator>true</lsaCandidateIndicator>
+      <breakdownElementRealization>
+        <partIdentifier>
+          <partNumberValue>PN-ENG-M88-2-FULL</partNumberValue>
+          <enterpriseIdentifier>F0221</enterpriseIdentifier>
+        </partIdentifier>
+      </breakdownElementRealization>
+      <remarks>
+        <remarkText>Turboréacteur militaire double corps double flux pour Rafale C/B/M. Poussée 75 kN.</remarkText>
+      </remarks>
+      <breakdownElementStructure>
+
+        <!-- ============================================================= -->
+        <!-- SOUS-SYSTÈME 1 : Soufflante & Compresseur BP (M01)           -->
+        <!-- ============================================================= -->
+        <breakdownElement id="BE_M01">
+          <breakdownElementIdentifier breakdownElementIdentifierClass="lcn">
+            <identifierValue>M01</identifierValue>
+          </breakdownElementIdentifier>
+          <breakdownElementName>
+            <nameString>Module Soufflante et Compresseur BP</nameString>
+          </breakdownElementName>
+          <breakdownElementType>system</breakdownElementType>
+          <breakdownElementRevision>
+            <revisionIdentifier>
+              <identifierValue>01</identifierValue>
+            </revisionIdentifier>
+            <lsaCandidateIndicator>true</lsaCandidateIndicator>
+            <remarks>
+              <remarkText>Soufflante 3 étages titane sans aubes directrices amont (wide-chord fan).</remarkText>
+            </remarks>
+            <breakdownElementStructure>
+
+              <breakdownElement id="BE_M01_01">
+                <breakdownElementIdentifier breakdownElementIdentifierClass="lcn">
+                  <identifierValue>M01-01</identifierValue>
+                </breakdownElementIdentifier>
+                <breakdownElementName>
+                  <nameString>Disque de Rotor Soufflante Étage 1 (Titane Ti-17)</nameString>
+                </breakdownElementName>
+                <breakdownElementType>assembly</breakdownElementType>
+                <breakdownElementRevision>
+                  <revisionIdentifier>
+                    <identifierValue>01</identifierValue>
+                  </revisionIdentifier>
+                  <lsaCandidateIndicator>true</lsaCandidateIndicator>
+                  <breakdownElementRealization>
+                    <partIdentifier>
+                      <partNumberValue>PN-FAN-DSC-01</partNumberValue>
+                      <enterpriseIdentifier>F0221</enterpriseIdentifier>
+                    </partIdentifier>
+                  </breakdownElementRealization>
+                  <remarks>
+                    <remarkText>Disque forgé haute résistance. MTBF 8 500 FH.</remarkText>
+                  </remarks>
+                </breakdownElementRevision>
+              </breakdownElement>
+
+              <breakdownElement id="BE_M01_02">
+                <breakdownElementIdentifier breakdownElementIdentifierClass="lcn">
+                  <identifierValue>M01-02</identifierValue>
+                </breakdownElementIdentifier>
+                <breakdownElementName>
+                  <nameString>Aubes de Fan Étage 1 Grande Corde (24x)</nameString>
+                </breakdownElementName>
+                <breakdownElementType>hardware</breakdownElementType>
+                <breakdownElementRevision>
+                  <revisionIdentifier>
+                    <identifierValue>01</identifierValue>
+                  </revisionIdentifier>
+                  <lsaCandidateIndicator>true</lsaCandidateIndicator>
+                  <breakdownElementRealization>
+                    <partIdentifier>
+                      <partNumberValue>PN-BLD-FAN-E1</partNumberValue>
+                      <enterpriseIdentifier>F0221</enterpriseIdentifier>
+                    </partIdentifier>
+                  </breakdownElementRealization>
+                  <remarks>
+                    <remarkText>Aubes démontables en ligne. Traitement anti-érosion bord d'attaque.</remarkText>
+                  </remarks>
+                </breakdownElementRevision>
+              </breakdownElement>
+
+            </breakdownElementStructure>
+          </breakdownElementRevision>
+        </breakdownElement>
+
+        <!-- ============================================================= -->
+        <!-- SOUS-SYSTÈME 2 : Compresseur Haute Pression HP (M02)         -->
+        <!-- ============================================================= -->
+        <breakdownElement id="BE_M02">
+          <breakdownElementIdentifier breakdownElementIdentifierClass="lcn">
+            <identifierValue>M02</identifierValue>
+          </breakdownElementIdentifier>
+          <breakdownElementName>
+            <nameString>Compresseur Haute Pression HP (6 Étages)</nameString>
+          </breakdownElementName>
+          <breakdownElementType>system</breakdownElementType>
+          <breakdownElementRevision>
+            <revisionIdentifier>
+              <identifierValue>01</identifierValue>
+            </revisionIdentifier>
+            <lsaCandidateIndicator>true</lsaCandidateIndicator>
+            <breakdownElementRealization>
+              <partIdentifier>
+                <partNumberValue>PN-HPC-ASSY-06</partNumberValue>
+                <enterpriseIdentifier>F0221</enterpriseIdentifier>
+              </partIdentifier>
+            </breakdownElementRealization>
+            <remarks>
+              <remarkText>Rapport de compression HP 9.3:1. Aubage monobloc (BLISK) sur premiers étages.</remarkText>
+            </remarks>
+            <breakdownElementStructure>
+
+              <breakdownElement id="BE_M02_01">
+                <breakdownElementIdentifier breakdownElementIdentifierClass="lcn">
+                  <identifierValue>M02-01</identifierValue>
+                </breakdownElementIdentifier>
+                <breakdownElementName>
+                  <nameString>Rotor Blisk HP Étages 1-3</nameString>
+                </breakdownElementName>
+                <breakdownElementType>assembly</breakdownElementType>
+                <breakdownElementRevision>
+                  <revisionIdentifier>
+                    <identifierValue>01</identifierValue>
+                  </revisionIdentifier>
+                  <lsaCandidateIndicator>true</lsaCandidateIndicator>
+                  <breakdownElementRealization>
+                    <partIdentifier>
+                      <partNumberValue>PN-HPC-BLK-13</partNumberValue>
+                      <enterpriseIdentifier>F0221</enterpriseIdentifier>
+                    </partIdentifier>
+                  </breakdownElementRealization>
+                </breakdownElementRevision>
+              </breakdownElement>
+
+              <breakdownElement id="BE_M02_02">
+                <breakdownElementIdentifier breakdownElementIdentifierClass="lcn">
+                  <identifierValue>M02-02</identifierValue>
+                </breakdownElementIdentifier>
+                <breakdownElementName>
+                  <nameString>Stator HP à Géométrie Variable (VSV Actuators)</nameString>
+                </breakdownElementName>
+                <breakdownElementType>subsystem</breakdownElementType>
+                <breakdownElementRevision>
+                  <revisionIdentifier>
+                    <identifierValue>01</identifierValue>
+                  </revisionIdentifier>
+                  <lsaCandidateIndicator>true</lsaCandidateIndicator>
+                  <breakdownElementRealization>
+                    <partIdentifier>
+                      <partNumberValue>PN-VSV-ACT-02</partNumberValue>
+                      <enterpriseIdentifier>F0221</enterpriseIdentifier>
+                    </partIdentifier>
+                  </breakdownElementRealization>
+                  <remarks>
+                    <remarkText>Vérins asservis par le FADEC pour contrôle marge de pompage.</remarkText>
+                  </remarks>
+                </breakdownElementRevision>
+              </breakdownElement>
+
+            </breakdownElementStructure>
+          </breakdownElementRevision>
+        </breakdownElement>
+
+        <!-- ============================================================= -->
+        <!-- SOUS-SYSTÈME 3 : Chambre de Combustion & Allumage (M03)      -->
+        <!-- ============================================================= -->
+        <breakdownElement id="BE_M03">
+          <breakdownElementIdentifier breakdownElementIdentifierClass="lcn">
+            <identifierValue>M03</identifierValue>
+          </breakdownElementIdentifier>
+          <breakdownElementName>
+            <nameString>Chambre de Combustion Annulaire &amp; Injecteurs</nameString>
+          </breakdownElementName>
+          <breakdownElementType>system</breakdownElementType>
+          <breakdownElementRevision>
+            <revisionIdentifier>
+              <identifierValue>01</identifierValue>
+            </revisionIdentifier>
+            <lsaCandidateIndicator>true</lsaCandidateIndicator>
+            <breakdownElementRealization>
+              <partIdentifier>
+                <partNumberValue>PN-CC-ANN-M88</partNumberValue>
+                <enterpriseIdentifier>F0221</enterpriseIdentifier>
+              </partIdentifier>
+            </breakdownElementRealization>
+            <remarks>
+              <remarkText>Chambre à faible émission de fumée et injection aérodynamique avancée.</remarkText>
+            </remarks>
+            <breakdownElementStructure>
+
+              <breakdownElement id="BE_M03_01">
+                <breakdownElementIdentifier breakdownElementIdentifierClass="lcn">
+                  <identifierValue>M03-01</identifierValue>
+                </breakdownElementIdentifier>
+                <breakdownElementName>
+                  <nameString>Rampe d'Injection Carburant (18 Injecteurs)</nameString>
+                </breakdownElementName>
+                <breakdownElementType>assembly</breakdownElementType>
+                <breakdownElementRevision>
+                  <revisionIdentifier>
+                    <identifierValue>01</identifierValue>
+                  </revisionIdentifier>
+                  <lsaCandidateIndicator>true</lsaCandidateIndicator>
+                  <breakdownElementRealization>
+                    <partIdentifier>
+                      <partNumberValue>PN-FUEL-MAN-18</partNumberValue>
+                      <enterpriseIdentifier>F0221</enterpriseIdentifier>
+                    </partIdentifier>
+                  </breakdownElementRealization>
+                </breakdownElementRevision>
+              </breakdownElement>
+
+              <breakdownElement id="BE_M03_02">
+                <breakdownElementIdentifier breakdownElementIdentifierClass="lcn">
+                  <identifierValue>M03-02</identifierValue>
+                </breakdownElementIdentifier>
+                <breakdownElementName>
+                  <nameString>Bougies d'Allumage Haute Énergie (2x)</nameString>
+                </breakdownElementName>
+                <breakdownElementType>hardware</breakdownElementType>
+                <breakdownElementRevision>
+                  <revisionIdentifier>
+                    <identifierValue>01</identifierValue>
+                  </revisionIdentifier>
+                  <lsaCandidateIndicator>false</lsaCandidateIndicator>
+                  <breakdownElementRealization>
+                    <partIdentifier>
+                      <partNumberValue>PN-IGN-PLUG-HE</partNumberValue>
+                      <enterpriseIdentifier>F0221</enterpriseIdentifier>
+                    </partIdentifier>
+                  </breakdownElementRealization>
+                </breakdownElementRevision>
+              </breakdownElement>
+
+            </breakdownElementStructure>
+          </breakdownElementRevision>
+        </breakdownElement>
+
+        <!-- ============================================================= -->
+        <!-- SOUS-SYSTÈME 4 : Régulation Numérique FADEC (M04)            -->
+        <!-- ============================================================= -->
+        <breakdownElement id="BE_M04">
+          <breakdownElementIdentifier breakdownElementIdentifierClass="lcn">
+            <identifierValue>M04</identifierValue>
+          </breakdownElementIdentifier>
+          <breakdownElementName>
+            <nameString>Calculateur Électronique de Régulation Moteur (FADEC)</nameString>
+          </breakdownElementName>
+          <breakdownElementType>system</breakdownElementType>
+          <breakdownElementRevision>
+            <revisionIdentifier>
+              <identifierValue>01</identifierValue>
+            </revisionIdentifier>
+            <lsaCandidateIndicator>true</lsaCandidateIndicator>
+            <breakdownElementRealization>
+              <partIdentifier>
+                <partNumberValue>PN-FADEC-ECU-M88</partNumberValue>
+                <enterpriseIdentifier>F0221</enterpriseIdentifier>
+              </partIdentifier>
+            </breakdownElementRealization>
+            <remarks>
+              <remarkText>Calculateur double canal redondant (Canal A / Canal B) conforme DO-178C DAL A.</remarkText>
+            </remarks>
+          </breakdownElementRevision>
+        </breakdownElement>
+
+      </breakdownElementStructure>
+    </breakdownElementRevision>
+  </breakdownElement>
+
+</s3000l:productBreakdown>

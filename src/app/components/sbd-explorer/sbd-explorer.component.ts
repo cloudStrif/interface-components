@@ -64,6 +64,13 @@ export class S3000LExplorerComponent implements OnInit {
     this.parserService.loadSampleData(sample);
   }
 
+  public exportXml(): void {
+    const activeProject = this.projectService.activeProject();
+    const projId = activeProject ? activeProject.id.toLowerCase() : 's3000l';
+    const date = new Date().toISOString().split('T')[0];
+    this.parserService.exportXmlFile(`${projId}_dump_s3000l_${date}.xml`);
+  }
+
   public expandAllNodes(): void {
     const tree = this.parserService.currentTree();
     if (tree) {

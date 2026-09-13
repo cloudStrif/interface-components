@@ -48,6 +48,20 @@
         <input type="file" accept=".xml,.s3000l" class="hidden" (change)="onFileSelected($event)">
       </label>
 
+      <!-- Export / Dump XML Button -->
+      <button (click)="exportXml()"
+              [disabled]="!parserService.currentTree()"
+              title="Exporter l'arborescence actuelle au format S3000L XML (Dump)"
+              class="px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/40 text-slate-700 hover:text-emerald-700 transition-all flex items-center gap-2.5 text-xs group shadow-xs disabled:opacity-40 disabled:pointer-events-none">
+        <svg class="w-4 h-4 text-emerald-600 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        <div class="leading-none text-left">
+          <span class="font-bold text-slate-900 block group-hover:text-emerald-800">Exporter XML S3000L</span>
+          <span class="text-[10px] text-slate-500 font-mono">Télécharger le dump</span>
+        </div>
+      </button>
+
       <!-- Preset Data Buttons -->
       <div class="flex items-center bg-slate-100/90 p-1 rounded-xl border border-slate-200 text-xs shadow-xs">
         <span class="text-[10px] text-slate-500 px-2 font-mono uppercase font-semibold">Exemples :</span>
