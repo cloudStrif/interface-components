@@ -1,0 +1,660 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+  Fichier exemple S3000L Issue 2.0 — Système de Propulsion M88-2
+  ============================================================================
+  Format : ASD S-Series Specification S3000L Issue 2.0
+  Usage  : Glisser-déposer dans le module PBS / LCN de l'application Web BASL
+           ou charger via le bouton "Charger un XML S3000L"
+
+  Ce fichier est un exemple représentatif de la structure PBS d'un turboréacteur
+  militaire. Les données sont fictives et destinées à la démonstration.
+  ============================================================================
+-->
+<s3000lProductBreakdown
+  xmlns="http://www.s3000l.org/s3000l"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  specVersion="2.0"
+  securityClassification="RESTRICTED"
+  documentNumber="BASL-M88-PBS-001"
+  issueDate="2026-09-12"
+  issuedBy="Direction Ingénierie Soutien Logistique">
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- ARTICLE RACINE — Système Propulsion Complet                            -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <productIdentifier
+    id="PROD-M88-2"
+    name="Ensemble Propulsion Turboréacteur M88-2"
+    lcn="M00-00"
+    partNumber="PN-ENG-M88-2-FULL"
+    lsaCandidate="true">
+    <description>
+      Turboréacteur double flux militaire haute performance.
+      Poussée maximale avec post-combustion : 75 kN.
+      Architecture 3 étages Fan + 6 étages HP Compresseur + Turbine HP + Turbine BP.
+      Conforme S3000L Issue 2.0 — STANAG 4673.
+    </description>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- SYSTÈME 1 — Soufflante et Compresseur Basse Pression (BP)          -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <systemBreakdown
+      name="Soufflante et Compresseur Basse Pression (BP)"
+      lcn="M01-00"
+      lsaCandidate="true">
+      <description>Ensemble soufflante monoétage et compresseur 2 étages basse pression.</description>
+
+      <breakdownElement
+        name="Module Soufflante (Fan)"
+        lcn="M01-01"
+        partNumber="PN-FAN-M88-01"
+        lsaCandidate="true">
+        <description>Soufflante monoétage en fibres de carbone/titane. Rapport de dilution 0.3.</description>
+
+        <hardwareItem
+          name="Disque Soufflante — Alliage Titane Ti-17"
+          lcn="M01-01-01"
+          partNumber="PN-FAN-DSC-001"
+          cageCode="F0221"
+          smrCode="PAOGD"
+          qpa="1"
+          lsaCandidate="true" />
+
+        <hardwareItem
+          name="Aubes Soufflante — Composite Carbone/Résine"
+          lcn="M01-01-02"
+          partNumber="PN-FAN-BLD-018"
+          cageCode="F0221"
+          smrCode="PAOGE"
+          qpa="18" />
+
+        <hardwareItem
+          name="Cône d'Entrée Carbone"
+          lcn="M01-01-03"
+          partNumber="PN-FAN-CONE-001"
+          cageCode="F0221"
+          smrCode="PAOGH"
+          qpa="1" />
+
+        <taskRequirement
+          name="Inspection Visuelle Aubes Fan — FOD Check"
+          taskType="Inspection"
+          taskNumber="TSK-M01-INS-001"
+          interval="50 FH"
+          maintenanceLevel="O"
+          mttr="0.5" />
+
+        <taskRequirement
+          name="Remplacement Lot Aubes Fan sur Détection FOD"
+          taskType="Corrective"
+          taskNumber="TSK-M01-COR-001"
+          interval="On Condition"
+          maintenanceLevel="I"
+          mttr="12.0" />
+      </breakdownElement>
+
+      <breakdownElement
+        name="Carter de Soufflante et Nacelle Intérieure"
+        lcn="M01-02"
+        partNumber="PN-FAN-CAS-001">
+        <description>Carter composite carbone/fibre de verre. Blindage FOD intégré.</description>
+
+        <hardwareItem
+          name="Carter de Rétention FOD"
+          lcn="M01-02-01"
+          partNumber="PN-FAN-FOD-CAS"
+          cageCode="F0221"
+          smrCode="PAOGD"
+          qpa="1" />
+
+        <hardwareItem
+          name="Inverseur de Poussée — Volet Gauche"
+          lcn="M01-02-02"
+          partNumber="PN-THR-REV-L"
+          cageCode="F0055"
+          smrCode="PAOGH"
+          qpa="1"
+          lsaCandidate="true" />
+
+        <hardwareItem
+          name="Inverseur de Poussée — Volet Droit"
+          lcn="M01-02-03"
+          partNumber="PN-THR-REV-R"
+          cageCode="F0055"
+          smrCode="PAOGH"
+          qpa="1"
+          lsaCandidate="true" />
+      </breakdownElement>
+
+      <breakdownElement
+        name="Compresseur Basse Pression — 2 Étages"
+        lcn="M01-03"
+        partNumber="PN-LPC-ASSY-001"
+        lsaCandidate="true">
+        <description>Compresseur BP 2 étages — Rapport de compression global 4:1.</description>
+
+        <hardwareItem
+          name="Rotor BP Étage 1 — Aubes et Disque"
+          lcn="M01-03-01"
+          partNumber="PN-LPC-ROT-1"
+          cageCode="F0221"
+          smrCode="PAOGD"
+          qpa="1" />
+
+        <hardwareItem
+          name="Rotor BP Étage 2 — Aubes et Disque"
+          lcn="M01-03-02"
+          partNumber="PN-LPC-ROT-2"
+          cageCode="F0221"
+          smrCode="PAOGD"
+          qpa="1" />
+
+        <hardwareItem
+          name="Stator BP — Directrices Inter-étages"
+          lcn="M01-03-03"
+          partNumber="PN-LPC-STAT-001"
+          cageCode="F0221"
+          smrCode="PAOGD"
+          qpa="1" />
+      </breakdownElement>
+    </systemBreakdown>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- SYSTÈME 2 — Compresseur Haute Pression (HP)                        -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <systemBreakdown
+      name="Compresseur Haute Pression (HP) — 6 Étages"
+      lcn="M02-00"
+      lsaCandidate="true">
+      <description>
+        Compresseur HP 6 étages — Rapport de compression 7.5:1.
+        Architecture avec directrices à géométrie variable sur les 3 premiers étages.
+      </description>
+
+      <breakdownElement
+        name="Rotor de Compresseur HP — Tambour 6 Étages"
+        lcn="M02-01"
+        partNumber="PN-HPC-ROT-ASSY"
+        lsaCandidate="true">
+        <description>Ensemble aubagé monobloc (blisk) en Titane-Inconel hybrid. Limité en vie à 12 000 FC.</description>
+
+        <hardwareItem
+          name="Aubes Compresseur HP — Étages 1 à 3 (Titane Ti-6Al-4V)"
+          lcn="M02-01-01"
+          partNumber="PN-HPC-BLD-E13"
+          cageCode="F0221"
+          smrCode="PAOGE"
+          qpa="84"
+          lsaCandidate="true" />
+
+        <hardwareItem
+          name="Aubes Compresseur HP — Étages 4 à 6 (Inconel 718)"
+          lcn="M02-01-02"
+          partNumber="PN-HPC-BLD-E46"
+          cageCode="F0221"
+          smrCode="PAOGE"
+          qpa="96" />
+
+        <hardwareItem
+          name="Disque Rotor HP Étages 1-3 (Forging Ti-17)"
+          lcn="M02-01-03"
+          partNumber="PN-HPC-DSC-1-3"
+          cageCode="F0221"
+          smrCode="PAOGD"
+          qpa="1" />
+
+        <hardwareItem
+          name="Disque Rotor HP Étages 4-6 (Forging IN718)"
+          lcn="M02-01-04"
+          partNumber="PN-HPC-DSC-4-6"
+          cageCode="F0221"
+          smrCode="PAOGD"
+          qpa="1" />
+
+        <taskRequirement
+          name="Inspection Boroscopique Aubes HP Étages 1-6"
+          taskType="Inspection"
+          taskNumber="TSK-M02-INS-001"
+          interval="150 FH"
+          maintenanceLevel="O"
+          mttr="1.8" />
+      </breakdownElement>
+
+      <breakdownElement
+        name="Stator HP — Directrices à Géométrie Variable (VSV)"
+        lcn="M02-02"
+        partNumber="PN-HPC-VSV-ASSY"
+        lsaCandidate="true">
+        <description>Anneau de directrices variables étages 1-3. Commande par anneau d'actionnement FADEC.</description>
+
+        <hardwareItem
+          name="Directrices Variables — Ensemble Étage 1"
+          lcn="M02-02-01"
+          partNumber="PN-VSV-STG1-SET"
+          cageCode="F0221"
+          smrCode="PAOGD"
+          qpa="1" />
+
+        <hardwareItem
+          name="Actuateur de Commande VSV — Anneau"
+          lcn="M02-02-02"
+          partNumber="PN-VSV-ACT-RING"
+          cageCode="F0055"
+          smrCode="PAOGH"
+          qpa="1"
+          lsaCandidate="true" />
+      </breakdownElement>
+
+      <breakdownElement
+        name="Vannes de Décharge Compresseur HP (Bleed Valves)"
+        lcn="M02-03"
+        partNumber="PN-BLV-ASSY-HP">
+        <description>4 vannes de décharge pneumatique évitant le pompage du compresseur HP. LRU échangeables en ligne.</description>
+
+        <hardwareItem
+          name="Vanne de Décharge HP — Type A (Position 3/9h)"
+          lcn="M02-03-01"
+          partNumber="PN-BLV-HP-A"
+          cageCode="F0055"
+          smrCode="PAOGH"
+          qpa="2"
+          lsaCandidate="true" />
+
+        <hardwareItem
+          name="Vanne de Décharge HP — Type B (Position 6/12h)"
+          lcn="M02-03-02"
+          partNumber="PN-BLV-HP-B"
+          cageCode="F0055"
+          smrCode="PAOGH"
+          qpa="2" />
+
+        <taskRequirement
+          name="Test Fonctionnel Vannes de Décharge HP"
+          taskType="Preventive"
+          taskNumber="TSK-M02-PRV-001"
+          interval="300 FH"
+          maintenanceLevel="O"
+          mttr="2.0" />
+      </breakdownElement>
+    </systemBreakdown>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- SYSTÈME 3 — Chambre de Combustion Annulaire                        -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <systemBreakdown
+      name="Chambre de Combustion Annulaire"
+      lcn="M03-00"
+      lsaCandidate="true">
+      <description>Chambre de combustion annulaire avec 18 injecteurs haute pression.</description>
+
+      <breakdownElement
+        name="Corps de la Chambre de Combustion"
+        lcn="M03-01"
+        partNumber="PN-COMB-LINER-001">
+        <description>Virole annulaire en superalliage Hastelloy X avec revêtement barrière thermique.</description>
+
+        <hardwareItem
+          name="Virole Interne de Chambre"
+          lcn="M03-01-01"
+          partNumber="PN-COMB-INT-LINER"
+          cageCode="F0221"
+          smrCode="PAOGD"
+          qpa="1" />
+
+        <hardwareItem
+          name="Virole Externe de Chambre"
+          lcn="M03-01-02"
+          partNumber="PN-COMB-EXT-LINER"
+          cageCode="F0221"
+          smrCode="PAOGD"
+          qpa="1" />
+      </breakdownElement>
+
+      <breakdownElement
+        name="Module Injecteurs de Carburant HP (18 injecteurs)"
+        lcn="M03-02"
+        partNumber="PN-INJ-ASSY-18"
+        lsaCandidate="true">
+        <description>18 injecteurs haute pression à double circuit. Contrôle de débit à 300 FH.</description>
+
+        <hardwareItem
+          name="Injecteur Carburant HP — Unitaire"
+          lcn="M03-02-01"
+          partNumber="PN-FUEL-INJ-HP-01"
+          cageCode="F0055"
+          smrCode="PAOGH"
+          qpa="18"
+          lsaCandidate="true" />
+
+        <hardwareItem
+          name="Collecteur Carburant HP — Anneau"
+          lcn="M03-02-02"
+          partNumber="PN-FUEL-MAN-HP"
+          cageCode="F0055"
+          smrCode="PAOGE"
+          qpa="1" />
+
+        <taskRequirement
+          name="Contrôle Débit et Étanchéité Injecteurs HP"
+          taskType="Preventive"
+          taskNumber="TSK-M03-PRV-001"
+          interval="300 FH"
+          maintenanceLevel="I"
+          mttr="4.5" />
+      </breakdownElement>
+
+      <breakdownElement
+        name="Système d'Allumage (Igniter)"
+        lcn="M03-03"
+        partNumber="PN-IGN-ASSY">
+        <description>Deux bougies d'allumage à plasma haute énergie (HEI). LRU échangeables en ligne.</description>
+
+        <hardwareItem
+          name="Bougie d'Allumage Plasma HEI"
+          lcn="M03-03-01"
+          partNumber="PN-IGN-PLUG-HEI"
+          cageCode="F0987"
+          smrCode="PAOGH"
+          qpa="2"
+          lsaCandidate="true" />
+
+        <hardwareItem
+          name="Boîte d'Allumage (Exciter Box)"
+          lcn="M03-03-02"
+          partNumber="PN-IGN-EXCITER-01"
+          cageCode="F0987"
+          smrCode="PAOGH"
+          qpa="2"
+          lsaCandidate="true" />
+      </breakdownElement>
+    </systemBreakdown>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- SYSTÈME 4 — Turbine Haute Pression (HP)                            -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <systemBreakdown
+      name="Turbine Haute Pression (HP) — Monoétage"
+      lcn="M04-00"
+      lsaCandidate="true">
+      <description>Turbine HP monoétage en cristaux monocristallins AM1. Température d'entrée EGT max : 1650°C.</description>
+
+      <breakdownElement
+        name="Rotor Turbine HP — Aubes Monocristallines"
+        lcn="M04-01"
+        partNumber="PN-HPT-ROT-ASSY"
+        lsaCandidate="true">
+        <description>24 aubes monocristallines AM1 avec barrière thermique EB-PVD 150µm. Durée de vie limite : 8 000 FH.</description>
+
+        <hardwareItem
+          name="Aube Turbine HP Monocristalline — AM1 + TBC"
+          lcn="M04-01-01"
+          partNumber="PN-HPT-BLD-MONO-AM1"
+          cageCode="F0221"
+          smrCode="PAOGD"
+          qpa="24"
+          lsaCandidate="true" />
+
+        <hardwareItem
+          name="Disque Turbine HP — Superalliage René 95"
+          lcn="M04-01-02"
+          partNumber="PN-HPT-DSC-R95"
+          cageCode="F0221"
+          smrCode="PAOGD"
+          qpa="1" />
+
+        <taskRequirement
+          name="Inspection Visuelle Aubes HPT par Boroscope Flexible"
+          taskType="Inspection"
+          taskNumber="TSK-M04-INS-001"
+          interval="300 FH"
+          maintenanceLevel="O"
+          mttr="2.5" />
+      </breakdownElement>
+
+      <breakdownElement
+        name="Distributeur HP (Nozzle Guide Vanes)"
+        lcn="M04-02"
+        partNumber="PN-HPT-NGV-ASSY">
+        <description>Distributeur HP en CMSX-4 avec film cooling. Réparable en atelier intermédiaire agréé.</description>
+
+        <hardwareItem
+          name="Secteur Distributeur HP — Segment de 3 aubes"
+          lcn="M04-02-01"
+          partNumber="PN-HPT-NGV-SEG"
+          cageCode="F0221"
+          smrCode="PAOGE"
+          qpa="8" />
+      </breakdownElement>
+    </systemBreakdown>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- SYSTÈME 5 — Turbine Basse Pression (BP) et Post-Combustion         -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <systemBreakdown
+      name="Turbine Basse Pression (BP) et Tuyère"
+      lcn="M05-00"
+      lsaCandidate="true">
+      <description>Turbine BP monoétage entraînant la soufflante. Tuyère convergente-divergente à géométrie variable.</description>
+
+      <breakdownElement
+        name="Rotor Turbine BP — 2 Étages"
+        lcn="M05-01"
+        partNumber="PN-LPT-ROT-ASSY">
+
+        <hardwareItem
+          name="Aubes Turbine BP Étage 1"
+          lcn="M05-01-01"
+          partNumber="PN-LPT-BLD-STG1"
+          cageCode="F0221"
+          smrCode="PAOGE"
+          qpa="36" />
+
+        <hardwareItem
+          name="Aubes Turbine BP Étage 2"
+          lcn="M05-01-02"
+          partNumber="PN-LPT-BLD-STG2"
+          cageCode="F0221"
+          smrCode="PAOGE"
+          qpa="48" />
+      </breakdownElement>
+
+      <breakdownElement
+        name="Tuyère à Géométrie Variable — Convergente-Divergente"
+        lcn="M05-02"
+        partNumber="PN-NOZ-CDV-ASSY"
+        lsaCandidate="true">
+        <description>Tuyère C/D avec 16 volets primaires + 16 volets secondaires. Actionnée par 4 vérins hydrauliques.</description>
+
+        <hardwareItem
+          name="Volet Primaire Tuyère (16 pièces)"
+          lcn="M05-02-01"
+          partNumber="PN-NOZ-FLAP-PRI"
+          cageCode="F0221"
+          smrCode="PAOGH"
+          qpa="16"
+          lsaCandidate="true" />
+
+        <hardwareItem
+          name="Volet Secondaire Tuyère (16 pièces)"
+          lcn="M05-02-02"
+          partNumber="PN-NOZ-FLAP-SEC"
+          cageCode="F0221"
+          smrCode="PAOGH"
+          qpa="16" />
+
+        <hardwareItem
+          name="Vérin Hydraulique de Tuyère"
+          lcn="M05-02-03"
+          partNumber="PN-NOZ-ACT-HYD"
+          cageCode="F0055"
+          smrCode="PAOGH"
+          qpa="4"
+          lsaCandidate="true" />
+
+        <taskRequirement
+          name="Contrôle Jeux et Fonctionnel Tuyère CDV"
+          taskType="Inspection"
+          taskNumber="TSK-M05-INS-001"
+          interval="200 FH"
+          maintenanceLevel="O"
+          mttr="3.0" />
+      </breakdownElement>
+
+      <breakdownElement
+        name="Post-Combustion (Afterburner)"
+        lcn="M05-03"
+        partNumber="PN-AB-ASSY"
+        lsaCandidate="true">
+        <description>Réchauffe sélective (régimes 6, 7, 8). Accroissement de poussée +80%. Durée de vie 500 FPC.</description>
+
+        <hardwareItem
+          name="Flameholder (Accroche-Flamme) PC"
+          lcn="M05-03-01"
+          partNumber="PN-AB-FLAMEHOLDER"
+          cageCode="F0221"
+          smrCode="PAOGH"
+          qpa="1" />
+
+        <hardwareItem
+          name="Injecteurs Post-Combustion — Rampe"
+          lcn="M05-03-02"
+          partNumber="PN-AB-INJ-RAIL"
+          cageCode="F0055"
+          smrCode="PAOGH"
+          qpa="3" />
+      </breakdownElement>
+    </systemBreakdown>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- SYSTÈME 6 — Calculateur FADEC et Capteurs                          -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <systemBreakdown
+      name="Calculateur de Régulation FADEC et Capteurs Moteur"
+      lcn="M06-00"
+      lsaCandidate="true">
+      <description>
+        Full Authority Digital Engine Control — Double canal redondant A/B.
+        Régule tous les paramètres moteur en temps réel (carburant, VSV, tuyère, PC).
+      </description>
+
+      <breakdownElement
+        name="Electronic Control Unit (ECU) FADEC — Duale A/B"
+        lcn="M06-01"
+        partNumber="PN-ECU-FADEC-9900X"
+        lsaCandidate="true">
+        <description>Calculateur FADEC bi-canal redondant. LRU échangeable en ligne par technicien B2 avionique.</description>
+
+        <hardwareItem
+          name="ECU FADEC — Canal A (Principal)"
+          lcn="M06-01-01"
+          partNumber="PN-ECU-CH-A"
+          cageCode="F0987"
+          smrCode="PAOGH"
+          qpa="1"
+          lsaCandidate="true" />
+
+        <hardwareItem
+          name="ECU FADEC — Canal B (Secours)"
+          lcn="M06-01-02"
+          partNumber="PN-ECU-CH-B"
+          cageCode="F0987"
+          smrCode="PAOGH"
+          qpa="1"
+          lsaCandidate="true" />
+
+        <taskRequirement
+          name="Téléchargement Logs FADEC et Analyse NFF"
+          taskType="Diagnostic"
+          taskNumber="TSK-M06-DIA-001"
+          interval="On Condition"
+          maintenanceLevel="O"
+          mttr="0.5" />
+
+        <taskRequirement
+          name="Échange Standard ECU FADEC LRU"
+          taskType="Corrective"
+          taskNumber="TSK-M06-COR-001"
+          interval="On Condition"
+          maintenanceLevel="O"
+          mttr="1.5" />
+      </breakdownElement>
+
+      <breakdownElement
+        name="Capteurs de Pression et Température Moteur"
+        lcn="M06-02"
+        partNumber="PN-SENS-ASSY">
+        <description>Réseau de 12 capteurs P/T couvrant tous les étages critiques (P2, P3, P4, T2, T4.5, EGT).</description>
+
+        <hardwareItem
+          name="Capteur Pression Entrée Moteur P2 + Température T2"
+          lcn="M06-02-01"
+          partNumber="PN-SENS-P2T2"
+          cageCode="F0987"
+          smrCode="PAOGH"
+          qpa="2"
+          lsaCandidate="true" />
+
+        <hardwareItem
+          name="Capteur Pression HP P3 (Inter-compresseur)"
+          lcn="M06-02-02"
+          partNumber="PN-SENS-P3"
+          cageCode="F0987"
+          smrCode="PAOGH"
+          qpa="3" />
+
+        <hardwareItem
+          name="Sonde EGT — Thermocouple Turbine Sortie"
+          lcn="M06-02-03"
+          partNumber="PN-SENS-EGT-TC"
+          cageCode="F0987"
+          smrCode="PAOGH"
+          qpa="7"
+          lsaCandidate="true" />
+
+        <taskRequirement
+          name="Contrôle et Remplacement Sondes EGT Défectueuses"
+          taskType="Preventive"
+          taskNumber="TSK-M06-PRV-001"
+          interval="500 FH"
+          maintenanceLevel="O"
+          mttr="1.0" />
+      </breakdownElement>
+
+      <breakdownElement
+        name="Régulateur de Carburant (Fuel Control Unit)"
+        lcn="M06-03"
+        partNumber="PN-FCU-HP-001"
+        lsaCandidate="true">
+        <description>FCU hydromécanique commandé par FADEC. Débit max 4 000 kg/h. LRU.</description>
+
+        <hardwareItem
+          name="Unité de Régulation Carburant (FCU)"
+          lcn="M06-03-01"
+          partNumber="PN-FCU-HYDRO-001"
+          cageCode="F0055"
+          smrCode="PAOGH"
+          qpa="1"
+          lsaCandidate="true" />
+
+        <hardwareItem
+          name="Pompe Carburant Haute Pression (HPC)"
+          lcn="M06-03-02"
+          partNumber="PN-PUMP-HP-FUEL"
+          cageCode="F0055"
+          smrCode="PAOGH"
+          qpa="1"
+          lsaCandidate="true" />
+
+        <taskRequirement
+          name="Test de Débit FCU sur Banc Carburant"
+          taskType="Preventive"
+          taskNumber="TSK-M06-PRV-002"
+          interval="600 FH"
+          maintenanceLevel="I"
+          mttr="6.0" />
+      </breakdownElement>
+    </systemBreakdown>
+
+  </productIdentifier>
+</s3000lProductBreakdown>

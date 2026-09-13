@@ -1,0 +1,107 @@
+<div class="min-h-screen bg-[#f4f6f9] text-slate-900 flex flex-col font-sans">
+
+  <!-- Global Application Header -->
+  <app-header (openNewProjectModal)="openCreateProjectModal()" />
+
+  <!-- Body: Sidebar + Content -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- ===== LEFT SIDEBAR (SLICwave Navigation) ===== -->
+    <nav [class.w-56]="!isSidebarCollapsed()"
+         [class.w-16]="isSidebarCollapsed()"
+         class="bg-[#001E38] flex flex-col shrink-0 transition-all duration-200 z-20 shadow-xl overflow-hidden">
+
+      <!-- Project Badge -->
+      @if (!isSidebarCollapsed()) {
+        <div class="px-4 py-3 border-b border-[#002d54]">
+          <div class="text-[9px] uppercase tracking-widest font-bold text-slate-400 mb-1">Projet actif</div>
+          @if (projectService.activeProject(); as proj) {
+            <div class="text-xs font-bold text-white leading-tight truncate">{{ proj.name }}</div>
+            <div class="text-[10px] text-slate-400 font-mono">S3000L v{{ proj.s3000lVersion }}</div>
+          } @else {
+            <div class="text-xs text-slate-500 italic">Aucun projet</div>
+          }
+        </div>
+      }
+
+      <!-- Nav Items -->
+      <div class="flex-1 py-2 space-y-0.5 px-2 overflow-y-auto">
+        @for (item of navItems; track item.id) {
+          @if (projectService.activeProject(); as proj) {
+            <a [routerLink]="['/project', proj.id, item.path]"
+               routerLinkActive="bg-[#0055B8] text-white"
+               [routerLinkActiveOptions]="{ exact: false }"
+               class="flex items-center gap-3 px-2.5 py-2.5 rounded-xl text-slate-300 hover:bg-[#002d54] hover:text-white transition-all group cursor-pointer no-underline">
+
+              <!-- Icon -->
+              <span class="shrink-0 text-current" [innerHTML]="item.icon"></span>
+
+              <!-- Label (hidden when collapsed) -->
+              @if (!isSidebarCollapsed()) {
+                <div class="min-w-0">
+                  <div class="text-xs font-semibold leading-tight truncate">{{ item.label }}</div>
+                  <div class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight truncate">{{ item.sublabel }}</div>
+                </div>
+              }
+            </a>
+          }
+        }
+      </div>
+
+      <!-- Sidebar Footer: Toggle collapse -->
+      <div class="border-t border-[#002d54] p-2">
+        <button (click)="toggleSidebar()"
+                class="w-full flex items-center justify-center gap-2 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-[#002d54] transition-all cursor-pointer">
+          @if (isSidebarCollapsed()) {
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+            </svg>
+          } @else {
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+            </svg>
+            <span class="text-xs font-medium">Réduire</span>
+          }
+        </button>
+      </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT (Router Outlet for SLICwave modules) ===== -->
+    <main class="flex-1 overflow-y-auto overflow-x-hidden">
+      @if (projectService.hasProjects()) {
+        <router-outlet />
+      } @else {
+        <!-- Zero-Projects empty state -->
+        <div class="p-8 flex items-center justify-center min-h-full">
+          <div class="bg-white border border-slate-200 rounded-3xl p-10 shadow-sm text-center max-w-lg w-full space-y-6">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-blue-50 border border-blue-100 text-[#0055B8]">
+              <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-[#001E38]">Aucun projet dans la base BASL</h2>
+              <p class="text-sm text-slate-500 mt-2">Créez un projet ou restaurez les données de démonstration.</p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+              <button (click)="openCreateProjectModal()"
+                      class="px-5 py-2.5 rounded-xl bg-[#0055B8] hover:bg-[#004494] text-white text-sm font-semibold transition-all cursor-pointer">
+                Nouveau projet
+              </button>
+              <button (click)="projectService.resetToDemoProjects()"
+                      class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold transition-all cursor-pointer">
+                Charger les démos
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </main>
+  </div>
+
+  <!-- Create Project Modal -->
+  @if (showCreateProjectModal()) {
+    <app-create-project-modal (closeModal)="closeCreateProjectModal()" />
+  }
+
+</div>

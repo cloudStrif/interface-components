@@ -1,33 +1,35 @@
-import { Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, effect } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ProjectService } from '../../services/project.service';
 import { LoginComponent } from '../login/login.component';
-import { AppHeaderComponent } from '../header/app-header.component';
-import { S3000LExplorerComponent } from '../sbd-explorer/sbd-explorer.component';
-import { CreateProjectModalComponent } from '../create-project-modal/create-project-modal.component';
 
+/**
+ * SbdDemoComponent — Auth Gate
+ * Redirige vers le projet actif si authentifié, sinon affiche le login SSO.
+ */
 @Component({
   selector: 'app-sbd-demo',
   standalone: true,
-  imports: [
-    CommonModule, 
-    LoginComponent, 
-    AppHeaderComponent, 
-    S3000LExplorerComponent, 
-    CreateProjectModalComponent
-  ],
+  imports: [LoginComponent],
   templateUrl: './sbd-demo.component.html'
 })
 export class SbdDemoComponent {
   public authService = inject(AuthService);
+  private projectService = inject(ProjectService);
+  private router = inject(Router);
 
-  public showCreateProjectModal = signal(false);
-
-  public openCreateProjectModal(): void {
-    this.showCreateProjectModal.set(true);
-  }
-
-  public closeCreateProjectModal(): void {
-    this.showCreateProjectModal.set(false);
+  constructor() {
+    // Dès qu'on est authentifié → naviguer vers le projet actif
+    effect(() => {
+      if (this.authService.isAuthenticated()) {
+        const activeId = this.projectService.activeProjectId();
+        if (activeId) {
+          this.router.navigate(['/project', activeId, 'pbs']);
+        } else {
+          this.router.navigate(['/project', 'no-project', 'pbs']);
+        }
+      }
+    });
   }
 }

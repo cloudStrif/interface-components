@@ -1,4 +1,4 @@
-<div class="p-4 lg:p-6 space-y-4 max-w-[1920px] mx-auto min-h-[calc(100vh-4rem)] flex flex-col">
+<div class="p-4 lg:p-5 space-y-4 max-w-[1920px] mx-auto flex flex-col" style="min-height: calc(100vh - 4rem)">
 
   <!-- Top Controls & XML Upload Bar (Clean White Card) -->
   <div class="bg-white border border-slate-200 rounded-2xl p-4 lg:p-5 shadow-xs flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4">
@@ -14,17 +14,17 @@
         <div class="flex items-center gap-2">
           <h2 class="text-base font-bold text-[#001E38] tracking-tight">Arborescence Spécification S3000L (LSA / PBS)</h2>
           <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold"
-                [class.bg-emerald-50]="projectService.activeProject().s3000lVersion === '2.0'"
-                [class.text-emerald-700]="projectService.activeProject().s3000lVersion === '2.0'"
+                [class.bg-emerald-50]="projectService.activeProject()?.s3000lVersion === '2.0'"
+                [class.text-emerald-700]="projectService.activeProject()?.s3000lVersion === '2.0'"
                 [class.border]="true"
-                [class.border-emerald-200]="projectService.activeProject().s3000lVersion === '2.0'"
-                [class.bg-blue-50]="projectService.activeProject().s3000lVersion === '1.1'"
-                [class.text-blue-700]="projectService.activeProject().s3000lVersion === '1.1'"
-                [class.border-blue-200]="projectService.activeProject().s3000lVersion === '1.1'">
-            Issue {{ projectService.activeProject().s3000lVersion }}
+                [class.border-emerald-200]="projectService.activeProject()?.s3000lVersion === '2.0'"
+                [class.bg-blue-50]="projectService.activeProject()?.s3000lVersion === '1.1'"
+                [class.text-blue-700]="projectService.activeProject()?.s3000lVersion === '1.1'"
+                [class.border-blue-200]="projectService.activeProject()?.s3000lVersion === '1.1'">
+            Issue {{ projectService.activeProject()?.s3000lVersion || '2.0' }}
           </span>
         </div>
-        <p class="text-xs text-slate-500">Projet actif : <span class="text-[#0055B8] font-semibold">{{ projectService.activeProject().name }}</span></p>
+        <p class="text-xs text-slate-500">Projet actif : <span class="text-[#0055B8] font-semibold">{{ projectService.activeProject()?.name || 'Aucun projet' }}</span></p>
       </div>
     </div>
 

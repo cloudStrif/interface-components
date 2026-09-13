@@ -12,7 +12,7 @@
       <div class="hidden md:block">
         <div class="flex items-center gap-2">
           <span class="font-bold text-white tracking-wide text-sm">
-            SL Data Engine <span class="font-normal text-blue-200">| Aero LSA</span>
+            SL Data Engine <span class="font-normal text-blue-200">| Web BASL Studio</span>
           </span>
           <span class="text-[10px] uppercase font-semibold bg-blue-500/20 text-blue-200 px-1.5 py-0.5 rounded border border-blue-400/30">LSA</span>
         </div>
@@ -23,23 +23,40 @@
     <!-- Project Dropdown Selector -->
     <div class="relative">
       <button (click)="toggleProjectDropdown()" 
-              class="flex items-center gap-3 bg-[#00294d] hover:bg-[#003463] border border-[#003d75] rounded-xl px-3.5 py-1.5 transition-all text-left">
-        <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
-        <div class="flex flex-col">
-          <span class="text-xs font-semibold text-white truncate max-w-[180px] sm:max-w-[240px]">
-            {{ projectService.activeProject().name }}
+              class="flex items-center gap-3 bg-[#00294d] hover:bg-[#003463] border border-[#003d75] rounded-xl px-3.5 py-1.5 transition-all text-left cursor-pointer">
+        
+        @if (projectService.activeProject(); as activeProj) {
+          <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+          <div class="flex flex-col">
+            <span class="text-xs font-semibold text-white truncate max-w-[180px] sm:max-w-[240px]">
+              {{ activeProj.name }}
+            </span>
+            <span class="text-[10px] text-slate-300 font-mono">
+              S3000L Issue {{ activeProj.s3000lVersion }}
+            </span>
+          </div>
+          <span class="ml-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold" 
+                [class.bg-emerald-500\/20]="activeProj.s3000lVersion === '2.0'"
+                [class.text-emerald-300]="activeProj.s3000lVersion === '2.0'"
+                [class.bg-blue-500\/20]="activeProj.s3000lVersion === '1.1'"
+                [class.text-blue-300]="activeProj.s3000lVersion === '1.1'">
+            v{{ activeProj.s3000lVersion }}
           </span>
-          <span class="text-[10px] text-slate-300 font-mono">
-            S3000L Issue {{ projectService.activeProject().s3000lVersion }}
+        } @else {
+          <div class="w-2 h-2 rounded-full bg-slate-400"></div>
+          <div class="flex flex-col">
+            <span class="text-xs font-semibold text-white">
+              Aucun projet actif
+            </span>
+            <span class="text-[10px] text-slate-400 font-mono">
+              Base BASL vide
+            </span>
+          </div>
+          <span class="ml-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-700 text-slate-300">
+            0 projet
           </span>
-        </div>
-        <span class="ml-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold" 
-              [class.bg-emerald-500\/20]="projectService.activeProject().s3000lVersion === '2.0'"
-              [class.text-emerald-300]="projectService.activeProject().s3000lVersion === '2.0'"
-              [class.bg-blue-500\/20]="projectService.activeProject().s3000lVersion === '1.1'"
-              [class.text-blue-300]="projectService.activeProject().s3000lVersion === '1.1'">
-          v{{ projectService.activeProject().s3000lVersion }}
-        </span>
+        }
+
         <svg class="w-4 h-4 text-slate-300 ml-1 transition-transform" [class.rotate-180]="isProjectDropdownOpen" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
         </svg>
@@ -53,39 +70,55 @@
             <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-mono">{{ projectService.projects().length }} projets</span>
           </div>
 
-          <div class="max-h-64 overflow-y-auto py-1 space-y-1">
-            @for (proj of projectService.projects(); track proj.id) {
-              <button (click)="selectProject(proj.id)"
-                      [class.bg-blue-50]="proj.id === projectService.activeProjectId()"
-                      [class.border-l-4]="proj.id === projectService.activeProjectId()"
-                      [class.border-[#0055B8]]="proj.id === projectService.activeProjectId()"
-                      class="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 transition-colors flex items-start justify-between group">
-                <div>
-                  <div class="text-xs font-semibold text-slate-900 group-hover:text-[#0055B8] transition-colors flex items-center gap-1.5">
-                    <span>{{ proj.name }}</span>
+          <!-- If there are projects -->
+          @if (projectService.projects().length > 0) {
+            <div class="max-h-64 overflow-y-auto py-1 space-y-1">
+              @for (proj of projectService.projects(); track proj.id) {
+                <button (click)="selectProject(proj.id)"
+                        [class.bg-blue-50]="proj.id === projectService.activeProjectId()"
+                        [class.border-l-4]="proj.id === projectService.activeProjectId()"
+                        [class.border-[#0055B8]]="proj.id === projectService.activeProjectId()"
+                        class="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 transition-colors flex items-start justify-between group cursor-pointer">
+                  <div>
+                    <div class="text-xs font-semibold text-slate-900 group-hover:text-[#0055B8] transition-colors flex items-center gap-1.5">
+                      <span>{{ proj.name }}</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-0.5 line-clamp-1">{{ proj.description }}</p>
                   </div>
-                  <p class="text-[11px] text-slate-500 mt-0.5 line-clamp-1">{{ proj.description }}</p>
-                </div>
-                <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold shrink-0 ml-2"
-                      [class.bg-emerald-100]="proj.s3000lVersion === '2.0'"
-                      [class.text-emerald-800]="proj.s3000lVersion === '2.0'"
-                      [class.bg-blue-100]="proj.s3000lVersion === '1.1'"
-                      [class.text-blue-800]="proj.s3000lVersion === '1.1'">
-                  v{{ proj.s3000lVersion }}
-                </span>
-              </button>
-            }
-          </div>
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold shrink-0 ml-2"
+                        [class.bg-emerald-100]="proj.s3000lVersion === '2.0'"
+                        [class.text-emerald-800]="proj.s3000lVersion === '2.0'"
+                        [class.bg-blue-100]="proj.s3000lVersion === '1.1'"
+                        [class.text-blue-800]="proj.s3000lVersion === '1.1'">
+                    v{{ proj.s3000lVersion }}
+                  </span>
+                </button>
+              }
+            </div>
+          } @else {
+            <!-- Empty state in dropdown -->
+            <div class="p-4 text-center space-y-1">
+              <p class="text-xs font-semibold text-slate-700">Aucun projet dans votre base</p>
+              <p class="text-[11px] text-slate-400">Créez votre premier projet ou chargez les démos.</p>
+            </div>
+          }
 
-          <!-- Add Project Button in Dropdown -->
-          <div class="pt-2 border-t border-slate-100">
+          <!-- Dropdown Footer Actions -->
+          <div class="pt-2 border-t border-slate-100 space-y-1.5">
             <button (click)="onNewProjectClick()" 
-                    class="w-full py-2 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#0055B8] border border-blue-200 text-xs font-semibold flex items-center justify-center gap-2 transition-all">
+                    class="w-full py-2 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#0055B8] border border-blue-200 text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
               </svg>
               <span>Créer un nouveau projet S3000L</span>
             </button>
+
+            @if (projectService.projects().length === 0) {
+              <button (click)="projectService.resetToDemoProjects()" 
+                      class="w-full py-1.5 px-3 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+                <span>Restaurer les projets de démonstration</span>
+              </button>
+            }
           </div>
         </div>
       }
@@ -96,7 +129,7 @@
   <div class="flex items-center gap-3">
     <!-- Quick Create Button -->
     <button (click)="onNewProjectClick()" 
-            class="hidden sm:flex items-center gap-1.5 bg-[#0055B8] hover:bg-[#004494] text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm transition-all border border-blue-400/30">
+            class="hidden sm:flex items-center gap-1.5 bg-[#0055B8] hover:bg-[#004494] text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm transition-all border border-blue-400/30 cursor-pointer">
       <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
       </svg>
@@ -106,7 +139,7 @@
     <!-- User Profile Dropdown -->
     <div class="relative">
       <button (click)="toggleUserDropdown()" 
-              class="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-[#00294d] transition-all border border-transparent hover:border-[#003d75]">
+              class="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-[#00294d] transition-all border border-transparent hover:border-[#003d75] cursor-pointer">
         <img [src]="authService.currentUser()?.avatarUrl" [alt]="authService.currentUser()?.name" class="w-8 h-8 rounded-full object-cover border border-blue-300/40">
         <div class="hidden lg:block text-left">
           <div class="text-xs font-semibold text-white leading-none">{{ authService.currentUser()?.name }}</div>
@@ -142,7 +175,7 @@
             </div>
 
             <button (click)="logout()" 
-                    class="w-full text-left px-3 py-2 rounded-xl text-xs font-medium text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition-colors flex items-center justify-between mt-2">
+                    class="w-full text-left px-3 py-2 rounded-xl text-xs font-medium text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition-colors flex items-center justify-between mt-2 cursor-pointer">
               <span>Se déconnecter de Darwin OIDC</span>
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

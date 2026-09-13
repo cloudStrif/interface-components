@@ -1,22 +1,28 @@
 @if (parserService.selectedNode(); as node) {
   <div class="h-full flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
     
-    <!-- Header Card -->
-    <div class="p-5 border-b border-slate-100 bg-slate-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <!-- Top Header SLICwave Item Record -->
+    <div class="p-5 border-b border-slate-100 bg-slate-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
         <div class="flex items-center gap-2 mb-1.5 flex-wrap">
           <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-blue-50 text-[#0055B8] border border-blue-200">
             &lt;{{ node.tagName }}&gt;
           </span>
           @if (node.lcn) {
-            <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-100 text-slate-700 border border-slate-200">
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-100 text-slate-800 border border-slate-200 font-semibold">
               LCN: {{ node.lcn }}
             </span>
           }
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-100 text-slate-600 border border-slate-200">
+            ALC: 01
+          </span>
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-100 text-slate-600 border border-slate-200">
+            UOC: ALL
+          </span>
           @if (node.lsaCandidate) {
             <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              LSA Candidate
+              LCI Candidate
             </span>
           }
         </div>
@@ -27,7 +33,7 @@
       <!-- Quick Action Buttons -->
       <div class="flex items-center gap-2 shrink-0">
         <button (click)="copyXmlSnippet(node.xmlSnippet)" 
-                class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-200 shadow-2xs">
+                class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-200 shadow-2xs cursor-pointer">
           <svg class="w-3.5 h-3.5 text-[#0055B8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
           </svg>
@@ -36,166 +42,275 @@
       </div>
     </div>
 
-    <!-- Navigation Tabs -->
-    <div class="flex border-b border-slate-200 px-5 gap-6 bg-white text-xs font-semibold">
-      <button (click)="activeTab = 'general'" 
-              [class.border-[#0055B8]]="activeTab === 'general'"
-              [class.text-[#0055B8]]="activeTab === 'general'"
-              [class.text-slate-500]="activeTab !== 'general'"
-              class="py-3.5 border-b-2 border-transparent transition-colors hover:text-[#0055B8]">
-        Informations Générales &amp; LSA
+    <!-- Navigation Tabs SLICwave / BASL Modules -->
+    <div class="flex border-b border-slate-200 px-5 gap-4 lg:gap-6 bg-white text-xs font-semibold overflow-x-auto custom-scrollbar">
+      <button (click)="setTab('identification')" 
+              [class.border-[#0055B8]]="activeTab === 'identification'"
+              [class.text-[#0055B8]]="activeTab === 'identification'"
+              [class.text-slate-500]="activeTab !== 'identification'"
+              class="py-3.5 border-b-2 border-transparent transition-colors hover:text-[#0055B8] whitespace-nowrap cursor-pointer">
+        Fiche Article &amp; LCN
       </button>
-      <button (click)="activeTab = 'attributes'" 
-              [class.border-[#0055B8]]="activeTab === 'attributes'"
-              [class.text-[#0055B8]]="activeTab === 'attributes'"
-              [class.text-slate-500]="activeTab !== 'attributes'"
-              class="py-3.5 border-b-2 border-transparent transition-colors hover:text-[#0055B8] flex items-center gap-1.5">
-        <span>Attributs XML</span>
-        <span class="px-1.5 py-0.2 rounded-full bg-slate-100 text-[10px] font-mono text-slate-600 border border-slate-200">{{ node.attributes.length }}</span>
+
+      <button (click)="setTab('mta')" 
+              [class.border-[#0055B8]]="activeTab === 'mta'"
+              [class.text-[#0055B8]]="activeTab === 'mta'"
+              [class.text-slate-500]="activeTab !== 'mta'"
+              class="py-3.5 border-b-2 border-transparent transition-colors hover:text-[#0055B8] whitespace-nowrap cursor-pointer">
+        Analyse de Maintenance (MTA)
       </button>
-      <button (click)="activeTab = 'maintenance'" 
-              [class.border-[#0055B8]]="activeTab === 'maintenance'"
-              [class.text-[#0055B8]]="activeTab === 'maintenance'"
-              [class.text-slate-500]="activeTab !== 'maintenance'"
-              class="py-3.5 border-b-2 border-transparent transition-colors hover:text-[#0055B8]">
-        Maintenance &amp; Tâches
+
+      <button (click)="setTab('fmeca')" 
+              [class.border-[#0055B8]]="activeTab === 'fmeca'"
+              [class.text-[#0055B8]]="activeTab === 'fmeca'"
+              [class.text-slate-500]="activeTab !== 'fmeca'"
+              class="py-3.5 border-b-2 border-transparent transition-colors hover:text-[#0055B8] whitespace-nowrap cursor-pointer">
+        Fiabilité &amp; FMECA
       </button>
-      <button (click)="activeTab = 'xml'" 
+
+      <button (click)="setTab('provisioning')" 
+              [class.border-[#0055B8]]="activeTab === 'provisioning'"
+              [class.text-[#0055B8]]="activeTab === 'provisioning'"
+              [class.text-slate-500]="activeTab !== 'provisioning'"
+              class="py-3.5 border-b-2 border-transparent transition-colors hover:text-[#0055B8] whitespace-nowrap cursor-pointer">
+        Rechanges &amp; SMR
+      </button>
+
+      <button (click)="setTab('gse')" 
+              [class.border-[#0055B8]]="activeTab === 'gse'"
+              [class.text-[#0055B8]]="activeTab === 'gse'"
+              [class.text-slate-500]="activeTab !== 'gse'"
+              class="py-3.5 border-b-2 border-transparent transition-colors hover:text-[#0055B8] whitespace-nowrap cursor-pointer">
+        Outillages &amp; GSE
+      </button>
+
+      <button (click)="setTab('xml')" 
               [class.border-[#0055B8]]="activeTab === 'xml'"
               [class.text-[#0055B8]]="activeTab === 'xml'"
               [class.text-slate-500]="activeTab !== 'xml'"
-              class="py-3.5 border-b-2 border-transparent transition-colors hover:text-[#0055B8]">
-        Code XML Source
+              class="py-3.5 border-b-2 border-transparent transition-colors hover:text-[#0055B8] whitespace-nowrap cursor-pointer">
+        Spécification S3000L
       </button>
     </div>
 
-    <!-- Tab Contents -->
+    <!-- Tab Contents SLICwave / BASL -->
     <div class="p-6 overflow-y-auto flex-1 space-y-6 custom-scrollbar bg-white">
       
-      <!-- TAB 1: General Info -->
-      @if (activeTab === 'general') {
+      <!-- MODULE 1: Fiche Article & Identification LCN -->
+      @if (activeTab === 'identification') {
         <div class="space-y-6">
-          <!-- Grid Summary -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-              <div class="text-[10px] text-slate-500 uppercase font-mono tracking-wider font-semibold">Logistics Control Number (LCN)</div>
-              <div class="text-base font-bold text-slate-900 font-mono mt-1">{{ node.lcn || 'Non attribué' }}</div>
+          <!-- Summary Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-3.5">
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+              <div class="text-[10px] text-slate-500 uppercase font-mono tracking-wider font-semibold">LCN Breakdown</div>
+              <div class="text-sm font-bold text-slate-900 font-mono mt-1">{{ node.lcn || 'Non défini' }}</div>
             </div>
 
-            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-              <div class="text-[10px] text-slate-500 uppercase font-mono tracking-wider font-semibold">Part Number (Réf. Pièce)</div>
-              <div class="text-base font-bold text-[#0055B8] font-mono mt-1">{{ node.partNumber || 'N/A' }}</div>
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+              <div class="text-[10px] text-slate-500 uppercase font-mono tracking-wider font-semibold">Part Number (P/N)</div>
+              <div class="text-sm font-bold text-[#0055B8] font-mono mt-1">{{ node.partNumber || 'PN-SPEC-GEN' }}</div>
             </div>
 
-            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-              <div class="text-[10px] text-slate-500 uppercase font-mono tracking-wider font-semibold">Éléments Enfants PBS</div>
-              <div class="text-base font-bold text-emerald-700 font-mono mt-1">{{ node.children.length }} sous-éléments</div>
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+              <div class="text-[10px] text-slate-500 uppercase font-mono tracking-wider font-semibold">Code CAGE Fabricant</div>
+              <div class="text-sm font-bold text-slate-800 font-mono mt-1">F0221 / F0055</div>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+              <div class="text-[10px] text-slate-500 uppercase font-mono tracking-wider font-semibold">Applicabilité (UOC)</div>
+              <div class="text-sm font-bold text-emerald-700 font-mono mt-1">ALL (Multi-version)</div>
             </div>
           </div>
 
-          <!-- Detail Properties Table -->
+          <!-- Structured BASL Table -->
           <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 shadow-xs">
-            <h4 class="text-xs font-bold text-[#001E38] uppercase tracking-wider">Détails Spécification S3000L</h4>
+            <h4 class="text-xs font-bold text-[#001E38] uppercase tracking-wider">Caractéristiques Découpage BASL (MIL-STD-1388 / S3000L)</h4>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6 text-xs">
               <div class="flex justify-between py-2 border-b border-slate-100">
-                <span class="text-slate-500">Balise XML :</span>
-                <span class="font-mono text-[#0055B8] font-semibold">&lt;{{ node.tagName }}&gt;</span>
+                <span class="text-slate-500">Niveau d'Indenture (Indenture Level) :</span>
+                <span class="font-mono text-slate-800 font-semibold">Niveau Découpage PBS Aéronautique</span>
               </div>
               <div class="flex justify-between py-2 border-b border-slate-100">
-                <span class="text-slate-500">Type de Composant :</span>
+                <span class="text-slate-500">Type de Découpage :</span>
                 <span class="font-bold text-slate-800 uppercase">{{ node.type }}</span>
               </div>
               <div class="flex justify-between py-2 border-b border-slate-100">
-                <span class="text-slate-500">Statut LSA Candidate :</span>
+                <span class="text-slate-500">Statut LCI (Logistics Candidate Item) :</span>
                 <span [class.text-emerald-700]="node.lsaCandidate" [class.text-slate-500]="!node.lsaCandidate" class="font-bold">
-                  {{ node.lsaCandidate ? 'Oui (Candidat Éligible LSA)' : 'Non' }}
+                  {{ node.lsaCandidate ? 'Oui (Candidat Éligible LSA/MTA)' : 'Non' }}
                 </span>
               </div>
               <div class="flex justify-between py-2 border-b border-slate-100">
-                <span class="text-slate-500">Niveau de Décomposition :</span>
-                <span class="font-mono text-slate-700">Découpage PBS Aéronautique</span>
+                <span class="text-slate-500">Sous-ensembles rattachés :</span>
+                <span class="font-mono text-[#0055B8] font-bold">{{ node.children.length }} éléments</span>
               </div>
             </div>
           </div>
         </div>
       }
 
-      <!-- TAB 2: Attributes Table -->
-      @if (activeTab === 'attributes') {
-        <div class="space-y-4">
-          @if (node.attributes.length === 0) {
-            <div class="text-center py-12 text-slate-400 text-xs">
-              Aucun attribut XML spécifique détecté sur cette balise.
-            </div>
-          } @else {
-            <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-xs">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-slate-50 text-slate-700 font-mono border-b border-slate-200">
-                  <tr>
-                    <th class="py-3 px-4 font-semibold">Nom de l'Attribut</th>
-                    <th class="py-3 px-4 font-semibold">Valeur</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 font-mono">
-                  @for (attr of node.attributes; track attr.name) {
-                    <tr class="hover:bg-slate-50 transition-colors">
-                      <td class="py-3 px-4 text-[#0055B8] font-semibold">{{ attr.name }}</td>
-                      <td class="py-3 px-4 text-slate-800">{{ attr.value }}</td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          }
-        </div>
-      }
-
-      <!-- TAB 3: Maintenance & Tasks -->
-      @if (activeTab === 'maintenance') {
+      <!-- MODULE 2: Analyse de Maintenance (MTA) -->
+      @if (activeTab === 'mta') {
         <div class="space-y-4">
           <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-xs text-blue-900 flex items-start gap-3">
             <svg class="w-5 h-5 text-[#0055B8] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
             </svg>
             <div>
-              <span class="font-bold text-[#001E38] block mb-0.5">Données de Maintien en Condition Opérationnelle (MCO)</span>
-              Ces exigences de maintenance sont associées à l'élément LCN {{ node.lcn || node.name }}.
+              <span class="font-bold text-[#001E38] block mb-0.5">Maintenance Task Analysis (MTA / Plan de Maintenance)</span>
+              Opérations de soutien logistique associées à l'article LCN {{ node.lcn || node.name }}.
             </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-              <div class="text-xs font-bold text-slate-800 flex items-center gap-2">
-                <svg class="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Intervalle d'Inspection Préventive
+              <div class="text-xs font-bold text-slate-800 flex items-center justify-between">
+                <span class="flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                  Tâche Préventive : Contrôle Boroscopique
+                </span>
+                <span class="text-[10px] font-mono bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">TSK-01-PRV</span>
               </div>
-              <p class="text-xs text-slate-600">Contrôle visuel et boroscopique périodique selon spécification S3000L LSA.</p>
-              <div class="text-xs font-mono text-amber-700 font-bold">Intervalle: 150 FH (Flight Hours)</div>
+              <p class="text-xs text-slate-600 leading-relaxed">Inspection visuelle indirecte par boroscope rigide/flexible des aubes et passages de gaz.</p>
+              <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-200 text-slate-700">
+                <span>Périodicité : <strong class="text-amber-700 font-mono">150 FH</strong></span>
+                <span>MTTR : <strong class="text-slate-900 font-mono">1.8 h</strong></span>
+              </div>
             </div>
 
             <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-              <div class="text-xs font-bold text-slate-800 flex items-center gap-2">
-                <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Outillage Spécialisé &amp; GSE
+              <div class="text-xs font-bold text-slate-800 flex items-center justify-between">
+                <span class="flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                  Tâche Corrective : Remplacement standard (LRU)
+                </span>
+                <span class="text-[10px] font-mono bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">TSK-02-COR</span>
               </div>
-              <p class="text-xs text-slate-600">Banc de test diagnostic et adaptateurs hydrauliques haute pression.</p>
-              <div class="text-xs font-mono text-emerald-700 font-bold">Réf GSE: GSE-S3000L-TOOL-09</div>
+              <p class="text-xs text-slate-600 leading-relaxed">Dépose et repose sur ligne de vol (O-Level) avec purge des raccords rapides.</p>
+              <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-200 text-slate-700">
+                <span>Échelon : <strong class="text-emerald-700">Niveau O (En ligne)</strong></span>
+                <span>Équipe : <strong class="text-slate-900 font-mono">2 Techniciens B1</strong></span>
+              </div>
             </div>
           </div>
         </div>
       }
 
-      <!-- TAB 4: XML Snippet -->
+      <!-- MODULE 3: Fiabilité & FMECA (AMDEC) -->
+      @if (activeTab === 'fmeca') {
+        <div class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+              <div class="text-[10px] text-slate-500 uppercase font-mono tracking-wider font-semibold">MTBF (Mean Time Between Failures)</div>
+              <div class="text-base font-bold text-slate-900 font-mono mt-1">12 450 FH</div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+              <div class="text-[10px] text-slate-500 uppercase font-mono tracking-wider font-semibold">Taux de Défaillance (&lambda;)</div>
+              <div class="text-base font-bold text-[#0055B8] font-mono mt-1">8.03 &times; 10<sup>-5</sup> /h</div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+              <div class="text-[10px] text-slate-500 uppercase font-mono tracking-wider font-semibold">Criticité FMECA (MIL-STD-1629)</div>
+              <div class="text-base font-bold text-amber-700 font-mono mt-1">Catégorie II (Majeure)</div>
+            </div>
+          </div>
+
+          <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-xs">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-700 font-mono border-b border-slate-200">
+                <tr>
+                  <th class="py-3 px-4 font-semibold">Mode de Défaillance</th>
+                  <th class="py-3 px-4 font-semibold">Effet Local</th>
+                  <th class="py-3 px-4 font-semibold">Effet Système</th>
+                  <th class="py-3 px-4 font-semibold">Détection</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="py-3 px-4 font-semibold text-slate-800">Érosion / Écaillage de surface</td>
+                  <td class="py-3 px-4 text-slate-600">Perte de rendement aérodynamique</td>
+                  <td class="py-3 px-4 text-amber-700 font-medium">Augmentation EGT (+8°C)</td>
+                  <td class="py-3 px-4 font-mono text-slate-500">Boroscopie périodique</td>
+                </tr>
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="py-3 px-4 font-semibold text-slate-800">Fuite joint dynamique HP</td>
+                  <td class="py-3 px-4 text-slate-600">Baisse de pression hydraulique</td>
+                  <td class="py-3 px-4 text-slate-600">Alerte capteur FADEC cockpit</td>
+                  <td class="py-3 px-4 font-mono text-slate-500">Télémesure de bord</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+
+      <!-- MODULE 4: Rechanges & Approvisionnement (SMR) -->
+      @if (activeTab === 'provisioning') {
+        <div class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+              <div class="text-[10px] text-slate-500 uppercase font-mono tracking-wider font-semibold">Code SMR (Source, Maint, Recov)</div>
+              <div class="text-base font-bold text-slate-900 font-mono mt-1">PAOGD</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Procured, Aviation Interm, Overhaul, Depot</div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+              <div class="text-[10px] text-slate-500 uppercase font-mono tracking-wider font-semibold">Quantité Par Application (QPA)</div>
+              <div class="text-base font-bold text-[#0055B8] font-mono mt-1">1 unité</div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+              <div class="text-[10px] text-slate-500 uppercase font-mono tracking-wider font-semibold">Délai d'Approvisionnement (Lead Time)</div>
+              <div class="text-base font-bold text-slate-900 font-mono mt-1">45 jours calendaires</div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1.5">
+            <div class="font-bold text-[#001E38]">Politique de Rechange &amp; Stockage (BASL Provisioning)</div>
+            <p class="leading-relaxed">
+              Composant réparable en atelier intermédiaire (I-Level) et révision générale en dépôt industriel (D-Level). Durée de vie stockage sous emballage hermétique : 5 ans.
+            </p>
+          </div>
+        </div>
+      }
+
+      <!-- MODULE 5: Outillages & Support Equipment (GSE) -->
+      @if (activeTab === 'gse') {
+        <div class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+              <div class="text-xs font-bold text-slate-800 flex items-center justify-between">
+                <span>Banc de Test &amp; Étalonnage GSE</span>
+                <span class="text-[10px] font-mono bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">GSE-TOOL-09</span>
+              </div>
+              <p class="text-xs text-slate-600">Servitude de diagnostic électronique et vérification des bus de communication FADEC / AFDX.</p>
+              <div class="text-xs font-mono text-slate-500 pt-1 border-t border-slate-200">
+                Périodicité d'étalonnage : 12 mois
+              </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+              <div class="text-xs font-bold text-slate-800 flex items-center justify-between">
+                <span>Kit d'Élingage &amp; Berceau de Manutention</span>
+                <span class="text-[10px] font-mono bg-slate-200 text-slate-800 px-1.5 py-0.5 rounded">GSE-LIFT-22</span>
+              </div>
+              <p class="text-xs text-slate-600">Dispositif de maintien pour dépose en atelier et manutention sécurisée sur banc d'essai.</p>
+              <div class="text-xs font-mono text-slate-500 pt-1 border-t border-slate-200">
+                Charge maximale utile (CMU) : 1 200 kg
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- MODULE 6: Spécification S3000L XML -->
       @if (activeTab === 'xml') {
-        <div class="space-y-3">
+        <div class="space-y-4">
           <div class="flex items-center justify-between">
-            <span class="text-xs text-slate-500 font-mono">Extrait du document XML S3000L</span>
-            <button (click)="copyXmlSnippet(node.xmlSnippet)" class="text-xs text-[#0055B8] hover:underline font-medium">
+            <span class="text-xs text-slate-500 font-mono">Extrait du document XML S3000L normatif</span>
+            <button (click)="copyXmlSnippet(node.xmlSnippet)" class="text-xs text-[#0055B8] hover:underline font-medium cursor-pointer">
               {{ copiedXml ? 'Copié !' : 'Copier dans le presse-papier' }}
             </button>
           </div>
@@ -203,6 +318,28 @@
           <pre class="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-mono text-emerald-400 overflow-x-auto whitespace-pre-wrap leading-relaxed shadow-xs">
 {{ node.xmlSnippet || '&lt;' + node.tagName + ' /&gt;' }}
           </pre>
+
+          <!-- XML Attributes Table if present -->
+          @if (node.attributes && node.attributes.length > 0) {
+            <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-xs">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-700 font-mono border-b border-slate-200">
+                  <tr>
+                    <th class="py-2.5 px-4 font-semibold">Attribut XML</th>
+                    <th class="py-2.5 px-4 font-semibold">Valeur</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 font-mono">
+                  @for (attr of node.attributes; track attr.name) {
+                    <tr class="hover:bg-slate-50 transition-colors">
+                      <td class="py-2.5 px-4 text-[#0055B8] font-semibold">{{ attr.name }}</td>
+                      <td class="py-2.5 px-4 text-slate-800">{{ attr.value }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
         </div>
       }
 
@@ -214,8 +351,8 @@
       <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
       </svg>
-      <p class="text-sm font-bold text-slate-700">Aucun nœud sélectionné</p>
-      <p class="text-xs text-slate-500 mt-1">Sélectionnez un élément dans l'arborescence à gauche pour afficher ses détails S3000L.</p>
+      <p class="text-sm font-bold text-slate-700">Aucun élément BASL sélectionné</p>
+      <p class="text-xs text-slate-500 mt-1">Sélectionnez un nœud dans l'arborescence LCN à gauche pour afficher sa fiche SLICwave.</p>
     </div>
   </div>
 }

@@ -1,21 +1,5 @@
 @if (!authService.isAuthenticated()) {
-  <!-- Show Login Screen if NOT authenticated via Darwin OIDC -->
+  <!-- Auth gate: afficher le login SSO si non authentifié -->
   <app-login />
-} @else {
-  <!-- Show Main Application Workspace when authenticated -->
-  <div class="min-h-screen bg-[#f4f6f9] text-slate-900 flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
-    
-    <!-- Global Application Header -->
-    <app-header (openNewProjectModal)="openCreateProjectModal()" />
-
-    <!-- Main S3000L XML Explorer Workspace -->
-    <main class="flex-1">
-      <app-sbd-explorer />
-    </main>
-
-    <!-- Create Project Modal (Form with 2 fields: Name & S3000L Version 1.1 / 2.0) -->
-    @if (showCreateProjectModal()) {
-      <app-create-project-modal (closeModal)="closeCreateProjectModal()" />
-    }
-  </div>
 }
+<!-- Si authentifié, le effect() dans le TS redirige automatiquement vers /project/:id/pbs -->

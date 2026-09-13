@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { S3000LParserService } from '../../services/s3000l-parser.service';
 import { S3000LTreeNode } from '../../models/s3000l-tree.model';
 
+export type SlicwaveTab = 'identification' | 'mta' | 'fmeca' | 'provisioning' | 'gse' | 'xml';
+
 @Component({
   selector: 'app-sbd-node-detail',
   standalone: true,
@@ -12,8 +14,12 @@ import { S3000LTreeNode } from '../../models/s3000l-tree.model';
 export class S3000LNodeDetailComponent {
   public parserService = inject(S3000LParserService);
 
-  public activeTab: 'general' | 'attributes' | 'maintenance' | 'xml' = 'general';
+  public activeTab: SlicwaveTab = 'identification';
   public copiedXml = false;
+
+  public setTab(tab: SlicwaveTab): void {
+    this.activeTab = tab;
+  }
 
   public copyXmlSnippet(snippet?: string): void {
     if (!snippet) return;

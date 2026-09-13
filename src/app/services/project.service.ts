@@ -24,13 +24,17 @@ export class ProjectService {
   public projects = signal<Project[]>(MOCK_PROJECTS);
   
   // Signal réactif pour le projet actif sélectionné
-  public activeProjectId = signal<string>(MOCK_PROJECTS[0].id);
+  public activeProjectId = signal<string>(MOCK_PROJECTS.length > 0 ? MOCK_PROJECTS[0].id : '');
 
-  // Computed signal calculant automatiquement l'objet projet actif
-  public activeProject = computed(() => {
+  // Indicateur calculé pour savoir si des projets existent
+  public hasProjects = computed(() => this.projects().length > 0);
+
+  // Computed signal calculant automatiquement l'objet projet actif (sécurisé si vide)
+  public activeProject = computed<Project | null>(() => {
     const list = this.projects();
+    if (list.length === 0) return null;
     const activeId = this.activeProjectId();
-    return list.find(p => p.id === activeId) || list[0];
+    return list.find(p => p.id === activeId) || list[0] || null;
   });
 
   /**
@@ -62,5 +66,21 @@ export class ProjectService {
     this.projects.update(list => [newProj, ...list]);
     this.activeProjectId.set(newProj.id);
     return newProj;
+  }
+
+  /**
+   * Restaurer les projets d'exemple pour les démos client
+   */
+  public resetToDemoProjects(): void {
+    this.projects.set(MOCK_PROJECTS);
+    this.activeProjectId.set(MOCK_PROJECTS[0].id);
+  }
+
+  /**
+   * Vider tous les projets (utile pour tester l'écran vide / zéro projet)
+   */
+  public clearAllProjects(): void {
+    this.projects.set([]);
+    this.activeProjectId.set('');
   }
 }
