@@ -127,6 +127,15 @@
 
   <!-- Right Side: User Profile & New Project Button -->
   <div class="flex items-center gap-3">
+    <!-- Quick Link to Dynamic Form Demo -->
+    <a routerLink="/forms-demo"
+       class="hidden md:flex items-center gap-1.5 bg-[#00294d] hover:bg-[#003463] text-blue-200 hover:text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition-all border border-[#003d75] no-underline cursor-pointer">
+      <svg class="w-4 h-4 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+      </svg>
+      <span>Démo Dynamic Form</span>
+    </a>
+
     <!-- Quick Create Button -->
     <button (click)="onNewProjectClick()" 
             class="hidden sm:flex items-center gap-1.5 bg-[#0055B8] hover:bg-[#004494] text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm transition-all border border-blue-400/30 cursor-pointer">

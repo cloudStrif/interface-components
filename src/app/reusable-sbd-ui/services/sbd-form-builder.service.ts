@@ -1,4 +1,4 @@
-﻿import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
   SbdFormFieldSchema,
@@ -233,6 +233,10 @@ export class SbdFormBuilderService {
 
   checkbox(key: string, label: string): SbdFieldBuilder {
     return new SbdFieldBuilder(key, 'checkbox', label, this);
+  }
+
+  checkboxGroup(key: string, label: string): SbdFieldBuilder {
+    return new SbdFieldBuilder(key, 'checkbox-group', label, this);
   }
 
   toggle(key: string, label: string): SbdFieldBuilder {

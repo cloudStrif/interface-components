@@ -1,4 +1,4 @@
-﻿import { Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
 // ─── Field Types ───────────────────────────────────────────────────────────────
 
@@ -12,6 +12,7 @@ export type SbdFormFieldType =
   | 'radio'
   | 'textarea'
   | 'checkbox'
+  | 'checkbox-group'
   | 'toggle'
   | 'date'
   | 'datetime-local'

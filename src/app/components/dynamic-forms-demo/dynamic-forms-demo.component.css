@@ -1,0 +1,12 @@
+/* Styles additionnels spécifiques au composant Démo Formulaires */
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+}

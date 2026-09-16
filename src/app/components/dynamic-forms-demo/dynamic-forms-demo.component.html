@@ -1,0 +1,218 @@
+<div class="min-h-full bg-slate-50 p-6 lg:p-10 font-sans space-y-6">
+
+  <!-- =========================================================================
+       PAGE HEADER & NAVIGATION
+       ========================================================================= -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs">
+    <div class="space-y-1">
+      <div class="flex items-center gap-2 text-xs font-semibold text-slate-500">
+        <a routerLink="/" class="hover:text-[#0055B8] transition-colors">Accueil</a>
+        <span class="text-slate-300">/</span>
+        <span class="text-slate-400">Composants Réutilisables</span>
+        <span class="text-slate-300">/</span>
+        <span class="text-[#0055B8]">Dynamic Form SBD</span>
+      </div>
+      <h1 class="text-xl lg:text-2xl font-black text-[#001E38] tracking-tight flex items-center gap-3">
+        <span>Formulaire Dynamique &amp; Groupes de Checkboxes</span>
+        <span class="text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 bg-blue-50 text-[#0055B8] border border-blue-200/60 rounded-full">
+          reusable-sbd-ui
+        </span>
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-500 max-w-2xl">
+        Démonstration complète de la création de formulaires avec plusieurs groupes de cases à cocher sous des titres dédiés (<code class="bg-slate-100 text-[#001E38] px-1.5 py-0.5 rounded font-mono text-[11px]">nom : checkbox 1, 2, 3...</code>).
+      </p>
+    </div>
+
+    <!-- Quick action links -->
+    <div class="flex items-center gap-2">
+      <a routerLink="/project/no-project/pbs" 
+         class="px-4 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all flex items-center gap-2 no-underline cursor-pointer">
+        <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        <span>Retour au projet BASL</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       APPROACH SELECTOR TABS
+       ========================================================================= -->
+  <div class="flex flex-wrap items-center gap-3 border-b border-slate-200 pb-2">
+    <button
+      type="button"
+      (click)="setTab('checkbox-groups')"
+      class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer"
+      [class.bg-[#001E38]]="activeTab() === 'checkbox-groups'"
+      [class.text-white]="activeTab() === 'checkbox-groups'"
+      [class.shadow-sm]="activeTab() === 'checkbox-groups'"
+      [class.bg-white]="activeTab() !== 'checkbox-groups'"
+      [class.text-slate-600]="activeTab() !== 'checkbox-groups'"
+      [class.border]="activeTab() !== 'checkbox-groups'"
+      [class.border-slate-200]="activeTab() !== 'checkbox-groups'"
+      [class.hover:bg-slate-100]="activeTab() !== 'checkbox-groups'"
+    >
+      <span class="w-2 h-2 rounded-full" [class.bg-emerald-400]="activeTab() === 'checkbox-groups'" [class.bg-slate-400]="activeTab() !== 'checkbox-groups'"></span>
+      <span>Approche 1 : 'checkbox-group' (Recommandée)</span>
+      <span class="text-[10px] px-1.5 py-0.5 rounded font-mono font-normal opacity-80" [class.bg-white\/20]="activeTab() === 'checkbox-groups'" [class.bg-slate-100]="activeTab() !== 'checkbox-groups'">
+        Array de valeurs
+      </span>
+    </button>
+
+    <button
+      type="button"
+      (click)="setTab('sections-checkboxes')"
+      class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer"
+      [class.bg-[#001E38]]="activeTab() === 'sections-checkboxes'"
+      [class.text-white]="activeTab() === 'sections-checkboxes'"
+      [class.shadow-sm]="activeTab() === 'sections-checkboxes'"
+      [class.bg-white]="activeTab() !== 'sections-checkboxes'"
+      [class.text-slate-600]="activeTab() !== 'sections-checkboxes'"
+      [class.border]="activeTab() !== 'sections-checkboxes'"
+      [class.border-slate-200]="activeTab() !== 'sections-checkboxes'"
+      [class.hover:bg-slate-100]="activeTab() !== 'sections-checkboxes'"
+    >
+      <span class="w-2 h-2 rounded-full" [class.bg-emerald-400]="activeTab() === 'sections-checkboxes'" [class.bg-slate-400]="activeTab() !== 'sections-checkboxes'"></span>
+      <span>Approche 2 : Titres 'heading' + Checkboxes booléennes</span>
+      <span class="text-[10px] px-1.5 py-0.5 rounded font-mono font-normal opacity-80" [class.bg-white\/20]="activeTab() === 'sections-checkboxes'" [class.bg-slate-100]="activeTab() !== 'sections-checkboxes'">
+        Champs indépendants
+      </span>
+    </button>
+  </div>
+
+  <!-- =========================================================================
+       MAIN GRID : FORM (LEFT) + INSPECTOR (RIGHT)
+       ========================================================================= -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- ─── LEFT COLUMN : DYNAMIC FORM ──────────────────────────────────────── -->
+    <div class="lg:col-span-7 space-y-6">
+
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-6">
+        
+        <!-- Tab explanation badge -->
+        @if (activeTab() === 'checkbox-groups') {
+          <div class="bg-blue-50/70 border border-blue-200/80 rounded-xl p-4 text-xs space-y-1">
+            <div class="font-bold text-[#0055B8] flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Fonctionnement du mode 'checkbox-group'</span>
+            </div>
+            <p class="text-slate-600 leading-relaxed">
+              Chaque titre correspond à une propriété racine (ex: <code class="bg-white px-1 py-0.5 rounded border border-blue-200 text-[#001E38] font-mono">modules</code>, <code class="bg-white px-1 py-0.5 rounded border border-blue-200 text-[#001E38] font-mono">permissions</code>, <code class="bg-white px-1 py-0.5 rounded border border-blue-200 text-[#001E38] font-mono">notifications</code>) contenant une liste de valeurs sélectionnées sous forme de tableau (<code class="bg-white px-1 py-0.5 rounded border border-blue-200 text-[#001E38] font-mono">string[]</code>).
+            </p>
+          </div>
+
+          <!-- The Dynamic Form Component -->
+          <app-sbd-dynamic-form
+            [fields]="checkboxGroupsFields"
+            [showReset]="true"
+            submitLabel="Enregistrer les préférences"
+            (formChange)="onFormChange($event)"
+            (formSubmit)="onFormSubmit($event)"
+            (formCancel)="onFormCancel()"
+          />
+        } @else {
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-1">
+            <div class="font-bold text-[#001E38] flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-[#0055B8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Fonctionnement du mode 'heading' + checkboxes</span>
+            </div>
+            <p class="text-slate-600 leading-relaxed">
+              Les titres sont des éléments structurels <code class="bg-white px-1 py-0.5 rounded border border-slate-200 text-[#001E38] font-mono">heading</code>. Chaque case à cocher est un champ indépendant qui produit une valeur booléenne (<code class="bg-white px-1 py-0.5 rounded border border-slate-200 text-[#001E38] font-mono">true / false</code>).
+            </p>
+          </div>
+
+          <!-- The Dynamic Form Component -->
+          <app-sbd-dynamic-form
+            [fields]="sectionsCheckboxesFields"
+            [showReset]="true"
+            submitLabel="Valider la configuration"
+            (formChange)="onFormChange($event)"
+            (formSubmit)="onFormSubmit($event)"
+            (formCancel)="onFormCancel()"
+          />
+        }
+
+      </div>
+
+    </div>
+
+    <!-- ─── RIGHT COLUMN : LIVE STATE & CODE EXPLANATION ─────────────────────── -->
+    <div class="lg:col-span-5 space-y-6">
+
+      <!-- SUBMISSION TOAST / RESULT -->
+      @if (lastSubmittedEvent(); as submitted) {
+        <div class="bg-emerald-50 border border-emerald-300 rounded-2xl p-4 shadow-sm space-y-3 animate-fade-in">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span class="text-xs font-bold text-emerald-900 uppercase tracking-wide">Formulaire Soumis avec Succès</span>
+            </div>
+            <span class="text-[10px] font-mono text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
+              Mode: {{ submitted.mode }}
+            </span>
+          </div>
+          <div class="bg-emerald-900 text-emerald-100 rounded-xl p-3 font-mono text-[11px] overflow-x-auto">
+            <pre>{{ submitted.value | json }}</pre>
+          </div>
+        </div>
+      }
+
+      <!-- LIVE JSON VALUE INSPECTOR -->
+      <div class="bg-[#001E38] text-white border border-[#002d54] rounded-2xl p-5 shadow-lg space-y-3">
+        <div class="flex items-center justify-between border-b border-[#002d54] pb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-2.5 h-2.5 rounded-full bg-[#009CDE]"></div>
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-200">Aperçu Réactif du FormGroup (Live)</span>
+          </div>
+          <span class="text-[10px] bg-[#00294d] text-blue-200 px-2 py-0.5 rounded border border-[#003d75] font-mono">
+            ReactiveForms
+          </span>
+        </div>
+
+        <p class="text-[11px] text-slate-300">
+          Cette valeur est synchronisée en temps réel via l'événement <code class="text-amber-300">(formChange)</code> dès qu'une case est cochée ou décochée :
+        </p>
+
+        <div class="bg-[#001426] rounded-xl p-3.5 border border-[#00294d] overflow-x-auto max-h-72">
+          <pre class="text-[11px] font-mono text-emerald-400">{{ liveFormValue() | json }}</pre>
+        </div>
+      </div>
+
+      <!-- CODE EXAMPLE ACCORDION / CARD -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <h3 class="text-xs font-bold text-[#00205B] uppercase tracking-wider flex items-center gap-2">
+            <svg class="w-4 h-4 text-[#0055B8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+            </svg>
+            <span>Comment Déclarer ce Schéma (Code TS)</span>
+          </h3>
+          <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono font-medium">TypeScript</span>
+        </div>
+
+        <div class="bg-slate-900 text-slate-100 rounded-xl p-3.5 overflow-x-auto max-h-80 text-[11px] font-mono">
+          <pre><code>{{ activeTab() === 'checkbox-groups' ? codeSnippetApproach1 : codeSnippetApproach2 }}</code></pre>
+        </div>
+
+        <!-- Template Usage Explanation -->
+        <div class="pt-2 text-xs text-slate-500 border-t border-slate-100 space-y-1">
+          <div class="font-semibold text-slate-700">Utilisation dans votre template HTML :</div>
+          <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 font-mono text-[10px] text-slate-800">
+            &lt;app-sbd-dynamic-form<br>
+            &nbsp;&nbsp;[fields]="myFormFields"<br>
+            &nbsp;&nbsp;(formSubmit)="handleSave($event)"<br>
+            /&gt;
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

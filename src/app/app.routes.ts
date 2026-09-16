@@ -7,12 +7,23 @@ import { TaskCardsComponent } from './components/task-cards/task-cards.component
 import { FmecaComponent } from './components/fmeca/fmeca.component';
 import { LoraComponent } from './components/lora/lora.component';
 import { SupportItemsComponent } from './components/support-items/support-items.component';
+import { DynamicFormsDemoComponent } from './components/dynamic-forms-demo/dynamic-forms-demo.component';
 
 export const routes: Routes = [
   {
     // Route racine : vérification auth → redirection vers projet actif
     path: '',
     component: SbdDemoComponent,
+  },
+  {
+    // Page dédiée Démo Dynamic Form (accessible directement)
+    path: 'forms-demo',
+    component: DynamicFormsDemoComponent,
+  },
+  {
+    path: 'dynamic-form-demo',
+    redirectTo: 'forms-demo',
+    pathMatch: 'full'
   },
   {
     // Shell principal SLICwave avec sidebar et router-outlet enfants
@@ -33,6 +44,8 @@ export const routes: Routes = [
       { path: 'lora', component: LoraComponent },
       // Support Items — Pièces de rechange, GSE, outillage, documentation
       { path: 'support-items', component: SupportItemsComponent },
+      // Démo Dynamic Form avec Checkbox Groups
+      { path: 'forms-demo', component: DynamicFormsDemoComponent },
     ]
   },
   {

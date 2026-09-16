@@ -1,29 +1,30 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { ProjectService } from '../../services/project.service';
+import { UserRole } from '../../models/user.model';
 
+/**
+ * LoginComponent — Page de connexion SLICwave
+ * Sélection du profil : Administrateur / Contributeur / Lecteur
+ */
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule],
   templateUrl: './login.component.html'
 })
 export class LoginComponent {
-  public authService = inject(AuthService);
-  private router = inject(Router);
-  private projectService = inject(ProjectService);
+  public readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
   public isLoading = false;
   public showOidcDetails = false;
 
-  public onLogin(): void {
+  public onLogin(role: UserRole = 'administrateur'): void {
     this.isLoading = true;
-    this.authService.loginWithDarwin().then(() => {
+    setTimeout(() => {
+      this.auth.loginAs(role);
       this.isLoading = false;
-      const activeId = this.projectService.activeProjectId();
-      this.router.navigate(['/project', activeId]);
-    });
+      this.router.navigate(['/']);
+    }, 400);
   }
 }

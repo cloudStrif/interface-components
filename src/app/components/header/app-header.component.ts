@@ -1,7 +1,7 @@
 import { Component, inject, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ProjectService } from '../../services/project.service';
 import { S3000LParserService } from '../../services/s3000l-parser.service';
@@ -9,7 +9,7 @@ import { S3000LParserService } from '../../services/s3000l-parser.service';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './app-header.component.html'
 })
 export class AppHeaderComponent {
