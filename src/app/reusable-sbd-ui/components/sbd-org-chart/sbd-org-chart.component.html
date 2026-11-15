@@ -28,11 +28,6 @@
         <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
         <span>Dépliés : <strong>{{ treeStats().expanded }}</strong></span>
       </div>
-      <div
-        class="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-100 flex items-center gap-1.5 font-medium">
-        <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-        <span>Profondeur max : <strong>{{ treeStats().depth }}</strong> niveaux</span>
-      </div>
     </div>
 
     <!-- Outils de Zoom, Recentrage et Dépliage -->
@@ -75,13 +70,7 @@
         <span>Recentrer</span>
       </button>
 
-      <!-- Déplier / Replier rapide -->
-      <button type="button" (click)="expandFirstLevel()"
-        class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg shadow-xs transition-colors"
-        title="Déplier le niveau 1">
-        <span>Niveau 1</span>
-      </button>
-
+      <!-- Déplier / Replier tout -->
       <button type="button" (click)="expandAll()"
         class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg shadow-xs transition-colors"
         title="Tout déplier récursivement">
@@ -154,191 +143,105 @@
             class="inline-block w-auto [&_.p-organizationchart-node-children[style*='hidden']]:!hidden [&_.p-organizationchart-connectors[style*='hidden']]:!hidden [&_.p-organizationchart-connector-down]:!w-0.5 [&_.p-organizationchart-connector-down]:!bg-slate-300 [&_.p-organizationchart-connector-down]:!h-5 [&_.p-organizationchart-connector-down]:!mx-auto [&_.p-organizationchart-connector-left]:!border-r-2 [&_.p-organizationchart-connector-left]:!border-slate-300 [&_.p-organizationchart-connector-top]:!border-t-2 [&_.p-organizationchart-connector-top]:!border-slate-300 [&_.p-organizationchart-connector-right]:!border-l-2 [&_.p-organizationchart-connector-right]:!border-slate-300 [&_.p-organizationchart-node]:!p-0 [&_.p-organizationchart-node]:!bg-transparent [&_.p-organizationchart-node]:!border-none [&_.p-organizationchart-node-toggle-button]:!w-[26px] [&_.p-organizationchart-node-toggle-button]:!h-[26px] [&_.p-organizationchart-node-toggle-button]:!rounded-full [&_.p-organizationchart-node-toggle-button]:!bg-white [&_.p-organizationchart-node-toggle-button]:!border-2 [&_.p-organizationchart-node-toggle-button]:!border-slate-300 [&_.p-organizationchart-node-toggle-button]:!text-slate-600 [&_.p-organizationchart-node-toggle-button:hover]:!bg-blue-600 [&_.p-organizationchart-node-toggle-button:hover]:!border-blue-600 [&_.p-organizationchart-node-toggle-button:hover]:!text-white [&_.p-organizationchart-node-toggle-button:hover]:!scale-110 [&_.p-organizationchart-node-toggle-button:hover]:!shadow-md [&_.p-organizationchart-table]:!border-separate [&_.p-organizationchart-table]:!mx-auto [&_.p-organizationchart-table]:!w-auto [&_.p-organizationchart-table]:!max-w-none [&_.p-organizationchart-table]:[border-spacing:0]"
             (onNodeSelect)="onNodeSelected($event)" (onNodeExpand)="onNodeExpanded($event)"
             (onNodeCollapse)="onNodeCollapsed($event)">
-            <!-- 1. TEMPLATE NŒUD RACINE (ROOT) -->
-            <ng-template let-node pTemplate="root">
+            <!-- GABARIT UNIQUE & UNIFORME POUR TOUS LES NŒUDS PEU IMPORTE LA PROFONDEUR -->
+            <ng-template #unifiedNodeTemplate let-node>
               <div
-                class="w-72 bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-xl shadow-xl border-2 border-indigo-400/50 p-4 transition-all duration-200 hover:shadow-2xl hover:border-indigo-400 text-left cursor-pointer"
-                [class.ring-4]="selectedNode()?.key === node.key"
-                [class.ring-indigo-500/50]="selectedNode()?.key === node.key">
-                <div class="flex items-center justify-between mb-2 pb-2 border-b border-indigo-800/60">
+                class="w-64 bg-white text-slate-800 rounded-xl shadow-xs border border-slate-200 p-3.5 transition-all duration-200 hover:shadow-md hover:border-indigo-400 text-left cursor-pointer"
+                [class.ring-2]="selectedNode()?.key === node.key"
+                [class.ring-indigo-600]="selectedNode()?.key === node.key"
+                [class.border-indigo-600]="selectedNode()?.key === node.key"
+                [class.shadow-md]="selectedNode()?.key === node.key">
+
+                <!-- En-tête : Référence Code & Statut -->
+                <div class="flex items-center justify-between mb-2">
                   <span
-                    class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase bg-indigo-500/30 text-indigo-200 border border-indigo-400/30">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    {{ node.data?.code || 'RACINE' }}
+                    class="inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200 truncate max-w-[140px]">
+                    {{ node.data?.code || node.key }}
                   </span>
-                  <span class="text-[11px] text-indigo-300 font-medium">
-                    {{ node.data?.category }}
-                  </span>
-                </div>
-
-                <h3 class="text-sm font-bold text-white leading-snug line-clamp-2">
-                  {{ node.label || node.data?.title }}
-                </h3>
-
-                <p class="text-[11px] text-indigo-200/80 mt-1 line-clamp-2">
-                  {{ node.data?.description }}
-                </p>
-
-                <div
-                  class="mt-3 pt-2 border-t border-indigo-800/60 flex items-center justify-between text-[11px] text-indigo-300">
-                  <div class="flex items-center gap-1.5">
+                  <span
+                    class="text-[10px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1"
+                    [ngClass]="{
+                      'bg-emerald-50 text-emerald-700 border border-emerald-200/60': node.data?.status === 'active' || !node.data?.status,
+                      'bg-amber-50 text-amber-700 border border-amber-200/60': node.data?.status === 'maintenance',
+                      'bg-slate-100 text-slate-600 border border-slate-200': node.data?.status === 'planned'
+                    }">
                     <span
-                      class="w-5 h-5 rounded-full bg-indigo-600/60 text-white flex items-center justify-center text-[10px] font-bold">
-                      {{ node.data?.manager?.charAt(0) || 'D' }}
-                    </span>
-                    <span class="truncate max-w-[120px]">{{ node.data?.manager }}</span>
-                  </div>
-                  <div class="font-semibold text-emerald-400">
-                    {{ node.data?.stats?.reliabilityRate }}
-                  </div>
-                </div>
-
-                <!-- Indicateur d'enfants repliés -->
-                @if (!node.expanded && node.children && node.children.length) {
-                <div class="mt-2 text-center">
-                  <span
-                    class="inline-flex items-center gap-1 text-[10px] font-semibold text-indigo-300 bg-indigo-900/60 px-2 py-0.5 rounded-full border border-indigo-700/60">
-                    +{{ node.children.length }} systèmes majeurs (cliquer pour déplier)
-                  </span>
-                </div>
-                }
-              </div>
-            </ng-template>
-
-            <!-- 2. TEMPLATE NŒUD SYSTÈME (Niveau 1) -->
-            <ng-template let-node pTemplate="system">
-              <div
-                class="w-64 bg-white text-slate-800 rounded-xl shadow-md border-2 border-blue-200 p-3.5 transition-all duration-200 hover:shadow-lg hover:border-blue-400 text-left cursor-pointer"
-                [class.ring-4]="selectedNode()?.key === node.key"
-                [class.ring-blue-400/40]="selectedNode()?.key === node.key">
-                <div class="flex items-center justify-between mb-1.5">
-                  <span
-                    class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200 font-mono">
-                    {{ node.data?.code }}
-                  </span>
-                  <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full" [ngClass]="{
-                    'bg-emerald-50 text-emerald-700': node.data?.status === 'active',
-                    'bg-amber-50 text-amber-700': node.data?.status === 'maintenance',
-                    'bg-slate-100 text-slate-600': node.data?.status === 'planned'
-                  }">
-                    {{ node.data?.status === 'active' ? 'Opérationnel' : (node.data?.status === 'maintenance' ?
-                    'Maintenance' : 'Planifié') }}
+                      class="w-1.5 h-1.5 rounded-full"
+                      [ngClass]="{
+                        'bg-emerald-500': node.data?.status === 'active' || !node.data?.status,
+                        'bg-amber-500': node.data?.status === 'maintenance',
+                        'bg-slate-400': node.data?.status === 'planned'
+                      }"></span>
+                    {{ node.data?.status === 'active' || !node.data?.status ? 'Actif' : (node.data?.status === 'maintenance' ? 'Maintenance' : 'Planifié') }}
                   </span>
                 </div>
 
-                <h4 class="text-xs font-bold text-slate-900 line-clamp-2">
+                <!-- Libellé principal -->
+                <h4 class="text-xs font-bold text-slate-900 leading-snug line-clamp-2">
                   {{ node.label || node.data?.title }}
                 </h4>
 
-                <div
-                  class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-                  <span class="truncate max-w-[110px]">{{ node.data?.manager || node.data?.department }}</span>
-                  <span class="font-semibold text-blue-600">{{ node.data?.stats?.componentsCount }} pcs</span>
+                <!-- Catégorie / Description courte -->
+                @if (node.data?.category || node.data?.description) {
+                <p class="text-[11px] text-slate-500 mt-1 line-clamp-1">
+                  {{ node.data?.category || node.data?.description }}
+                </p>
+                }
+
+                <!-- Pied : Responsable / Métriques -->
+                <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                  <div class="flex items-center gap-1.5 min-w-0">
+                    <span
+                      class="w-4 h-4 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-[9px] font-bold shrink-0">
+                      {{ (node.data?.manager || node.data?.title || 'N').charAt(0) }}
+                    </span>
+                    <span class="truncate max-w-[110px]">{{ node.data?.manager || node.data?.department || 'Non assigné' }}</span>
+                  </div>
+
+                  @if (node.data?.stats?.reliabilityRate) {
+                  <span class="font-semibold text-emerald-600 text-[10px] font-mono shrink-0">
+                    {{ node.data?.stats?.reliabilityRate }}
+                  </span>
+                  } @else if (node.data?.stats?.componentsCount) {
+                  <span class="font-medium text-slate-500 text-[10px] shrink-0">
+                    {{ node.data?.stats?.componentsCount }} pcs
+                  </span>
+                  }
                 </div>
 
                 <!-- Indicateur d'enfants repliés -->
                 @if (!node.expanded && node.children && node.children.length) {
                 <div class="mt-2 text-center">
                   <span
-                    class="inline-flex items-center gap-1 text-[10px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
-                    +{{ node.children.length }} sous-systèmes
+                    class="inline-flex items-center gap-1 text-[10px] font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-0.5 rounded-full border border-indigo-200/80 transition-colors">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                    +{{ node.children.length }} éléments
                   </span>
                 </div>
                 }
               </div>
             </ng-template>
 
-            <!-- 3. TEMPLATE NŒUD SOUS-SYSTÈME (Niveau 2) -->
-            <ng-template let-node pTemplate="subsystem">
-              <div
-                class="w-60 bg-white text-slate-800 rounded-xl shadow-sm border border-emerald-200 p-3 transition-all duration-200 hover:shadow-md hover:border-emerald-400 text-left cursor-pointer"
-                [class.ring-4]="selectedNode()?.key === node.key"
-                [class.ring-emerald-400/40]="selectedNode()?.key === node.key">
-                <div class="flex items-center justify-between mb-1">
-                  <span
-                    class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 font-mono">
-                    {{ node.data?.code }}
-                  </span>
-                  <span class="text-[10px] text-emerald-600 font-medium">Sous-système</span>
-                </div>
-
-                <h5 class="text-xs font-semibold text-slate-900 line-clamp-2">
-                  {{ node.label || node.data?.title }}
-                </h5>
-
-                <div
-                  class="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
-                  <span>{{ node.data?.manager || 'Non assigné' }}</span>
-                  @if (node.data?.stats?.reliabilityRate) {
-                  <span class="font-semibold text-emerald-700">{{ node.data?.stats?.reliabilityRate }}</span>
-                  }
-                </div>
-
-                @if (!node.expanded && node.children && node.children.length) {
-                <div class="mt-1.5 text-center">
-                  <span
-                    class="inline-block text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-                    +{{ node.children.length }} assemblages
-                  </span>
-                </div>
-                }
-              </div>
-            </ng-template>
-
-            <!-- 4. TEMPLATE NŒUD ASSEMBLAGE / LRU (Niveau 3) -->
-            <ng-template let-node pTemplate="assembly">
-              <div
-                class="w-56 bg-white text-slate-800 rounded-lg shadow-xs border border-amber-200 p-2.5 transition-all duration-200 hover:shadow hover:border-amber-400 text-left cursor-pointer"
-                [class.ring-4]="selectedNode()?.key === node.key"
-                [class.ring-amber-400/40]="selectedNode()?.key === node.key">
-                <div class="flex items-center justify-between mb-1">
-                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 font-mono">
-                    {{ node.data?.code }}
-                  </span>
-                  <span class="text-[9px] font-medium text-amber-700 bg-amber-100/60 px-1 rounded">LRU</span>
-                </div>
-
-                <div class="text-[11px] font-medium text-slate-900 line-clamp-2">
-                  {{ node.label || node.data?.title }}
-                </div>
-
-                @if (!node.expanded && node.children && node.children.length) {
-                <div class="mt-1.5 text-center">
-                  <span class="text-[9px] font-semibold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded">
-                    +{{ node.children.length }} composants
-                  </span>
-                </div>
-                }
-              </div>
-            </ng-template>
-
-            <!-- 5. TEMPLATE NŒUD COMPOSANT / SRU (Niveau 4 - Feuilles) -->
-            <ng-template let-node pTemplate="component">
-              <div
-                class="w-52 bg-slate-50 text-slate-800 rounded-lg border border-violet-200 p-2 transition-all duration-200 hover:bg-white hover:shadow hover:border-violet-400 text-left cursor-pointer"
-                [class.ring-2]="selectedNode()?.key === node.key"
-                [class.ring-violet-500]="selectedNode()?.key === node.key">
-                <div class="flex items-center justify-between mb-1">
-                  <span class="text-[9px] font-mono font-bold text-violet-700 truncate max-w-[120px]">
-                    {{ node.data?.code }}
-                  </span>
-                  <span class="text-[9px] font-semibold text-violet-600 bg-violet-50 px-1 rounded">SRU</span>
-                </div>
-                <div class="text-[11px] text-slate-800 font-medium line-clamp-2">
-                  {{ node.label || node.data?.title }}
-                </div>
-              </div>
-            </ng-template>
-
-            <!-- 6. TEMPLATE DE SECOURS (DEFAULT) -->
+            <!-- Mappage du gabarit unique pour tous les types de nœuds -->
             <ng-template let-node pTemplate="default">
-              <div
-                class="w-56 bg-white text-slate-800 rounded-lg shadow-sm border border-slate-200 p-2.5 text-left hover:border-indigo-300 transition-colors cursor-pointer"
-                [class.ring-2]="selectedNode()?.key === node.key"
-                [class.ring-indigo-500]="selectedNode()?.key === node.key">
-                <div class="text-[10px] font-mono text-slate-500">{{ node.data?.code }}</div>
-                <div class="text-xs font-semibold text-slate-800">{{ node.label || node.data?.title }}</div>
-              </div>
+              <ng-container *ngTemplateOutlet="unifiedNodeTemplate; context: { $implicit: node }"></ng-container>
+            </ng-template>
+            <ng-template let-node pTemplate="root">
+              <ng-container *ngTemplateOutlet="unifiedNodeTemplate; context: { $implicit: node }"></ng-container>
+            </ng-template>
+            <ng-template let-node pTemplate="system">
+              <ng-container *ngTemplateOutlet="unifiedNodeTemplate; context: { $implicit: node }"></ng-container>
+            </ng-template>
+            <ng-template let-node pTemplate="subsystem">
+              <ng-container *ngTemplateOutlet="unifiedNodeTemplate; context: { $implicit: node }"></ng-container>
+            </ng-template>
+            <ng-template let-node pTemplate="assembly">
+              <ng-container *ngTemplateOutlet="unifiedNodeTemplate; context: { $implicit: node }"></ng-container>
+            </ng-template>
+            <ng-template let-node pTemplate="component">
+              <ng-container *ngTemplateOutlet="unifiedNodeTemplate; context: { $implicit: node }"></ng-container>
             </ng-template>
           </p-organizationchart>
         </div>
