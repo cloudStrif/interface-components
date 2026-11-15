@@ -1,0 +1,411 @@
+<div class="relative w-full transition-all duration-200" [class.fixed]="isFullscreen()" [class.inset-0]="isFullscreen()"
+  [class.z-50]="isFullscreen()" [class.bg-white]="isFullscreen()" [class.p-6]="isFullscreen()"
+  [class.flex]="isFullscreen()" [class.flex-col]="isFullscreen()" [class.h-screen]="isFullscreen()">
+  <!-- En-tête & Barre d'outils de contrôle -->
+  <header class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-4 border-b border-slate-200">
+    <div class="space-y-1">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-600 text-white shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+        </span>
+        <h2 class="text-xl font-bold text-slate-900 tracking-tight">{{ title }}</h2>
+      </div>
+      <p class="text-xs text-slate-500 pl-10">{{ subtitle }}</p>
+    </div>
+
+    <!-- Statistiques dynamiques d'arborescence -->
+    <div class="flex items-center gap-3 text-xs">
+      <div
+        class="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg border border-slate-200 flex items-center gap-1.5 font-medium">
+        <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+        <span>Total : <strong>{{ treeStats().total }}</strong> éléments</span>
+      </div>
+      <div
+        class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg border border-indigo-100 flex items-center gap-1.5 font-medium">
+        <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+        <span>Dépliés : <strong>{{ treeStats().expanded }}</strong></span>
+      </div>
+      <div
+        class="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-100 flex items-center gap-1.5 font-medium">
+        <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+        <span>Profondeur max : <strong>{{ treeStats().depth }}</strong> niveaux</span>
+      </div>
+    </div>
+
+    <!-- Outils de Zoom, Recentrage et Dépliage -->
+    @if (showControls) {
+    <div class="flex flex-wrap items-center gap-2">
+      <!-- Groupe Zoom -->
+      <div class="inline-flex items-center rounded-lg border border-slate-200 bg-white p-1 shadow-xs">
+        <button type="button" (click)="zoomOut()" [disabled]="zoomLevel() <= 0.4"
+          class="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded disabled:opacity-30 disabled:pointer-events-none transition-colors"
+          title="Zoom arrière (-15%)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+          </svg>
+        </button>
+
+        <button type="button" (click)="resetZoom()"
+          class="px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded transition-colors"
+          title="Réinitialiser zoom à 100%">
+          {{ (zoomLevel() * 100).toFixed(0) }}%
+        </button>
+
+        <button type="button" (click)="zoomIn()" [disabled]="zoomLevel() >= 1.8"
+          class="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded disabled:opacity-30 disabled:pointer-events-none transition-colors"
+          title="Zoom avant (+15%)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Recentrer sur la racine -->
+      <button type="button" (click)="centerRootView()"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg shadow-xs transition-colors"
+        title="Recentrer l'affichage sur la racine">
+        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+        <span>Recentrer</span>
+      </button>
+
+      <!-- Déplier / Replier rapide -->
+      <button type="button" (click)="expandFirstLevel()"
+        class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg shadow-xs transition-colors"
+        title="Déplier le niveau 1">
+        <span>Niveau 1</span>
+      </button>
+
+      <button type="button" (click)="expandAll()"
+        class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg shadow-xs transition-colors"
+        title="Tout déplier récursivement">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+        <span>Tout déplier</span>
+      </button>
+
+      <button type="button" (click)="collapseAll()"
+        class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg shadow-xs transition-colors"
+        title="Tout replier pour ne laisser que la racine">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+        </svg>
+        <span>Tout replier</span>
+      </button>
+
+      <!-- Plein Écran -->
+      <button type="button" (click)="toggleFullscreen()"
+        class="p-1.5 text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg shadow-xs transition-colors"
+        [title]="isFullscreen() ? 'Quitter plein écran' : 'Plein écran'">
+        @if (!isFullscreen()) {
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+        </svg>
+        } @else {
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        }
+      </button>
+    </div>
+    }
+  </header>
+
+  <!-- Fil d'Ariane (Breadcrumb) du nœud sélectionné -->
+  @if (selectedNodeBreadcrumb().length > 0) {
+  <nav class="flex items-center gap-2 py-2 px-3 bg-slate-50 border-b border-slate-200 text-xs overflow-x-auto">
+    <span class="text-slate-400 font-medium">Sélection :</span>
+    @for (crumb of selectedNodeBreadcrumb(); track $index; let last = $last) {
+    <span [class.font-semibold]="last" [class.text-indigo-600]="last" [class.text-slate-600]="!last">
+      {{ crumb }}
+    </span>
+    @if (!last) {
+    <svg class="w-3 h-3 text-slate-300 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+      <path fill-rule="evenodd"
+        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+        clip-rule="evenodd" />
+    </svg>
+    }
+    }
+  </nav>
+  }
+
+  <!-- Zone de Visualisation Adaptative Principale -->
+  <main class="relative mt-3">
+    <div #viewport
+      class="relative w-full min-h-[520px] max-h-[75vh] overflow-auto block py-10 px-4 bg-slate-50/90 bg-[radial-gradient(#e2e8f0_1.2px,transparent_1.2px)] bg-[size:24px_24px] border border-slate-200 rounded-2xl scroll-smooth select-text shadow-inner transition-all"
+      [class.max-h-[calc(100vh-140px)]]="isFullscreen()" [class.flex-1]="isFullscreen()" tabindex="0"
+      aria-label="Zone de visualisation de l'organigramme">
+      <!-- Canvas de centrage adaptatif sécurisé en Tailwind : empêche toute coupure négative à gauche -->
+      <div class="w-max min-w-full flex justify-center items-start px-16 box-border">
+        <div #stage class="shrink-0 inline-block min-w-min origin-top transition-transform duration-200 ease-out"
+          [style.transform]="'scale(' + zoomLevel() + ')'">
+          <!-- Composant Optimus UI OrganizationChart stylé à 100% en Tailwind (Pass-Through pt + classes utilitaires) -->
+          <p-organizationchart [value]="data" [collapsible]="collapsible" [selectionMode]="selectionMode"
+            [selection]="selectedNode()" [pt]="chartPt"
+            class="inline-block w-auto [&_.p-organizationchart-node-children[style*='hidden']]:!hidden [&_.p-organizationchart-connectors[style*='hidden']]:!hidden [&_.p-organizationchart-connector-down]:!w-0.5 [&_.p-organizationchart-connector-down]:!bg-slate-300 [&_.p-organizationchart-connector-down]:!h-5 [&_.p-organizationchart-connector-down]:!mx-auto [&_.p-organizationchart-connector-left]:!border-r-2 [&_.p-organizationchart-connector-left]:!border-slate-300 [&_.p-organizationchart-connector-top]:!border-t-2 [&_.p-organizationchart-connector-top]:!border-slate-300 [&_.p-organizationchart-connector-right]:!border-l-2 [&_.p-organizationchart-connector-right]:!border-slate-300 [&_.p-organizationchart-node]:!p-0 [&_.p-organizationchart-node]:!bg-transparent [&_.p-organizationchart-node]:!border-none [&_.p-organizationchart-node-toggle-button]:!w-[26px] [&_.p-organizationchart-node-toggle-button]:!h-[26px] [&_.p-organizationchart-node-toggle-button]:!rounded-full [&_.p-organizationchart-node-toggle-button]:!bg-white [&_.p-organizationchart-node-toggle-button]:!border-2 [&_.p-organizationchart-node-toggle-button]:!border-slate-300 [&_.p-organizationchart-node-toggle-button]:!text-slate-600 [&_.p-organizationchart-node-toggle-button:hover]:!bg-blue-600 [&_.p-organizationchart-node-toggle-button:hover]:!border-blue-600 [&_.p-organizationchart-node-toggle-button:hover]:!text-white [&_.p-organizationchart-node-toggle-button:hover]:!scale-110 [&_.p-organizationchart-node-toggle-button:hover]:!shadow-md [&_.p-organizationchart-table]:!border-separate [&_.p-organizationchart-table]:!mx-auto [&_.p-organizationchart-table]:!w-auto [&_.p-organizationchart-table]:!max-w-none [&_.p-organizationchart-table]:[border-spacing:0]"
+            (onNodeSelect)="onNodeSelected($event)" (onNodeExpand)="onNodeExpanded($event)"
+            (onNodeCollapse)="onNodeCollapsed($event)">
+            <!-- 1. TEMPLATE NŒUD RACINE (ROOT) -->
+            <ng-template let-node pTemplate="root">
+              <div
+                class="w-72 bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-xl shadow-xl border-2 border-indigo-400/50 p-4 transition-all duration-200 hover:shadow-2xl hover:border-indigo-400 text-left cursor-pointer"
+                [class.ring-4]="selectedNode()?.key === node.key"
+                [class.ring-indigo-500/50]="selectedNode()?.key === node.key">
+                <div class="flex items-center justify-between mb-2 pb-2 border-b border-indigo-800/60">
+                  <span
+                    class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase bg-indigo-500/30 text-indigo-200 border border-indigo-400/30">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    {{ node.data?.code || 'RACINE' }}
+                  </span>
+                  <span class="text-[11px] text-indigo-300 font-medium">
+                    {{ node.data?.category }}
+                  </span>
+                </div>
+
+                <h3 class="text-sm font-bold text-white leading-snug line-clamp-2">
+                  {{ node.label || node.data?.title }}
+                </h3>
+
+                <p class="text-[11px] text-indigo-200/80 mt-1 line-clamp-2">
+                  {{ node.data?.description }}
+                </p>
+
+                <div
+                  class="mt-3 pt-2 border-t border-indigo-800/60 flex items-center justify-between text-[11px] text-indigo-300">
+                  <div class="flex items-center gap-1.5">
+                    <span
+                      class="w-5 h-5 rounded-full bg-indigo-600/60 text-white flex items-center justify-center text-[10px] font-bold">
+                      {{ node.data?.manager?.charAt(0) || 'D' }}
+                    </span>
+                    <span class="truncate max-w-[120px]">{{ node.data?.manager }}</span>
+                  </div>
+                  <div class="font-semibold text-emerald-400">
+                    {{ node.data?.stats?.reliabilityRate }}
+                  </div>
+                </div>
+
+                <!-- Indicateur d'enfants repliés -->
+                @if (!node.expanded && node.children && node.children.length) {
+                <div class="mt-2 text-center">
+                  <span
+                    class="inline-flex items-center gap-1 text-[10px] font-semibold text-indigo-300 bg-indigo-900/60 px-2 py-0.5 rounded-full border border-indigo-700/60">
+                    +{{ node.children.length }} systèmes majeurs (cliquer pour déplier)
+                  </span>
+                </div>
+                }
+              </div>
+            </ng-template>
+
+            <!-- 2. TEMPLATE NŒUD SYSTÈME (Niveau 1) -->
+            <ng-template let-node pTemplate="system">
+              <div
+                class="w-64 bg-white text-slate-800 rounded-xl shadow-md border-2 border-blue-200 p-3.5 transition-all duration-200 hover:shadow-lg hover:border-blue-400 text-left cursor-pointer"
+                [class.ring-4]="selectedNode()?.key === node.key"
+                [class.ring-blue-400/40]="selectedNode()?.key === node.key">
+                <div class="flex items-center justify-between mb-1.5">
+                  <span
+                    class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200 font-mono">
+                    {{ node.data?.code }}
+                  </span>
+                  <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full" [ngClass]="{
+                    'bg-emerald-50 text-emerald-700': node.data?.status === 'active',
+                    'bg-amber-50 text-amber-700': node.data?.status === 'maintenance',
+                    'bg-slate-100 text-slate-600': node.data?.status === 'planned'
+                  }">
+                    {{ node.data?.status === 'active' ? 'Opérationnel' : (node.data?.status === 'maintenance' ?
+                    'Maintenance' : 'Planifié') }}
+                  </span>
+                </div>
+
+                <h4 class="text-xs font-bold text-slate-900 line-clamp-2">
+                  {{ node.label || node.data?.title }}
+                </h4>
+
+                <div
+                  class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                  <span class="truncate max-w-[110px]">{{ node.data?.manager || node.data?.department }}</span>
+                  <span class="font-semibold text-blue-600">{{ node.data?.stats?.componentsCount }} pcs</span>
+                </div>
+
+                <!-- Indicateur d'enfants repliés -->
+                @if (!node.expanded && node.children && node.children.length) {
+                <div class="mt-2 text-center">
+                  <span
+                    class="inline-flex items-center gap-1 text-[10px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
+                    +{{ node.children.length }} sous-systèmes
+                  </span>
+                </div>
+                }
+              </div>
+            </ng-template>
+
+            <!-- 3. TEMPLATE NŒUD SOUS-SYSTÈME (Niveau 2) -->
+            <ng-template let-node pTemplate="subsystem">
+              <div
+                class="w-60 bg-white text-slate-800 rounded-xl shadow-sm border border-emerald-200 p-3 transition-all duration-200 hover:shadow-md hover:border-emerald-400 text-left cursor-pointer"
+                [class.ring-4]="selectedNode()?.key === node.key"
+                [class.ring-emerald-400/40]="selectedNode()?.key === node.key">
+                <div class="flex items-center justify-between mb-1">
+                  <span
+                    class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 font-mono">
+                    {{ node.data?.code }}
+                  </span>
+                  <span class="text-[10px] text-emerald-600 font-medium">Sous-système</span>
+                </div>
+
+                <h5 class="text-xs font-semibold text-slate-900 line-clamp-2">
+                  {{ node.label || node.data?.title }}
+                </h5>
+
+                <div
+                  class="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
+                  <span>{{ node.data?.manager || 'Non assigné' }}</span>
+                  @if (node.data?.stats?.reliabilityRate) {
+                  <span class="font-semibold text-emerald-700">{{ node.data?.stats?.reliabilityRate }}</span>
+                  }
+                </div>
+
+                @if (!node.expanded && node.children && node.children.length) {
+                <div class="mt-1.5 text-center">
+                  <span
+                    class="inline-block text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                    +{{ node.children.length }} assemblages
+                  </span>
+                </div>
+                }
+              </div>
+            </ng-template>
+
+            <!-- 4. TEMPLATE NŒUD ASSEMBLAGE / LRU (Niveau 3) -->
+            <ng-template let-node pTemplate="assembly">
+              <div
+                class="w-56 bg-white text-slate-800 rounded-lg shadow-xs border border-amber-200 p-2.5 transition-all duration-200 hover:shadow hover:border-amber-400 text-left cursor-pointer"
+                [class.ring-4]="selectedNode()?.key === node.key"
+                [class.ring-amber-400/40]="selectedNode()?.key === node.key">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 font-mono">
+                    {{ node.data?.code }}
+                  </span>
+                  <span class="text-[9px] font-medium text-amber-700 bg-amber-100/60 px-1 rounded">LRU</span>
+                </div>
+
+                <div class="text-[11px] font-medium text-slate-900 line-clamp-2">
+                  {{ node.label || node.data?.title }}
+                </div>
+
+                @if (!node.expanded && node.children && node.children.length) {
+                <div class="mt-1.5 text-center">
+                  <span class="text-[9px] font-semibold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded">
+                    +{{ node.children.length }} composants
+                  </span>
+                </div>
+                }
+              </div>
+            </ng-template>
+
+            <!-- 5. TEMPLATE NŒUD COMPOSANT / SRU (Niveau 4 - Feuilles) -->
+            <ng-template let-node pTemplate="component">
+              <div
+                class="w-52 bg-slate-50 text-slate-800 rounded-lg border border-violet-200 p-2 transition-all duration-200 hover:bg-white hover:shadow hover:border-violet-400 text-left cursor-pointer"
+                [class.ring-2]="selectedNode()?.key === node.key"
+                [class.ring-violet-500]="selectedNode()?.key === node.key">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9px] font-mono font-bold text-violet-700 truncate max-w-[120px]">
+                    {{ node.data?.code }}
+                  </span>
+                  <span class="text-[9px] font-semibold text-violet-600 bg-violet-50 px-1 rounded">SRU</span>
+                </div>
+                <div class="text-[11px] text-slate-800 font-medium line-clamp-2">
+                  {{ node.label || node.data?.title }}
+                </div>
+              </div>
+            </ng-template>
+
+            <!-- 6. TEMPLATE DE SECOURS (DEFAULT) -->
+            <ng-template let-node pTemplate="default">
+              <div
+                class="w-56 bg-white text-slate-800 rounded-lg shadow-sm border border-slate-200 p-2.5 text-left hover:border-indigo-300 transition-colors cursor-pointer"
+                [class.ring-2]="selectedNode()?.key === node.key"
+                [class.ring-indigo-500]="selectedNode()?.key === node.key">
+                <div class="text-[10px] font-mono text-slate-500">{{ node.data?.code }}</div>
+                <div class="text-xs font-semibold text-slate-800">{{ node.label || node.data?.title }}</div>
+              </div>
+            </ng-template>
+          </p-organizationchart>
+        </div>
+      </div>
+    </div>
+
+    <!-- Volet latéral flottant : Fiche détaillée du nœud sélectionné -->
+    @if (showDetailsPanel && selectedNode(); as node) {
+    <aside
+      class="absolute top-4 right-4 w-80 max-w-[calc(100%-2rem)] bg-white/95 backdrop-blur-md rounded-xl shadow-2xl border border-slate-200 p-4 z-20 animate-in fade-in slide-in-from-right-4 duration-200">
+      <div class="flex items-start justify-between pb-3 border-b border-slate-100">
+        <div>
+          <span
+            class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 font-mono">
+            {{ node.data?.code || node.key }}
+          </span>
+          <h3 class="text-sm font-bold text-slate-900 mt-1 leading-snug">
+            {{ node.label || node.data?.title }}
+          </h3>
+        </div>
+        <button type="button" (click)="closeDetails()"
+          class="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+          title="Fermer le volet">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="mt-3 space-y-2.5 text-xs">
+        @if (node.data?.description) {
+        <p class="text-slate-600 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+          {{ node.data?.description }}
+        </p>
+        }
+
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
+            <span class="text-[10px] text-slate-400 block font-medium">Statut S3000L</span>
+            <span class="font-semibold text-slate-800 capitalize">{{ node.data?.status || 'Actif' }}</span>
+          </div>
+          <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
+            <span class="text-[10px] text-slate-400 block font-medium">Fiabilité</span>
+            <span class="font-semibold text-emerald-600">{{ node.data?.stats?.reliabilityRate || '99.5%' }}</span>
+          </div>
+        </div>
+
+        @if (node.data?.manager) {
+        <div class="flex items-center gap-2 pt-1 text-slate-600">
+          <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <span>Responsable : <strong>{{ node.data?.manager }}</strong></span>
+        </div>
+        }
+
+        @if (node.children && node.children.length) {
+        <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+          <span class="text-slate-500 font-medium">Sous-niveaux directs :</span>
+          <span class="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-bold font-mono">
+            {{ node.children.length }}
+          </span>
+        </div>
+        }
+      </div>
+    </aside>
+    }
+  </main>
+</div>

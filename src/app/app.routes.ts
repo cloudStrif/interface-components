@@ -8,12 +8,23 @@ import { FmecaComponent } from './components/fmeca/fmeca.component';
 import { LoraComponent } from './components/lora/lora.component';
 import { SupportItemsComponent } from './components/support-items/support-items.component';
 import { DynamicFormsDemoComponent } from './components/dynamic-forms-demo/dynamic-forms-demo.component';
+import { OrgChartDemoComponent } from './components/org-chart-demo/org-chart-demo.component';
 
 export const routes: Routes = [
   {
     // Route racine : vérification auth → redirection vers projet actif
     path: '',
     component: SbdDemoComponent,
+  },
+  {
+    // Page dédiée Organigramme Adaptatif Optimus UI (accessible directement)
+    path: 'org-chart',
+    component: OrgChartDemoComponent,
+  },
+  {
+    path: 'org-chart-demo',
+    redirectTo: 'org-chart',
+    pathMatch: 'full'
   },
   {
     // Page dédiée Démo Dynamic Form (accessible directement)
@@ -34,6 +45,8 @@ export const routes: Routes = [
       { path: '', redirectTo: 'pbs', pathMatch: 'full' },
       // PBS / LCN — Arborescence Product Breakdown Structure
       { path: 'pbs', component: S3000LExplorerComponent },
+      // Organigramme Optimus UI
+      { path: 'org-chart', component: OrgChartDemoComponent },
       // Hardware Items — Articles matériels (P/N, NSN, SMR)
       { path: 'hardware', component: HardwareItemsComponent },
       // Task Cards — Analyse de Maintenance (MTA)
