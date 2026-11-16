@@ -140,13 +140,32 @@
           <!-- Composant Optimus UI OrganizationChart stylé à 100% en Tailwind (Pass-Through pt + classes utilitaires) -->
           <p-organizationchart [value]="data" [collapsible]="collapsible" [selectionMode]="selectionMode"
             [selection]="selectedNode()" [pt]="chartPt"
-            class="inline-block w-auto [&_.p-organizationchart-node-children[style*='hidden']]:!hidden [&_.p-organizationchart-connectors[style*='hidden']]:!hidden [&_.p-organizationchart-connector-down]:!w-0.5 [&_.p-organizationchart-connector-down]:!bg-slate-300 [&_.p-organizationchart-connector-down]:!h-5 [&_.p-organizationchart-connector-down]:!mx-auto [&_.p-organizationchart-connector-left]:!border-r-2 [&_.p-organizationchart-connector-left]:!border-slate-300 [&_.p-organizationchart-connector-top]:!border-t-2 [&_.p-organizationchart-connector-top]:!border-slate-300 [&_.p-organizationchart-connector-right]:!border-l-2 [&_.p-organizationchart-connector-right]:!border-slate-300 [&_.p-organizationchart-node]:!p-0 [&_.p-organizationchart-node]:!bg-transparent [&_.p-organizationchart-node]:!border-none [&_.p-organizationchart-node-toggle-button]:!w-[26px] [&_.p-organizationchart-node-toggle-button]:!h-[26px] [&_.p-organizationchart-node-toggle-button]:!rounded-full [&_.p-organizationchart-node-toggle-button]:!bg-white [&_.p-organizationchart-node-toggle-button]:!border-2 [&_.p-organizationchart-node-toggle-button]:!border-slate-300 [&_.p-organizationchart-node-toggle-button]:!text-slate-600 [&_.p-organizationchart-node-toggle-button:hover]:!bg-blue-600 [&_.p-organizationchart-node-toggle-button:hover]:!border-blue-600 [&_.p-organizationchart-node-toggle-button:hover]:!text-white [&_.p-organizationchart-node-toggle-button:hover]:!scale-110 [&_.p-organizationchart-node-toggle-button:hover]:!shadow-md [&_.p-organizationchart-table]:!border-separate [&_.p-organizationchart-table]:!mx-auto [&_.p-organizationchart-table]:!w-auto [&_.p-organizationchart-table]:!max-w-none [&_.p-organizationchart-table]:[border-spacing:0]"
+            class="inline-block w-auto 
+              [&_.p-organizationchart-node-children[style*='hidden']]:!hidden 
+              [&_.p-organizationchart-connectors[style*='hidden']]:!hidden 
+              [&_.p-organizationchart-connectors:not([style*='hidden'])]:animate-connector-in
+              [&_.p-organizationchart-node-children_td:nth-child(1)_.org-node-card]:[animation-delay:0ms]
+              [&_.p-organizationchart-node-children_td:nth-child(2)_.org-node-card]:[animation-delay:180ms]
+              [&_.p-organizationchart-node-children_td:nth-child(3)_.org-node-card]:[animation-delay:360ms]
+              [&_.p-organizationchart-node-children_td:nth-child(4)_.org-node-card]:[animation-delay:540ms]
+              [&_.p-organizationchart-node-children_td:nth-child(5)_.org-node-card]:[animation-delay:720ms]
+              [&_.p-organizationchart-node-children_td:nth-child(6)_.org-node-card]:[animation-delay:900ms]
+              [&_.p-organizationchart-node-children_td:nth-child(7)_.org-node-card]:[animation-delay:1080ms]
+              [&_.p-organizationchart-node-children_td:nth-child(8)_.org-node-card]:[animation-delay:1260ms]
+              [&_.p-organizationchart-node-children_td:nth-child(n+9)_.org-node-card]:[animation-delay:1440ms]
+              [&_.p-organizationchart-connector-down]:!w-0.5 [&_.p-organizationchart-connector-down]:!bg-slate-300 [&_.p-organizationchart-connector-down]:!h-5 [&_.p-organizationchart-connector-down]:!mx-auto 
+              [&_.p-organizationchart-connector-left]:!border-r-2 [&_.p-organizationchart-connector-left]:!border-slate-300 [&_.p-organizationchart-connector-left]:!rounded-none 
+              [&_.p-organizationchart-connector-top]:!border-t-2 [&_.p-organizationchart-connector-top]:!border-slate-300 
+              [&_.p-organizationchart-connector-right]:!border-l-2 [&_.p-organizationchart-connector-right]:!border-slate-300 [&_.p-organizationchart-connector-right]:!rounded-none 
+              [&_.p-organizationchart-node]:!p-0 [&_.p-organizationchart-node]:!bg-transparent [&_.p-organizationchart-node]:!border-none 
+              [&_.p-organizationchart-node-toggle-button]:!w-[26px] [&_.p-organizationchart-node-toggle-button]:!h-[26px] [&_.p-organizationchart-node-toggle-button]:!rounded-full [&_.p-organizationchart-node-toggle-button]:!bg-white [&_.p-organizationchart-node-toggle-button]:!border-2 [&_.p-organizationchart-node-toggle-button]:!border-slate-300 [&_.p-organizationchart-node-toggle-button]:!text-slate-600 [&_.p-organizationchart-node-toggle-button]:transition-all [&_.p-organizationchart-node-toggle-button]:duration-200 [&_.p-organizationchart-node-toggle-button:hover]:!bg-indigo-600 [&_.p-organizationchart-node-toggle-button:hover]:!border-indigo-600 [&_.p-organizationchart-node-toggle-button:hover]:!text-white [&_.p-organizationchart-node-toggle-button:hover]:!scale-110 [&_.p-organizationchart-node-toggle-button:hover]:!shadow-md 
+              [&_.p-organizationchart-table]:!border-separate [&_.p-organizationchart-table]:!mx-auto [&_.p-organizationchart-table]:!w-auto [&_.p-organizationchart-table]:!max-w-none [&_.p-organizationchart-table]:[border-spacing:0]"
             (onNodeSelect)="onNodeSelected($event)" (onNodeExpand)="onNodeExpanded($event)"
             (onNodeCollapse)="onNodeCollapsed($event)">
             <!-- GABARIT UNIQUE & UNIFORME POUR TOUS LES NŒUDS PEU IMPORTE LA PROFONDEUR -->
             <ng-template #unifiedNodeTemplate let-node>
               <div
-                class="w-64 bg-white text-slate-800 rounded-xl shadow-xs border border-slate-200 p-3.5 transition-all duration-200 hover:shadow-md hover:border-indigo-400 text-left cursor-pointer"
+                class="org-node-card animate-card-in group w-64 bg-white text-slate-800 rounded-xl shadow-xs border border-slate-200 p-3.5 text-left cursor-pointer transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:border-indigo-500 hover:ring-2 hover:ring-indigo-100"
                 [class.ring-2]="selectedNode()?.key === node.key"
                 [class.ring-indigo-600]="selectedNode()?.key === node.key"
                 [class.border-indigo-600]="selectedNode()?.key === node.key"
@@ -155,11 +174,11 @@
                 <!-- En-tête : Référence Code & Statut -->
                 <div class="flex items-center justify-between mb-2">
                   <span
-                    class="inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200 truncate max-w-[140px]">
+                    class="inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200 truncate max-w-[140px] transition-colors duration-200 group-hover:bg-indigo-50 group-hover:text-indigo-700 group-hover:border-indigo-200">
                     {{ node.data?.code || node.key }}
                   </span>
                   <span
-                    class="text-[10px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1"
+                    class="text-[10px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1 transition-transform duration-200 group-hover:scale-105"
                     [ngClass]="{
                       'bg-emerald-50 text-emerald-700 border border-emerald-200/60': node.data?.status === 'active' || !node.data?.status,
                       'bg-amber-50 text-amber-700 border border-amber-200/60': node.data?.status === 'maintenance',
@@ -177,7 +196,7 @@
                 </div>
 
                 <!-- Libellé principal -->
-                <h4 class="text-xs font-bold text-slate-900 leading-snug line-clamp-2">
+                <h4 class="text-xs font-bold text-slate-900 leading-snug line-clamp-2 transition-colors duration-200 group-hover:text-indigo-600">
                   {{ node.label || node.data?.title }}
                 </h4>
 
@@ -192,7 +211,7 @@
                 <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
                   <div class="flex items-center gap-1.5 min-w-0">
                     <span
-                      class="w-4 h-4 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-[9px] font-bold shrink-0">
+                      class="w-4 h-4 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-[9px] font-bold shrink-0 transition-colors duration-200 group-hover:bg-indigo-100 group-hover:text-indigo-700">
                       {{ (node.data?.manager || node.data?.title || 'N').charAt(0) }}
                     </span>
                     <span class="truncate max-w-[110px]">{{ node.data?.manager || node.data?.department || 'Non assigné' }}</span>
@@ -213,7 +232,7 @@
                 @if (!node.expanded && node.children && node.children.length) {
                 <div class="mt-2 text-center">
                   <span
-                    class="inline-flex items-center gap-1 text-[10px] font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-0.5 rounded-full border border-indigo-200/80 transition-colors">
+                    class="inline-flex items-center gap-1 text-[10px] font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-0.5 rounded-full border border-indigo-200/80 transition-all duration-200 group-hover:scale-105">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
