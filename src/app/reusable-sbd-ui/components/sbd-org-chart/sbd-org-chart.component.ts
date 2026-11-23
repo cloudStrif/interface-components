@@ -90,6 +90,53 @@ export class SbdOrgChartComponent implements AfterViewInit {
   public readonly zoomLevel: WritableSignal<number> = signal(1);
   public readonly isFullscreen: WritableSignal<boolean> = signal(false);
   public readonly searchQuery: WritableSignal<string> = signal('');
+  public readonly currentSearchIndex: WritableSignal<number> = signal(0);
+  public readonly isSearchDropdownOpen: WritableSignal<boolean> = signal(false);
+  public readonly highlightedNodeKey: WritableSignal<string | null> = signal(null);
+
+  /**
+   * Liste réactive des nœuds correspondant à la recherche courante
+   */
+  public readonly searchResults: Signal<SbdOrgTreeNode[]> = computed(() => {
+    const query = this.searchQuery().trim().toLowerCase();
+    if (!query) return [];
+
+    const rootNodes = this._dataSignal();
+    const results: SbdOrgTreeNode[] = [];
+
+    const searchRecursive = (nodes: SbdOrgTreeNode[]) => {
+      for (const n of nodes) {
+        const label = (n.label || '').toLowerCase();
+        const code = (n.data?.code || '').toLowerCase();
+        const title = (n.data?.title || '').toLowerCase();
+        const desc = (n.data?.description || '').toLowerCase();
+        const manager = (n.data?.manager || '').toLowerCase();
+        const dept = (n.data?.department || '').toLowerCase();
+        const cat = (n.data?.category || '').toLowerCase();
+        const key = (n.key || '').toLowerCase();
+
+        if (
+          label.includes(query) ||
+          code.includes(query) ||
+          title.includes(query) ||
+          desc.includes(query) ||
+          manager.includes(query) ||
+          dept.includes(query) ||
+          cat.includes(query) ||
+          key.includes(query)
+        ) {
+          results.push(n);
+        }
+
+        if (n.children && n.children.length > 0) {
+          searchRecursive(n.children);
+        }
+      }
+    };
+
+    searchRecursive(rootNodes);
+    return results;
+  });
 
   // Statistiques calculées
   public readonly treeStats: Signal<{ total: number; expanded: number; depth: number }> = computed(() => {
@@ -301,5 +348,199 @@ export class SbdOrgChartComponent implements AfterViewInit {
    */
   public getNodeStatus(node: SbdOrgTreeNode): string {
     return node.data?.status || 'active';
+  }
+
+  /**
+   * Mise à jour fluide de la saisie de recherche (sans lag ni blocage)
+   */
+  public onSearchInput(val: string): void {
+    this.searchQuery.set(val);
+    this.currentSearchIndex.set(0);
+    this.isSearchDropdownOpen.set(val.trim().length > 0);
+
+    if (!val.trim()) {
+      this.highlightedNodeKey.set(null);
+    }
+  }
+
+  /**
+   * Validation via la touche Entrée dans l'input de recherche
+   */
+  public onSearchEnter(event: Event): void {
+    event.preventDefault();
+    const results = this.searchResults();
+    if (!results.length) return;
+
+    const keyboardEvent = event as KeyboardEvent;
+    if (keyboardEvent.shiftKey) {
+      this.prevSearchResult();
+    } else if (!this.highlightedNodeKey()) {
+      // Premier appui sur Entrée : naviguer directement vers le premier résultat trouvé
+      this.currentSearchIndex.set(0);
+      this.goToNode(results[0], true);
+    } else {
+      this.nextSearchResult();
+    }
+  }
+
+  /**
+   * Aller au résultat de recherche suivant
+   */
+  public nextSearchResult(): void {
+    const results = this.searchResults();
+    if (!results.length) return;
+
+    const nextIndex = (this.currentSearchIndex() + 1) % results.length;
+    this.currentSearchIndex.set(nextIndex);
+    this.goToNode(results[nextIndex], true);
+  }
+
+  /**
+   * Aller au résultat de recherche précédent
+   */
+  public prevSearchResult(): void {
+    const results = this.searchResults();
+    if (!results.length) return;
+
+    const prevIndex = (this.currentSearchIndex() - 1 + results.length) % results.length;
+    this.currentSearchIndex.set(prevIndex);
+    this.goToNode(results[prevIndex], true);
+  }
+
+  /**
+   * Effacer la recherche
+   */
+  public clearSearch(): void {
+    this.searchQuery.set('');
+    this.currentSearchIndex.set(0);
+    this.isSearchDropdownOpen.set(false);
+    this.highlightedNodeKey.set(null);
+  }
+
+  /**
+   * Déplie automatiquement l'arborescence jusqu'au nœud, le sélectionne et scrolle dessus avec fluidité
+   */
+  public goToNode(node: SbdOrgTreeNode, closeDropdown = true): void {
+    if (!node) return;
+
+    if (closeDropdown) {
+      this.isSearchDropdownOpen.set(false);
+    }
+
+    // 1. Déplier tous les ancêtres depuis la racine
+    const ancestors = this.findAncestors(this._dataSignal(), node);
+    if (ancestors && ancestors.length > 0) {
+      let changed = false;
+      for (const ancestor of ancestors) {
+        if (!ancestor.expanded) {
+          ancestor.expanded = true;
+          changed = true;
+        }
+      }
+      if (changed) {
+        // Rafraîchir le signal pour déclencher l'affichage des nœuds enfants dans le DOM
+        this._dataSignal.set([...this._dataSignal()]);
+      }
+    }
+
+    // 2. Sélectionner le nœud
+    this.selectedNode.set(node);
+    this.nodeSelect.emit(node);
+
+    // 3. Activer la surbrillance dorée
+    const nodeKey = this.getNodeIdentifier(node);
+    this.highlightedNodeKey.set(nodeKey);
+
+    // 4. Centrer la vue (smooth scroll) sur le nœud ciblé après rendu DOM
+    setTimeout(() => {
+      this.scrollToNodeElement(nodeKey);
+    }, 120);
+
+    // 5. Retirer la surbrillance après 4 secondes
+    setTimeout(() => {
+      if (this.highlightedNodeKey() === nodeKey) {
+        this.highlightedNodeKey.set(null);
+      }
+    }, 4000);
+  }
+
+  /**
+   * Défilement automatique fluide et centré vers le nœud dans le viewport
+   */
+  private scrollToNodeElement(nodeKey: string): void {
+    if (!nodeKey) return;
+
+    const viewport = this.viewportRef()?.nativeElement;
+    const targetElement = document.getElementById('org-node-' + nodeKey)
+      || (viewport ? viewport.querySelector(`[data-node-key="${nodeKey}"]`) as HTMLElement : null);
+
+    if (!targetElement) return;
+
+    if (viewport) {
+      const viewportRect = viewport.getBoundingClientRect();
+      const elRect = targetElement.getBoundingClientRect();
+
+      const scrollLeft = viewport.scrollLeft + (elRect.left - viewportRect.left) - (viewportRect.width / 2) + (elRect.width / 2);
+      const scrollTop = viewport.scrollTop + (elRect.top - viewportRect.top) - (viewportRect.height / 2) + (elRect.height / 2);
+
+      if (typeof viewport.scrollTo === 'function') {
+        viewport.scrollTo({
+          left: Math.max(0, scrollLeft),
+          top: Math.max(0, scrollTop),
+          behavior: 'smooth'
+        });
+      } else {
+        viewport.scrollLeft = Math.max(0, scrollLeft);
+        viewport.scrollTop = Math.max(0, scrollTop);
+      }
+    } else {
+      targetElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+    }
+  }
+
+  /**
+   * Trouve la lignée d'ancêtres d'un nœud dans la hiérarchie
+   */
+  private findAncestors(
+    nodes: SbdOrgTreeNode[],
+    target: SbdOrgTreeNode,
+    currentPath: SbdOrgTreeNode[] = []
+  ): SbdOrgTreeNode[] | null {
+    for (const node of nodes) {
+      if (node === target || this.getNodeIdentifier(node) === this.getNodeIdentifier(target)) {
+        return currentPath;
+      }
+      if (node.children && node.children.length > 0) {
+        const found = this.findAncestors(node.children, target, [...currentPath, node]);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Récupère l'identifiant unique du nœud
+   */
+  public getNodeIdentifier(node: SbdOrgTreeNode): string {
+    return node.key || node.data?.code || node.data?.id || node.label || '';
+  }
+
+  /**
+   * Vérifie si le nœud est actuellement ciblé par la recherche
+   */
+  public isNodeHighlighted(node: SbdOrgTreeNode): boolean {
+    const current = this.highlightedNodeKey();
+    if (!current) return false;
+    return current === this.getNodeIdentifier(node);
+  }
+
+  /**
+   * Vérifie si le nœud fait partie des résultats de la recherche courante
+   */
+  public isNodeInSearchResults(node: SbdOrgTreeNode): boolean {
+    const query = this.searchQuery().trim();
+    if (!query) return false;
+    const key = this.getNodeIdentifier(node);
+    return this.searchResults().some(r => this.getNodeIdentifier(r) === key);
   }
 }

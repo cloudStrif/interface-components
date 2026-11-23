@@ -16,15 +16,128 @@
       <p class="text-xs text-slate-500 pl-10">{{ subtitle }}</p>
     </div>
 
-    <!-- Statistiques dynamiques d'arborescence -->
-    <div class="flex items-center gap-3 text-xs">
+    <!-- Barre de Recherche Intelligente & Statistiques -->
+    <div class="flex flex-wrap items-center gap-3 text-xs">
+      <!-- Input de recherche avec navigation et dropdown -->
+      <div class="relative w-full sm:w-72 md:w-80">
+        <div class="relative flex items-center">
+          <span class="absolute left-3 text-slate-400 pointer-events-none">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </span>
+
+          <input
+            type="text"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="onSearchInput($event)"
+            (keydown.enter)="onSearchEnter($event)"
+            (keydown.escape)="isSearchDropdownOpen.set(false)"
+            (focus)="isSearchDropdownOpen.set(searchQuery().trim().length > 0)"
+            placeholder="Rechercher (code, nom, resp...)"
+            class="w-full pl-9 pr-24 py-1.5 text-xs text-slate-800 placeholder-slate-400 bg-white border border-slate-200 rounded-lg shadow-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+          />
+
+          <!-- Contrôles intégrés (Compteur, Flèches Suivant/Précédent, Effacer) -->
+          <div class="absolute right-1.5 flex items-center gap-1">
+            @if (searchQuery().trim()) {
+              <!-- Compteur de résultats -->
+              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded font-medium"
+                [ngClass]="searchResults().length > 0 ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-slate-100 text-slate-400'">
+                {{ searchResults().length > 0 ? (currentSearchIndex() + 1) + '/' + searchResults().length : '0' }}
+              </span>
+
+              @if (searchResults().length > 1) {
+                <!-- Flèche Précédent -->
+                <button
+                  type="button"
+                  (click)="prevSearchResult()"
+                  class="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors cursor-pointer"
+                  title="Résultat précédent (Maj+Entrée)"
+                >
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                </button>
+
+                <!-- Flèche Suivant -->
+                <button
+                  type="button"
+                  (click)="nextSearchResult()"
+                  class="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors cursor-pointer"
+                  title="Résultat suivant (Entrée)"
+                >
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              }
+
+              <!-- Bouton Effacer -->
+              <button
+                type="button"
+                (click)="clearSearch()"
+                class="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors cursor-pointer"
+                title="Effacer la recherche"
+              >
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Dropdown instantané des résultats de recherche -->
+        @if (isSearchDropdownOpen() && searchResults().length > 0) {
+          <div class="absolute left-0 right-0 mt-1 max-h-64 overflow-y-auto bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-40 animate-in fade-in zoom-in-95 duration-150">
+            <div class="px-3 py-1 text-[10px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100 flex items-center justify-between">
+              <span>{{ searchResults().length }} élément{{ searchResults().length > 1 ? 's' : '' }} trouvé{{ searchResults().length > 1 ? 's' : '' }}</span>
+              <button
+                type="button"
+                (click)="isSearchDropdownOpen.set(false)"
+                class="text-slate-400 hover:text-slate-600 text-[10px]"
+              >
+                Fermer &times;
+              </button>
+            </div>
+            @for (res of searchResults(); track getNodeIdentifier(res); let idx = $index) {
+              <button
+                type="button"
+                (click)="currentSearchIndex.set(idx); goToNode(res, true)"
+                class="w-full px-3 py-2 text-left hover:bg-indigo-50/70 flex items-center justify-between gap-2 border-b border-slate-50 last:border-0 transition-colors cursor-pointer"
+                [class.bg-indigo-50]="currentSearchIndex() === idx"
+              >
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-mono font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 rounded border border-slate-200">
+                      {{ res.data?.code || res.key }}
+                    </span>
+                    <span class="text-xs font-semibold text-slate-800 truncate" [class.text-indigo-700]="currentSearchIndex() === idx">
+                      {{ res.label || res.data?.title }}
+                    </span>
+                  </div>
+                  @if (res.data?.manager || res.data?.category) {
+                    <p class="text-[10px] text-slate-500 truncate mt-0.5">
+                      {{ res.data?.manager ? 'Resp: ' + res.data?.manager : '' }} {{ res.data?.category ? '• ' + res.data?.category : '' }}
+                    </p>
+                  }
+                </div>
+                <span class="shrink-0 text-[10px] text-indigo-600 font-medium font-mono">Aller &rarr;</span>
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Statistiques dynamiques d'arborescence -->
       <div
-        class="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg border border-slate-200 flex items-center gap-1.5 font-medium">
+        class="hidden sm:flex px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg border border-slate-200 items-center gap-1.5 font-medium">
         <span class="w-2 h-2 rounded-full bg-slate-400"></span>
-        <span>Total : <strong>{{ treeStats().total }}</strong> éléments</span>
+        <span>Total : <strong>{{ treeStats().total }}</strong></span>
       </div>
       <div
-        class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg border border-indigo-100 flex items-center gap-1.5 font-medium">
+        class="hidden sm:flex px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg border border-indigo-100 items-center gap-1.5 font-medium">
         <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
         <span>Dépliés : <strong>{{ treeStats().expanded }}</strong></span>
       </div>
@@ -165,11 +278,30 @@
             <!-- GABARIT UNIQUE & UNIFORME POUR TOUS LES NŒUDS PEU IMPORTE LA PROFONDEUR -->
             <ng-template #unifiedNodeTemplate let-node>
               <div
-                class="org-node-card animate-card-in group w-64 bg-white text-slate-800 rounded-xl shadow-xs border border-slate-200 p-3.5 text-left cursor-pointer transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:border-indigo-500 hover:ring-2 hover:ring-indigo-100"
-                [class.ring-2]="selectedNode()?.key === node.key"
-                [class.ring-indigo-600]="selectedNode()?.key === node.key"
-                [class.border-indigo-600]="selectedNode()?.key === node.key"
-                [class.shadow-md]="selectedNode()?.key === node.key">
+                [id]="'org-node-' + getNodeIdentifier(node)"
+                [attr.data-node-key]="getNodeIdentifier(node)"
+                class="org-node-card animate-card-in group relative w-64 bg-white text-slate-800 rounded-xl shadow-xs border p-3.5 text-left cursor-pointer transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:border-indigo-500 hover:ring-2 hover:ring-indigo-100"
+                [class.border-slate-200]="!isNodeHighlighted(node) && !isNodeInSearchResults(node) && selectedNode()?.key !== node.key"
+                [class.ring-2]="selectedNode()?.key === node.key && !isNodeHighlighted(node)"
+                [class.ring-indigo-600]="selectedNode()?.key === node.key && !isNodeHighlighted(node)"
+                [class.border-indigo-600]="selectedNode()?.key === node.key && !isNodeHighlighted(node)"
+                [class.shadow-md]="selectedNode()?.key === node.key && !isNodeHighlighted(node)"
+                [class.border-indigo-400]="!isNodeHighlighted(node) && isNodeInSearchResults(node)"
+                [class.bg-indigo-50/20]="!isNodeHighlighted(node) && isNodeInSearchResults(node)"
+                [class.ring-4]="isNodeHighlighted(node)"
+                [class.ring-amber-400]="isNodeHighlighted(node)"
+                [class.ring-offset-2]="isNodeHighlighted(node)"
+                [class.border-amber-400]="isNodeHighlighted(node)"
+                [class.bg-amber-50/50]="isNodeHighlighted(node)"
+                [class.scale-105]="isNodeHighlighted(node)"
+                [class.shadow-2xl]="isNodeHighlighted(node)">
+
+                <!-- Badge Flottant "Résultat Trouvé" quand ciblé par la recherche -->
+                @if (isNodeHighlighted(node)) {
+                  <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] font-bold font-mono shadow-md flex items-center gap-1 animate-bounce">
+                    <span>★ Trouvé</span>
+                  </div>
+                }
 
                 <!-- En-tête : Référence Code & Statut -->
                 <div class="flex items-center justify-between mb-2">
