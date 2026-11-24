@@ -7,6 +7,8 @@ import {
   WritableSignal,
   signal,
   computed,
+  effect,
+  HostListener,
   ChangeDetectionStrategy,
   ElementRef,
   viewChild,
@@ -168,30 +170,128 @@ export class SbdOrgChartComponent implements AfterViewInit {
     
     const rootNodes = this._dataSignal();
     const path: string[] = [];
+    const targetId = this.getNodeIdentifier(selected);
 
-    const findPath = (nodes: SbdOrgTreeNode[], targetKey: string | undefined): boolean => {
+    const findPath = (nodes: SbdOrgTreeNode[]): boolean => {
       for (const n of nodes) {
         path.push(n.label || n.data?.title || 'Nœud');
-        if (n.key === targetKey || n === selected) {
+        if (this.getNodeIdentifier(n) === targetId || n === selected) {
           return true;
         }
         if (n.children && n.children.length) {
-          if (findPath(n.children, targetKey)) return true;
+          if (findPath(n.children)) return true;
         }
         path.pop();
       }
       return false;
     };
 
-    findPath(rootNodes, selected.key);
+    findPath(rootNodes);
     return path;
   });
 
+  /**
+   * Chemin complet sous forme de chaîne de caractères : obj1 / obj2 / obj3
+   */
+  public readonly selectedNodePathString: Signal<string> = computed(() => {
+    const breadcrumb = this.selectedNodeBreadcrumb();
+    if (!breadcrumb || breadcrumb.length === 0) return '';
+    return breadcrumb.join(' / ');
+  });
+
+  /**
+   * État de copie du chemin dans le presse-papier
+   */
+  public readonly isPathCopied: WritableSignal<boolean> = signal(false);
+
+  /**
+   * Ensemble des identifiants uniques des nœuds du chemin complet menant de la racine à la cible
+   */
+  public readonly activePathNodeKeys: Signal<Set<string>> = computed(() => {
+    const selected = this.selectedNode();
+    if (!selected) return new Set<string>();
+
+    const rootNodes = this._dataSignal();
+    const pathKeys = new Set<string>();
+    const targetId = this.getNodeIdentifier(selected);
+
+    const collectPath = (nodes: SbdOrgTreeNode[]): boolean => {
+      for (const n of nodes) {
+        const id = this.getNodeIdentifier(n);
+        if (id === targetId || n === selected) {
+          pathKeys.add(id);
+          return true;
+        }
+        if (n.children && n.children.length > 0) {
+          if (collectPath(n.children)) {
+            pathKeys.add(id);
+            return true;
+          }
+        }
+      }
+      return false;
+    };
+
+    collectPath(rootNodes);
+    return pathKeys;
+  });
+
+  /**
+   * Séquence ordonnée des nœuds du chemin complet de la racine jusqu'au nœud cible
+   */
+  public readonly activePathNodesSequence: Signal<SbdOrgTreeNode[]> = computed(() => {
+    const selected = this.selectedNode();
+    if (!selected) return [];
+
+    const rootNodes = this._dataSignal();
+    const sequence: SbdOrgTreeNode[] = [];
+    const targetId = this.getNodeIdentifier(selected);
+
+    const findSequence = (nodes: SbdOrgTreeNode[]): boolean => {
+      for (const n of nodes) {
+        sequence.push(n);
+        if (this.getNodeIdentifier(n) === targetId || n === selected) {
+          return true;
+        }
+        if (n.children && n.children.length > 0) {
+          if (findSequence(n.children)) return true;
+        }
+        sequence.pop();
+      }
+      return false;
+    };
+
+    findSequence(rootNodes);
+    return sequence;
+  });
+
+  /**
+   * Tracés vectoriels SVG précis pour le tracé lumineux du chemin actif
+   */
+  public readonly activeSvgPaths: WritableSignal<string[]> = signal([]);
+
+  constructor() {
+    effect(() => {
+      // Dépendance réactive à la séquence ordonnée des nœuds du chemin et au zoom
+      this.activePathNodesSequence();
+      this.zoomLevel();
+      setTimeout(() => {
+        this.updatePathLines();
+      }, 50);
+    });
+  }
+
+  @HostListener('window:resize')
+  public onWindowResize(): void {
+    this.updatePathLines();
+  }
+
   ngAfterViewInit(): void {
-    // Recentrer la vue sur la racine au premier chargement
+    // Recentrer la vue sur la racine et tracer les lignes au premier chargement
     setTimeout(() => {
       this.centerRootView();
-    }, 100);
+      this.updatePathLines();
+    }, 120);
   }
 
   /**
@@ -214,6 +314,7 @@ export class SbdOrgChartComponent implements AfterViewInit {
       // Forcer le signal pour recalculer les statistiques
       this._dataSignal.update(d => [...d]);
       this.nodeExpand.emit(node);
+      setTimeout(() => this.updatePathLines(), 60);
     }
   }
 
@@ -225,6 +326,7 @@ export class SbdOrgChartComponent implements AfterViewInit {
     if (node) {
       this._dataSignal.update(d => [...d]);
       this.nodeCollapse.emit(node);
+      setTimeout(() => this.updatePathLines(), 60);
     }
   }
 
@@ -265,6 +367,7 @@ export class SbdOrgChartComponent implements AfterViewInit {
     };
     setExpanded(nodes);
     this._dataSignal.set([...nodes]);
+    setTimeout(() => this.updatePathLines(), 80);
   }
 
   /**
@@ -282,7 +385,10 @@ export class SbdOrgChartComponent implements AfterViewInit {
     };
     setCollapsed(nodes);
     this._dataSignal.set([...nodes]);
-    setTimeout(() => this.centerRootView(), 50);
+    setTimeout(() => {
+      this.centerRootView();
+      this.updatePathLines();
+    }, 60);
   }
 
   /**
@@ -415,6 +521,7 @@ export class SbdOrgChartComponent implements AfterViewInit {
     this.currentSearchIndex.set(0);
     this.isSearchDropdownOpen.set(false);
     this.highlightedNodeKey.set(null);
+    setTimeout(() => this.updatePathLines(), 50);
   }
 
   /**
@@ -451,9 +558,10 @@ export class SbdOrgChartComponent implements AfterViewInit {
     const nodeKey = this.getNodeIdentifier(node);
     this.highlightedNodeKey.set(nodeKey);
 
-    // 4. Centrer la vue (smooth scroll) sur le nœud ciblé après rendu DOM
+    // 4. Centrer la vue (smooth scroll) sur le nœud ciblé après rendu DOM et recalculer le tracé SVG
     setTimeout(() => {
       this.scrollToNodeElement(nodeKey);
+      this.updatePathLines();
     }, 120);
 
     // 5. Retirer la surbrillance après 4 secondes
@@ -542,5 +650,148 @@ export class SbdOrgChartComponent implements AfterViewInit {
     if (!query) return false;
     const key = this.getNodeIdentifier(node);
     return this.searchResults().some(r => this.getNodeIdentifier(r) === key);
+  }
+
+  /**
+   * Vérifie si un nœud fait partie du chemin menant de la racine au nœud actif
+   */
+  public isNodeInActivePath(node: SbdOrgTreeNode): boolean {
+    const pathKeys = this.activePathNodeKeys();
+    if (!pathKeys.size) return false;
+    return pathKeys.has(this.getNodeIdentifier(node));
+  }
+
+  /**
+   * Vérifie si le nœud est un ancêtre sur le chemin actif (nœuds du chemin au-dessus du nœud cible)
+   */
+  public isNodeAncestorInPath(node: SbdOrgTreeNode): boolean {
+    if (!this.isNodeInActivePath(node)) return false;
+    const selected = this.selectedNode();
+    if (!selected) return false;
+    return this.getNodeIdentifier(node) !== this.getNodeIdentifier(selected);
+  }
+
+  /**
+   * Retourne les classes CSS dynamiques Tailwind pour la carte du nœud.
+   * La carte cible est mise en valeur, tandis que les cartes ancêtres restent sobres
+   * afin de laisser le CHEMIN (les connecteurs de l'arbre) en jaune être l'élément visuel principal.
+   */
+  public getNodeCardClasses(node: SbdOrgTreeNode): string {
+    const isTarget = this.isNodeHighlighted(node) || (this.selectedNode() === node && this.isNodeInActivePath(node));
+    if (isTarget) {
+      return 'ring-4 ring-amber-500 ring-offset-2 border-amber-500 bg-amber-50/70 scale-105 shadow-xl';
+    }
+    if (this.isNodeAncestorInPath(node)) {
+      // Nœud ancêtre : la carte reste sobre et nette car c'est le CHEMIN (les connecteurs) qui est coloré
+      return 'border-amber-300 bg-white shadow-xs';
+    }
+    if (this.selectedNode()?.key === node.key) {
+      return 'ring-2 ring-indigo-600 border-indigo-600 shadow-md';
+    }
+    if (this.isNodeInSearchResults(node)) {
+      return 'border-indigo-400 bg-indigo-50/20';
+    }
+    return 'border-slate-200';
+  }
+
+  /**
+   * Calcule les tracés vectoriels SVG reliant géométriquement chaque parent à son enfant
+   * le long du chemin hiérarchique menant de la racine à la cible.
+   */
+  public updatePathLines(): void {
+    const stage = this.stageRef()?.nativeElement;
+    if (!stage) {
+      this.activeSvgPaths.set([]);
+      return;
+    }
+
+    const sequence = this.activePathNodesSequence();
+    if (!sequence || sequence.length <= 1) {
+      this.activeSvgPaths.set([]);
+      return;
+    }
+
+    const stageRect = stage.getBoundingClientRect();
+    const zoom = this.zoomLevel() || 1;
+    const paths: string[] = [];
+
+    for (let i = 0; i < sequence.length - 1; i++) {
+      const parent = sequence[i];
+      const child = sequence[i + 1];
+
+      const parentEl = document.getElementById('org-node-' + this.getNodeIdentifier(parent));
+      const childEl = document.getElementById('org-node-' + this.getNodeIdentifier(child));
+
+      if (!parentEl || !childEl) continue;
+
+      const pRect = parentEl.getBoundingClientRect();
+      const cRect = childEl.getBoundingClientRect();
+
+      // Coordonnées en pixels non zoomés dans le repère de `#stage`
+      const x1 = Math.round((pRect.left + pRect.width / 2 - stageRect.left) / zoom);
+      const y1 = Math.round((pRect.bottom - stageRect.top) / zoom);
+
+      const x2 = Math.round((cRect.left + cRect.width / 2 - stageRect.left) / zoom);
+      const y2 = Math.round((cRect.top - stageRect.top) / zoom);
+
+      // Palier horizontal exactement au milieu de l'interstice vertical reliant parent et enfant
+      const yMid = Math.round(y1 + (y2 - y1) / 2);
+
+      if (Math.abs(x1 - x2) < 4) {
+        // Descente verticale directe
+        paths.push(`M ${x1} ${y1} L ${x1} ${y2}`);
+      } else {
+        // Tracé orthogonal en marche d'escalier fluide avec congés de raccordement arrondis
+        const r = Math.min(12, Math.abs(x1 - x2) / 2, Math.max(2, Math.abs(yMid - y1) - 2));
+        const dir = x2 > x1 ? 1 : -1;
+        paths.push(
+          `M ${x1} ${y1} ` +
+          `L ${x1} ${yMid - r} ` +
+          `Q ${x1} ${yMid} ${x1 + dir * r} ${yMid} ` +
+          `L ${x2 - dir * r} ${yMid} ` +
+          `Q ${x2} ${yMid} ${x2} ${yMid + r} ` +
+          `L ${x2} ${y2}`
+        );
+      }
+    }
+
+    this.activeSvgPaths.set(paths);
+  }
+
+  /**
+   * Copie la chaîne textuelle du chemin dans le presse-papier
+   */
+  public copyPathToClipboard(): void {
+    const text = this.selectedNodePathString();
+    if (!text) return;
+    navigator.clipboard?.writeText(text);
+    this.isPathCopied.set(true);
+    setTimeout(() => this.isPathCopied.set(false), 2000);
+  }
+
+  /**
+   * Calcule le chemin textuel complet pour n'importe quel nœud (utilisé dans la liste des résultats)
+   */
+  public getNodePathString(node: SbdOrgTreeNode): string {
+    const rootNodes = this._dataSignal();
+    const path: string[] = [];
+    const targetId = this.getNodeIdentifier(node);
+
+    const find = (nodes: SbdOrgTreeNode[]): boolean => {
+      for (const n of nodes) {
+        path.push(n.label || n.data?.title || 'Nœud');
+        if (this.getNodeIdentifier(n) === targetId || n === node) {
+          return true;
+        }
+        if (n.children && n.children.length) {
+          if (find(n.children)) return true;
+        }
+        path.pop();
+      }
+      return false;
+    };
+
+    find(rootNodes);
+    return path.join(' / ');
   }
 }

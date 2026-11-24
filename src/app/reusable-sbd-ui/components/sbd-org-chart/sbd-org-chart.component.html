@@ -23,110 +23,102 @@
         <div class="relative flex items-center">
           <span class="absolute left-3 text-slate-400 pointer-events-none">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </span>
 
-          <input
-            type="text"
-            [ngModel]="searchQuery()"
-            (ngModelChange)="onSearchInput($event)"
-            (keydown.enter)="onSearchEnter($event)"
-            (keydown.escape)="isSearchDropdownOpen.set(false)"
+          <input type="text" [ngModel]="searchQuery()" (ngModelChange)="onSearchInput($event)"
+            (keydown.enter)="onSearchEnter($event)" (keydown.escape)="isSearchDropdownOpen.set(false)"
             (focus)="isSearchDropdownOpen.set(searchQuery().trim().length > 0)"
             placeholder="Rechercher (code, nom, resp...)"
-            class="w-full pl-9 pr-24 py-1.5 text-xs text-slate-800 placeholder-slate-400 bg-white border border-slate-200 rounded-lg shadow-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
-          />
+            class="w-full pl-9 pr-24 py-1.5 text-xs text-slate-800 placeholder-slate-400 bg-white border border-slate-200 rounded-lg shadow-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all" />
 
           <!-- Contrôles intégrés (Compteur, Flèches Suivant/Précédent, Effacer) -->
           <div class="absolute right-1.5 flex items-center gap-1">
             @if (searchQuery().trim()) {
-              <!-- Compteur de résultats -->
-              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded font-medium"
-                [ngClass]="searchResults().length > 0 ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-slate-100 text-slate-400'">
-                {{ searchResults().length > 0 ? (currentSearchIndex() + 1) + '/' + searchResults().length : '0' }}
-              </span>
+            <!-- Compteur de résultats -->
+            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded font-medium"
+              [ngClass]="searchResults().length > 0 ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-slate-100 text-slate-400'">
+              {{ searchResults().length > 0 ? (currentSearchIndex() + 1) + '/' + searchResults().length : '0' }}
+            </span>
 
-              @if (searchResults().length > 1) {
-                <!-- Flèche Précédent -->
-                <button
-                  type="button"
-                  (click)="prevSearchResult()"
-                  class="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors cursor-pointer"
-                  title="Résultat précédent (Maj+Entrée)"
-                >
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                  </svg>
-                </button>
+            @if (searchResults().length > 1) {
+            <!-- Flèche Précédent -->
+            <button type="button" (click)="prevSearchResult()"
+              class="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors cursor-pointer"
+              title="Résultat précédent (Maj+Entrée)">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+              </svg>
+            </button>
 
-                <!-- Flèche Suivant -->
-                <button
-                  type="button"
-                  (click)="nextSearchResult()"
-                  class="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors cursor-pointer"
-                  title="Résultat suivant (Entrée)"
-                >
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-              }
+            <!-- Flèche Suivant -->
+            <button type="button" (click)="nextSearchResult()"
+              class="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors cursor-pointer"
+              title="Résultat suivant (Entrée)">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            }
 
-              <!-- Bouton Effacer -->
-              <button
-                type="button"
-                (click)="clearSearch()"
-                class="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors cursor-pointer"
-                title="Effacer la recherche"
-              >
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+            <!-- Bouton Effacer -->
+            <button type="button" (click)="clearSearch()"
+              class="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors cursor-pointer"
+              title="Effacer la recherche">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
             }
           </div>
         </div>
 
         <!-- Dropdown instantané des résultats de recherche -->
         @if (isSearchDropdownOpen() && searchResults().length > 0) {
-          <div class="absolute left-0 right-0 mt-1 max-h-64 overflow-y-auto bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-40 animate-in fade-in zoom-in-95 duration-150">
-            <div class="px-3 py-1 text-[10px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100 flex items-center justify-between">
-              <span>{{ searchResults().length }} élément{{ searchResults().length > 1 ? 's' : '' }} trouvé{{ searchResults().length > 1 ? 's' : '' }}</span>
-              <button
-                type="button"
-                (click)="isSearchDropdownOpen.set(false)"
-                class="text-slate-400 hover:text-slate-600 text-[10px]"
-              >
-                Fermer &times;
-              </button>
-            </div>
-            @for (res of searchResults(); track getNodeIdentifier(res); let idx = $index) {
-              <button
-                type="button"
-                (click)="currentSearchIndex.set(idx); goToNode(res, true)"
-                class="w-full px-3 py-2 text-left hover:bg-indigo-50/70 flex items-center justify-between gap-2 border-b border-slate-50 last:border-0 transition-colors cursor-pointer"
-                [class.bg-indigo-50]="currentSearchIndex() === idx"
-              >
-                <div class="min-w-0">
-                  <div class="flex items-center gap-1.5">
-                    <span class="text-[10px] font-mono font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 rounded border border-slate-200">
-                      {{ res.data?.code || res.key }}
-                    </span>
-                    <span class="text-xs font-semibold text-slate-800 truncate" [class.text-indigo-700]="currentSearchIndex() === idx">
-                      {{ res.label || res.data?.title }}
-                    </span>
-                  </div>
-                  @if (res.data?.manager || res.data?.category) {
-                    <p class="text-[10px] text-slate-500 truncate mt-0.5">
-                      {{ res.data?.manager ? 'Resp: ' + res.data?.manager : '' }} {{ res.data?.category ? '• ' + res.data?.category : '' }}
-                    </p>
-                  }
-                </div>
-                <span class="shrink-0 text-[10px] text-indigo-600 font-medium font-mono">Aller &rarr;</span>
-              </button>
-            }
+        <div
+          class="absolute left-0 right-0 mt-1 max-h-64 overflow-y-auto bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-40 animate-in fade-in zoom-in-95 duration-150">
+          <div
+            class="px-3 py-1 text-[10px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100 flex items-center justify-between">
+            <span>{{ searchResults().length }} élément{{ searchResults().length > 1 ? 's' : '' }} trouvé{{
+              searchResults().length > 1 ? 's' : '' }}</span>
+            <button type="button" (click)="isSearchDropdownOpen.set(false)"
+              class="text-slate-400 hover:text-slate-600 text-[10px]">
+              Fermer &times;
+            </button>
           </div>
+          @for (res of searchResults(); track getNodeIdentifier(res); let idx = $index) {
+          <button type="button" (click)="currentSearchIndex.set(idx); goToNode(res, true)"
+            class="w-full px-3 py-2 text-left hover:bg-indigo-50/70 flex items-center justify-between gap-2 border-b border-slate-50 last:border-0 transition-colors cursor-pointer"
+            [class.bg-indigo-50]="currentSearchIndex() === idx">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5">
+                <span
+                  class="text-[10px] font-mono font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 rounded border border-slate-200">
+                  {{ res.data?.code || res.key }}
+                </span>
+                <span class="text-xs font-semibold text-slate-800 truncate"
+                  [class.text-indigo-700]="currentSearchIndex() === idx">
+                  {{ res.label || res.data?.title }}
+                </span>
+              </div>
+              @if (res.data?.manager || res.data?.category) {
+              <p class="text-[10px] text-slate-500 truncate mt-0.5">
+                {{ res.data?.manager ? 'Resp: ' + res.data?.manager : '' }} {{ res.data?.category ? '• ' +
+                res.data?.category : '' }}
+              </p>
+              }
+              <!-- Chemin textuel d'accès sous forme de string obj1 / obj2 / obj3 -->
+              <p class="text-[10px] text-amber-700/90 font-mono truncate mt-0.5 flex items-center gap-1">
+                <span class="text-amber-500 font-bold">&bull;</span>
+                <span>{{ getNodePathString(res) }}</span>
+              </p>
+            </div>
+            <span class="shrink-0 text-[10px] text-indigo-600 font-medium font-mono">Aller &rarr;</span>
+          </button>
+          }
+        </div>
         }
       </div>
 
@@ -221,22 +213,20 @@
     }
   </header>
 
-  <!-- Fil d'Ariane (Breadcrumb) du nœud sélectionné -->
+  <!-- Fil d'Ariane épuré : chemin hiérarchique constitué des labels (obj1 / obj2 / obj3) -->
   @if (selectedNodeBreadcrumb().length > 0) {
-  <nav class="flex items-center gap-2 py-2 px-3 bg-slate-50 border-b border-slate-200 text-xs overflow-x-auto">
-    <span class="text-slate-400 font-medium">Sélection :</span>
-    @for (crumb of selectedNodeBreadcrumb(); track $index; let last = $last) {
-    <span [class.font-semibold]="last" [class.text-indigo-600]="last" [class.text-slate-600]="!last">
-      {{ crumb }}
-    </span>
-    @if (!last) {
-    <svg class="w-3 h-3 text-slate-300 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-      <path fill-rule="evenodd"
-        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-        clip-rule="evenodd" />
-    </svg>
-    }
-    }
+  <nav class="flex items-center gap-2 py-2 px-3 bg-slate-50/80 border-b border-slate-200 text-xs overflow-x-auto transition-all animate-in fade-in duration-150">
+    <span class="text-slate-400 font-medium shrink-0">Chemin :</span>
+    <div class="flex items-center gap-1.5 min-w-0 flex-nowrap font-medium">
+      @for (crumb of selectedNodeBreadcrumb(); track $index; let last = $last) {
+        <span [class.font-semibold]="last" [class.text-amber-700]="last" [class.text-slate-600]="!last" class="whitespace-nowrap">
+          {{ crumb }}
+        </span>
+        @if (!last) {
+          <span class="text-slate-300 font-bold select-none shrink-0">/</span>
+        }
+      }
+    </div>
   </nav>
   }
 
@@ -248,8 +238,22 @@
       aria-label="Zone de visualisation de l'organigramme">
       <!-- Canvas de centrage adaptatif sécurisé en Tailwind : empêche toute coupure négative à gauche -->
       <div class="w-max min-w-full flex justify-center items-start px-16 box-border">
-        <div #stage class="shrink-0 inline-block min-w-min origin-top transition-transform duration-200 ease-out"
+        <div #stage
+          class="relative shrink-0 inline-block min-w-min origin-top transition-transform duration-200 ease-out"
           [style.transform]="'scale(' + zoomLevel() + ')'">
+          <!-- Calque Vectoriel SVG pour le tracé lumineux du chemin actif -->
+          <svg class="absolute inset-0 pointer-events-none w-full h-full z-10 overflow-visible"
+            style="min-width: 100%; min-height: 100%;">
+            @for (p of activeSvgPaths(); track $index) {
+            <!-- Halo doré diffus -->
+            <path [attr.d]="p" fill="none" stroke="#fbbf24" stroke-width="8" stroke-linecap="round"
+              stroke-linejoin="round" opacity="0.4" />
+            <!-- Ligne principale ambre lumineuse -->
+            <path [attr.d]="p" fill="none" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"
+              stroke-linejoin="round" />
+            }
+          </svg>
+
           <!-- Composant Optimus UI OrganizationChart stylé à 100% en Tailwind (Pass-Through pt + classes utilitaires) -->
           <p-organizationchart [value]="data" [collapsible]="collapsible" [selectionMode]="selectionMode"
             [selection]="selectedNode()" [pt]="chartPt"
@@ -277,36 +281,36 @@
             (onNodeCollapse)="onNodeCollapsed($event)">
             <!-- GABARIT UNIQUE & UNIFORME POUR TOUS LES NŒUDS PEU IMPORTE LA PROFONDEUR -->
             <ng-template #unifiedNodeTemplate let-node>
-              <div
-                [id]="'org-node-' + getNodeIdentifier(node)"
-                [attr.data-node-key]="getNodeIdentifier(node)"
+              <div [id]="'org-node-' + getNodeIdentifier(node)" [attr.data-node-key]="getNodeIdentifier(node)"
                 class="org-node-card animate-card-in group relative w-64 bg-white text-slate-800 rounded-xl shadow-xs border p-3.5 text-left cursor-pointer transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:border-indigo-500 hover:ring-2 hover:ring-indigo-100"
-                [class.border-slate-200]="!isNodeHighlighted(node) && !isNodeInSearchResults(node) && selectedNode()?.key !== node.key"
-                [class.ring-2]="selectedNode()?.key === node.key && !isNodeHighlighted(node)"
-                [class.ring-indigo-600]="selectedNode()?.key === node.key && !isNodeHighlighted(node)"
-                [class.border-indigo-600]="selectedNode()?.key === node.key && !isNodeHighlighted(node)"
-                [class.shadow-md]="selectedNode()?.key === node.key && !isNodeHighlighted(node)"
-                [class.border-indigo-400]="!isNodeHighlighted(node) && isNodeInSearchResults(node)"
-                [class.bg-indigo-50/20]="!isNodeHighlighted(node) && isNodeInSearchResults(node)"
-                [class.ring-4]="isNodeHighlighted(node)"
-                [class.ring-amber-400]="isNodeHighlighted(node)"
-                [class.ring-offset-2]="isNodeHighlighted(node)"
-                [class.border-amber-400]="isNodeHighlighted(node)"
-                [class.bg-amber-50/50]="isNodeHighlighted(node)"
-                [class.scale-105]="isNodeHighlighted(node)"
-                [class.shadow-2xl]="isNodeHighlighted(node)">
+                [ngClass]="getNodeCardClasses(node)">
 
-                <!-- Badge Flottant "Résultat Trouvé" quand ciblé par la recherche -->
-                @if (isNodeHighlighted(node)) {
-                  <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] font-bold font-mono shadow-md flex items-center gap-1 animate-bounce">
-                    <span>★ Trouvé</span>
-                  </div>
+                <!-- Badge Flottant "★ Cible trouvée" quand ciblé -->
+                @if (isNodeHighlighted(node) || (selectedNode() === node && isNodeInActivePath(node))) {
+                <div
+                  class="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] font-bold font-mono shadow-md flex items-center gap-1 animate-bounce">
+                  <span>★ Cible trouvée</span>
+                </div>
+                }
+
+                <!-- Indicateur discret pour les étapes du chemin -->
+                @if (isNodeAncestorInPath(node)) {
+                <div
+                  class="absolute -top-2.5 right-3 z-10 px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 text-[9px] font-bold font-mono shadow-xs flex items-center gap-1 border border-amber-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                  <span>Étape chemin</span>
+                </div>
                 }
 
                 <!-- En-tête : Référence Code & Statut -->
                 <div class="flex items-center justify-between mb-2">
                   <span
-                    class="inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200 truncate max-w-[140px] transition-colors duration-200 group-hover:bg-indigo-50 group-hover:text-indigo-700 group-hover:border-indigo-200">
+                    class="inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold truncate max-w-[140px] transition-colors duration-200"
+                    [ngClass]="{
+                      'bg-amber-200 text-amber-900 border border-amber-400 font-extrabold': isNodeHighlighted(node) || (selectedNode() === node && isNodeInActivePath(node)),
+                      'bg-amber-100 text-amber-800 border border-amber-300 font-semibold': isNodeAncestorInPath(node),
+                      'bg-slate-100 text-slate-700 border border-slate-200 group-hover:bg-indigo-50 group-hover:text-indigo-700': !isNodeInActivePath(node)
+                    }">
                     {{ node.data?.code || node.key }}
                   </span>
                   <span
@@ -316,19 +320,19 @@
                       'bg-amber-50 text-amber-700 border border-amber-200/60': node.data?.status === 'maintenance',
                       'bg-slate-100 text-slate-600 border border-slate-200': node.data?.status === 'planned'
                     }">
-                    <span
-                      class="w-1.5 h-1.5 rounded-full"
-                      [ngClass]="{
+                    <span class="w-1.5 h-1.5 rounded-full" [ngClass]="{
                         'bg-emerald-500': node.data?.status === 'active' || !node.data?.status,
                         'bg-amber-500': node.data?.status === 'maintenance',
                         'bg-slate-400': node.data?.status === 'planned'
                       }"></span>
-                    {{ node.data?.status === 'active' || !node.data?.status ? 'Actif' : (node.data?.status === 'maintenance' ? 'Maintenance' : 'Planifié') }}
+                    {{ node.data?.status === 'active' || !node.data?.status ? 'Actif' : (node.data?.status ===
+                    'maintenance' ? 'Maintenance' : 'Planifié') }}
                   </span>
                 </div>
 
                 <!-- Libellé principal -->
-                <h4 class="text-xs font-bold text-slate-900 leading-snug line-clamp-2 transition-colors duration-200 group-hover:text-indigo-600">
+                <h4
+                  class="text-xs font-bold text-slate-900 leading-snug line-clamp-2 transition-colors duration-200 group-hover:text-indigo-600">
                   {{ node.label || node.data?.title }}
                 </h4>
 
@@ -340,13 +344,15 @@
                 }
 
                 <!-- Pied : Responsable / Métriques -->
-                <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                <div
+                  class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
                   <div class="flex items-center gap-1.5 min-w-0">
                     <span
                       class="w-4 h-4 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-[9px] font-bold shrink-0 transition-colors duration-200 group-hover:bg-indigo-100 group-hover:text-indigo-700">
                       {{ (node.data?.manager || node.data?.title || 'N').charAt(0) }}
                     </span>
-                    <span class="truncate max-w-[110px]">{{ node.data?.manager || node.data?.department || 'Non assigné' }}</span>
+                    <span class="truncate max-w-[110px]">{{ node.data?.manager || node.data?.department || 'Non assigné'
+                      }}</span>
                   </div>
 
                   @if (node.data?.stats?.reliabilityRate) {
@@ -398,68 +404,5 @@
         </div>
       </div>
     </div>
-
-    <!-- Volet latéral flottant : Fiche détaillée du nœud sélectionné -->
-    @if (showDetailsPanel && selectedNode(); as node) {
-    <aside
-      class="absolute top-4 right-4 w-80 max-w-[calc(100%-2rem)] bg-white/95 backdrop-blur-md rounded-xl shadow-2xl border border-slate-200 p-4 z-20 animate-in fade-in slide-in-from-right-4 duration-200">
-      <div class="flex items-start justify-between pb-3 border-b border-slate-100">
-        <div>
-          <span
-            class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 font-mono">
-            {{ node.data?.code || node.key }}
-          </span>
-          <h3 class="text-sm font-bold text-slate-900 mt-1 leading-snug">
-            {{ node.label || node.data?.title }}
-          </h3>
-        </div>
-        <button type="button" (click)="closeDetails()"
-          class="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-          title="Fermer le volet">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-
-      <div class="mt-3 space-y-2.5 text-xs">
-        @if (node.data?.description) {
-        <p class="text-slate-600 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-          {{ node.data?.description }}
-        </p>
-        }
-
-        <div class="grid grid-cols-2 gap-2 pt-1">
-          <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
-            <span class="text-[10px] text-slate-400 block font-medium">Statut S3000L</span>
-            <span class="font-semibold text-slate-800 capitalize">{{ node.data?.status || 'Actif' }}</span>
-          </div>
-          <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
-            <span class="text-[10px] text-slate-400 block font-medium">Fiabilité</span>
-            <span class="font-semibold text-emerald-600">{{ node.data?.stats?.reliabilityRate || '99.5%' }}</span>
-          </div>
-        </div>
-
-        @if (node.data?.manager) {
-        <div class="flex items-center gap-2 pt-1 text-slate-600">
-          <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
-          <span>Responsable : <strong>{{ node.data?.manager }}</strong></span>
-        </div>
-        }
-
-        @if (node.children && node.children.length) {
-        <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
-          <span class="text-slate-500 font-medium">Sous-niveaux directs :</span>
-          <span class="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-bold font-mono">
-            {{ node.children.length }}
-          </span>
-        </div>
-        }
-      </div>
-    </aside>
-    }
   </main>
 </div>
