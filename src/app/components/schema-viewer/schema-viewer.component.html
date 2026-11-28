@@ -1,0 +1,837 @@
+<div class="min-h-screen bg-slate-100 flex flex-col font-sans select-none">
+  <!-- En-tête Principal & Barre de Commande -->
+  <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 shrink-0 shadow-xs z-30">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-700 via-indigo-600 to-blue-500 text-white flex items-center justify-center shadow-md shadow-indigo-100 shrink-0">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+        </svg>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-lg font-extrabold text-slate-900 tracking-tight">Schéma de Base de Données & Modèle IR</h1>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+            S3000L v{{ modelData().s3000lDialect || '2.0' }}
+          </span>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            API IRModelJSON
+          </span>
+        </div>
+        <p class="text-xs text-slate-500 mt-0.5">
+          Génération visuelle interactive d'un schéma relationnel BDD à partir d'une réponse API IRModelJSON
+        </p>
+      </div>
+    </div>
+
+    <!-- Statistiques Synthétiques du Modèle -->
+    <div class="flex flex-wrap items-center gap-2 text-xs">
+      <div class="px-3 py-1.5 bg-slate-50 rounded-lg border border-slate-200 flex items-center gap-1.5 font-medium text-slate-700">
+        <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+        <span>Entités : <strong>{{ modelStats().entitiesCount }}</strong></span>
+      </div>
+      <div class="px-3 py-1.5 bg-slate-50 rounded-lg border border-slate-200 flex items-center gap-1.5 font-medium text-slate-700">
+        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+        <span>Colonnes : <strong>{{ modelStats().totalColumns }}</strong></span>
+      </div>
+      <div class="px-3 py-1.5 bg-slate-50 rounded-lg border border-slate-200 flex items-center gap-1.5 font-medium text-slate-700">
+        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+        <span>Clés étrangères (FK) : <strong>{{ modelStats().totalFks }}</strong></span>
+      </div>
+      <div class="px-3 py-1.5 bg-slate-50 rounded-lg border border-slate-200 flex items-center gap-1.5 font-medium text-slate-700">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <span>Tables N:M : <strong>{{ modelStats().joinTablesCount }}</strong></span>
+      </div>
+    </div>
+
+    <!-- Barre d'outils d'action (Import, DDL, JSON, Reset) -->
+    <div class="flex items-center gap-2 shrink-0">
+      <button
+        type="button"
+        (click)="openImportModal()"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition-colors cursor-pointer"
+        title="Coller ou charger un JSON d'API personnalisé"
+      >
+        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+        </svg>
+        <span>Tester un JSON API</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="downloadSqlFile()"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg shadow-xs transition-colors cursor-pointer"
+        title="Télécharger le script DDL SQL"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        <span>Exporter SQL</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="downloadJsonModel()"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition-colors cursor-pointer"
+        title="Télécharger l'objet IRModelJSON brut"
+      >
+        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+        </svg>
+        <span>JSON</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="resetToMock()"
+        class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+        title="Réinitialiser vers le mock complet"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Barre de Navigation par Onglets de Vue & Recherche -->
+  <div class="bg-white border-b border-slate-200 px-6 py-2.5 flex flex-col md:flex-row md:items-center md:justify-between gap-3 shrink-0 z-20">
+    <!-- Onglets de sélection du mode -->
+    <div class="flex items-center gap-1.5 overflow-x-auto">
+      <button
+        type="button"
+        (click)="activeViewMode.set('graph')"
+        class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer"
+        [ngClass]="activeViewMode() === 'graph' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+        </svg>
+        <span>Diagramme ERD (Graph)</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="activeViewMode.set('dictionary')"
+        class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer"
+        [ngClass]="activeViewMode() === 'dictionary' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        </svg>
+        <span>Dictionnaire de données</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="activeViewMode.set('joins')"
+        class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer"
+        [ngClass]="activeViewMode() === 'joins' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+        </svg>
+        <span>Tables de jonction N:M ({{ modelStats().joinTablesCount }})</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="activeViewMode.set('types')"
+        class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer"
+        [ngClass]="activeViewMode() === 'types' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+        </svg>
+        <span>Énumérations & Types ({{ modelStats().enumsCount }})</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="activeViewMode.set('ddl')"
+        class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer"
+        [ngClass]="activeViewMode() === 'ddl' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+        </svg>
+        <span>Script SQL DDL</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="activeViewMode.set('json')"
+        class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer"
+        [ngClass]="activeViewMode() === 'json' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+        </svg>
+        <span>JSON Brut</span>
+      </button>
+    </div>
+
+    <!-- Champ de recherche réactif -->
+    <div class="relative w-full sm:w-64">
+      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </span>
+      <input
+        type="text"
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)"
+        placeholder="Filtrer table, colonne, type..."
+        class="w-full pl-8 pr-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all"
+      />
+    </div>
+  </div>
+
+  <!-- Corps Principal selon le Mode Actif -->
+  <main class="flex-1 relative overflow-hidden flex">
+
+    <!-- =================================================================================== -->
+    <!-- 1. VUE DIAGRAMME ERD (CANVAS GRAPHIQUE INTERACTIF AVEC CÂBLES RELATIONNELS SVG)     -->
+    <!-- =================================================================================== -->
+    @if (activeViewMode() === 'graph') {
+      <div
+        #canvasContainer
+        class="flex-1 relative overflow-auto bg-slate-100 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:24px_24px] cursor-default"
+      >
+        <!-- Contrôles flottants de Zoom & Disposition -->
+        <div class="absolute top-4 left-4 z-20 flex items-center gap-1.5 bg-white/95 backdrop-blur-md p-1.5 rounded-xl border border-slate-200 shadow-md">
+          <button
+            type="button"
+            (click)="zoomOut()"
+            [disabled]="zoomLevel() <= 0.4"
+            class="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg disabled:opacity-30 cursor-pointer transition-colors"
+            title="Zoom arrière (-15%)"
+          >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            (click)="resetZoom()"
+            class="px-2 py-1 text-xs font-mono font-bold text-slate-700 hover:bg-slate-100 rounded-lg cursor-pointer"
+            title="Réinitialiser zoom (100%)"
+          >
+            {{ (zoomLevel() * 100).toFixed(0) }}%
+          </button>
+
+          <button
+            type="button"
+            (click)="zoomIn()"
+            [disabled]="zoomLevel() >= 1.8"
+            class="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg disabled:opacity-30 cursor-pointer transition-colors"
+            title="Zoom avant (+15%)"
+          >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+
+          <div class="w-px h-4 bg-slate-200 mx-1"></div>
+
+          <button
+            type="button"
+            (click)="autoLayout()"
+            class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+            title="Réorganiser les tables sur la grille"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+            <span>Réaligner</span>
+          </button>
+        </div>
+
+        <!-- Scène du Canvas mise à l'échelle -->
+        <div
+          class="relative w-[2800px] h-[2200px] origin-top-left transition-transform duration-150 ease-out"
+          [style.transform]="'scale(' + zoomLevel() + ')'"
+        >
+          <!-- Calque SVG pour les câbles de relations de clé étrangère (FK) et N:M -->
+          <svg class="absolute inset-0 w-full h-full pointer-events-none z-10 overflow-visible">
+            <defs>
+              <!-- Marqueur flèche normale -->
+              <marker id="erd-arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#94a3b8" />
+              </marker>
+              <!-- Marqueur flèche active / survolée -->
+              <marker id="erd-arrow-active" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#4f46e5" />
+              </marker>
+            </defs>
+
+            @for (wire of relationshipWires(); track wire.id) {
+              <!-- Tracé de la relation -->
+              <path
+                [attr.d]="wire.path"
+                fill="none"
+                [attr.stroke]="isWireHighlighted(wire) ? '#4f46e5' : '#94a3b8'"
+                [attr.stroke-width]="isWireHighlighted(wire) ? '3' : '1.8'"
+                [attr.stroke-dasharray]="wire.kind === 'join' ? '5,4' : 'none'"
+                [attr.marker-end]="isWireHighlighted(wire) ? 'url(#erd-arrow-active)' : 'url(#erd-arrow)'"
+                [attr.opacity]="isWireHighlighted(wire) ? '1' : (hoveredEntity() || selectedEntity() ? '0.25' : '0.75')"
+                class="transition-all duration-200"
+              />
+
+              <!-- Puce descriptive au milieu du câble -->
+              @if (isWireHighlighted(wire)) {
+                <circle [attr.cx]="(wire.startX + wire.endX)/2" [attr.cy]="(wire.startY + wire.endY)/2" r="4" fill="#4f46e5" />
+              }
+            }
+          </svg>
+
+          <!-- Tables d'entités positionnées sur le canvas (Glissables avec cdkDrag) -->
+          @for (entity of filteredEntities(); track entity.name) {
+            <div
+              cdkDrag
+              (cdkDragEnded)="onDragEnded($event, entity.name)"
+              [style.left.px]="entityPositions()[entity.name]?.x || 100"
+              [style.top.px]="entityPositions()[entity.name]?.y || 100"
+              (mouseenter)="hoveredEntity.set(entity.name)"
+              (mouseleave)="hoveredEntity.set(null)"
+              (click)="selectEntity(entity)"
+              class="absolute w-[320px] bg-white rounded-xl shadow-md border text-left transition-shadow duration-200 z-20 cursor-grab active:cursor-grabbing group hover:shadow-xl hover:z-30"
+              [ngClass]="selectedEntity()?.name === entity.name ? 'border-indigo-600 ring-2 ring-indigo-500/30' : 'border-slate-200'"
+            >
+              <!-- En-tête de la table -->
+              <div
+                class="px-3.5 py-2.5 rounded-t-xl border-b flex items-center justify-between gap-2 transition-colors"
+                [ngClass]="selectedEntity()?.name === entity.name ? 'bg-indigo-600 text-white border-indigo-700' : 'bg-slate-50 text-slate-800 border-slate-200 group-hover:bg-indigo-50/50'"
+              >
+                <div class="flex items-center gap-2 min-w-0">
+                  <svg class="w-4 h-4 shrink-0" [ngClass]="selectedEntity()?.name === entity.name ? 'text-indigo-200' : 'text-indigo-600'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  <div class="min-w-0">
+                    <div class="text-xs font-bold font-mono truncate leading-tight">{{ entity.tableName }}</div>
+                    <div class="text-[10px] font-sans truncate" [ngClass]="selectedEntity()?.name === entity.name ? 'text-indigo-200' : 'text-slate-500'">{{ entity.name }}</div>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1 shrink-0">
+                  @if (entity.abstract) {
+                    <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-amber-100 text-amber-800 border border-amber-300">
+                      Abstract
+                    </span>
+                  }
+                  <span
+                    class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold"
+                    [ngClass]="selectedEntity()?.name === entity.name ? 'bg-indigo-800 text-indigo-100' : 'bg-slate-200 text-slate-700'"
+                  >
+                    {{ entity.columns.length }} cols
+                  </span>
+                </div>
+              </div>
+
+              <!-- Liste des colonnes de la table -->
+              <div class="divide-y divide-slate-100 max-h-[380px] overflow-y-auto font-mono text-[11px]">
+                @for (col of entity.columns; track col.columnName) {
+                  <div
+                    class="px-3 py-1.5 flex items-center justify-between gap-2 hover:bg-slate-50 transition-colors"
+                    [class.bg-indigo-50/30]="col.isPrimaryKey"
+                  >
+                    <!-- Nom de colonne & icônes PK / FK -->
+                    <div class="flex items-center gap-1.5 min-w-0">
+                      @if (col.isPrimaryKey) {
+                        <span class="text-amber-500 text-xs shrink-0" title="Clé primaire (PK)">🔑</span>
+                      } @else if (col.isForeignKey) {
+                        <span class="text-indigo-500 text-xs shrink-0" [title]="'Clé étrangère vers ' + col.referencesEntity">🔗</span>
+                      } @else {
+                        <span class="w-3 text-slate-300 shrink-0 text-center">•</span>
+                      }
+
+                      <span
+                        class="truncate"
+                        [ngClass]="col.isPrimaryKey ? 'font-bold text-slate-900' : (col.nullable ? 'text-slate-600' : 'font-semibold text-slate-800')"
+                      >
+                        {{ col.columnName }}
+                      </span>
+                    </div>
+
+                    <!-- Type SQL & Référence -->
+                    <div class="flex items-center gap-1 shrink-0">
+                      @if (col.isForeignKey && col.referencesEntity) {
+                        <span class="text-[9px] px-1 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 font-sans truncate max-w-[80px]" [title]="'Lien FK vers ' + col.referencesEntity">
+                          &rarr; {{ col.referencesEntity }}
+                        </span>
+                      }
+                      <span class="px-1.5 py-0.2 rounded text-[10px] border font-mono" [ngClass]="getSqlTypeBadgeClasses(col.sqlType)">
+                        {{ col.sqlType }}
+                      </span>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <!-- Pied de carte avec résumé -->
+              @if (entity.documentation) {
+                <div class="px-3 py-1.5 bg-slate-50 rounded-b-xl border-t border-slate-100 text-[10px] text-slate-500 font-sans line-clamp-1 italic">
+                  {{ entity.documentation }}
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Volet latéral d'inspection détaillée de la table sélectionnée -->
+      @if (selectedEntity(); as entity) {
+        <aside class="w-96 bg-white border-l border-slate-200 flex flex-col shrink-0 z-20 shadow-xl overflow-hidden animate-in slide-in-from-right duration-200">
+          <!-- En-tête de l'inspecteur -->
+          <div class="px-5 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+            <div>
+              <div class="text-[10px] uppercase tracking-wider font-bold text-indigo-600 font-mono">Détails Entité BDD</div>
+              <h2 class="text-sm font-extrabold text-slate-900 leading-tight mt-0.5">{{ entity.name }}</h2>
+              <div class="text-[11px] font-mono text-slate-500">Table: <code class="text-slate-800 font-bold">{{ entity.tableName }}</code></div>
+            </div>
+            <button
+              type="button"
+              (click)="selectedEntity.set(null)"
+              class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Corps du volet d'inspection -->
+          <div class="flex-1 overflow-y-auto p-5 space-y-4 text-xs">
+            <!-- Documentation -->
+            @if (entity.documentation) {
+              <div>
+                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Documentation</label>
+                <p class="text-slate-700 bg-slate-50 p-2.5 rounded-lg border border-slate-200 leading-relaxed font-sans text-xs">
+                  {{ entity.documentation }}
+                </p>
+              </div>
+            }
+
+            <!-- Colonnes et Contraintes -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Colonnes ({{ entity.columns.length }})</label>
+                <span class="text-[10px] text-slate-400 font-mono">PK: 🔑 | FK: 🔗</span>
+              </div>
+
+              <div class="space-y-2">
+                @for (col of entity.columns; track col.columnName) {
+                  <div class="p-2.5 rounded-lg border bg-white shadow-2xs space-y-1" [class.border-indigo-200]="col.isPrimaryKey || col.isForeignKey" [class.border-slate-200]="!col.isPrimaryKey && !col.isForeignKey">
+                    <div class="flex items-center justify-between gap-1">
+                      <div class="flex items-center gap-1.5 font-mono font-bold text-slate-800">
+                        @if (col.isPrimaryKey) { <span>🔑</span> }
+                        @if (col.isForeignKey) { <span>🔗</span> }
+                        <span>{{ col.columnName }}</span>
+                      </div>
+                      <span class="px-1.5 py-0.2 rounded text-[10px] font-mono border" [ngClass]="getSqlTypeBadgeClasses(col.sqlType)">
+                        {{ col.sqlType }}
+                      </span>
+                    </div>
+
+                    <div class="flex items-center gap-2 text-[10px] text-slate-500 font-sans">
+                      <span>{{ col.nullable ? 'NULL' : 'NOT NULL' }}</span>
+                      <span>•</span>
+                      <span>JSON: <code class="font-mono text-slate-700">{{ col.jsonType }}</code></span>
+                      @if (col.defaultValue) {
+                        <span>•</span>
+                        <span>Défaut: <code class="font-mono text-slate-700">{{ col.defaultValue }}</code></span>
+                      }
+                    </div>
+
+                    @if (col.referencesEntity) {
+                      <div class="text-[10px] text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded font-mono">
+                        FK vers &rarr; <strong>{{ col.referencesEntity }}</strong>
+                      </div>
+                    }
+
+                    @if (col.documentation) {
+                      <div class="text-[11px] text-slate-600 italic font-sans pt-0.5">
+                        {{ col.documentation }}
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- DDL SQL spécifique pour cette table -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">DDL SQL de la table</label>
+                <button
+                  type="button"
+                  (click)="copyToClipboard(getEntitySqlDdl(entity))"
+                  class="text-[10px] text-indigo-600 hover:text-indigo-800 font-semibold cursor-pointer"
+                >
+                  {{ isCopied() ? 'Copié !' : 'Copier SQL' }}
+                </button>
+              </div>
+              <pre class="p-3 bg-slate-900 text-emerald-400 rounded-xl font-mono text-[11px] overflow-x-auto leading-relaxed">{{ getEntitySqlDdl(entity) }}</pre>
+            </div>
+          </div>
+        </aside>
+      }
+    }
+
+    <!-- =================================================================================== -->
+    <!-- 2. VUE DICTIONNAIRE DE DONNÉES (TABULAIRE GLOBAL)                                   -->
+    <!-- =================================================================================== -->
+    @if (activeViewMode() === 'dictionary') {
+      <div class="flex-1 overflow-auto p-6 bg-slate-50">
+        <div class="max-w-7xl mx-auto space-y-6">
+          @for (entity of filteredEntities(); track entity.name) {
+            <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
+              <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-sm font-bold text-slate-900 font-mono">{{ entity.tableName }}</h3>
+                    <span class="text-xs text-slate-500 font-sans">({{ entity.name }})</span>
+                    @if (entity.abstract) {
+                      <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800 uppercase">Abstract</span>
+                    }
+                  </div>
+                  @if (entity.documentation) {
+                    <p class="text-xs text-slate-500 mt-0.5">{{ entity.documentation }}</p>
+                  }
+                </div>
+                <span class="px-2 py-1 rounded bg-slate-100 text-slate-700 text-xs font-mono font-medium">
+                  {{ entity.columns.length }} colonnes
+                </span>
+              </div>
+
+              <!-- Tableau des colonnes -->
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-50/50 text-[10px] uppercase font-bold text-slate-400 border-b border-slate-200">
+                    <th class="py-2.5 px-4">Clé</th>
+                    <th class="py-2.5 px-4">Colonne SQL</th>
+                    <th class="py-2.5 px-4">Type SQL</th>
+                    <th class="py-2.5 px-4">Type JSON</th>
+                    <th class="py-2.5 px-4">Nullable</th>
+                    <th class="py-2.5 px-4">Référence FK / Enum</th>
+                    <th class="py-2.5 px-4">Documentation</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 font-mono">
+                  @for (col of entity.columns; track col.columnName) {
+                    <tr class="hover:bg-slate-50/70 transition-colors">
+                      <td class="py-2 px-4 whitespace-nowrap">
+                        @if (col.isPrimaryKey) { <span class="text-amber-500 font-bold" title="Clé primaire">🔑 PK</span> }
+                        @else if (col.isForeignKey) { <span class="text-indigo-600 font-bold" title="Clé étrangère">🔗 FK</span> }
+                        @else { <span class="text-slate-300">-</span> }
+                      </td>
+                      <td class="py-2 px-4 font-bold text-slate-800">{{ col.columnName }}</td>
+                      <td class="py-2 px-4">
+                        <span class="px-1.5 py-0.5 rounded border text-[10px]" [ngClass]="getSqlTypeBadgeClasses(col.sqlType)">
+                          {{ col.sqlType }}
+                        </span>
+                      </td>
+                      <td class="py-2 px-4 text-slate-600">{{ col.jsonType }}</td>
+                      <td class="py-2 px-4">
+                        <span class="text-[10px] px-1.5 py-0.5 rounded" [ngClass]="col.nullable ? 'bg-slate-100 text-slate-600' : 'bg-rose-50 text-rose-700 font-bold'">
+                          {{ col.nullable ? 'NULL' : 'NOT NULL' }}
+                        </span>
+                      </td>
+                      <td class="py-2 px-4 font-sans text-slate-600">
+                        @if (col.referencesEntity) {
+                          <span class="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono text-[10px]">
+                            &rarr; {{ col.referencesEntity }}
+                          </span>
+                        } @else if (col.isEnum && col.enumRef) {
+                          <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono text-[10px]">
+                            Enum: {{ col.enumRef }}
+                          </span>
+                        } @else {
+                          <span class="text-slate-400">-</span>
+                        }
+                      </td>
+                      <td class="py-2 px-4 font-sans text-slate-600 text-xs">{{ col.documentation || '-' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- =================================================================================== -->
+    <!-- 3. VUE TABLES DE JONCTION N:M                                                      -->
+    <!-- =================================================================================== -->
+    @if (activeViewMode() === 'joins') {
+      <div class="flex-1 overflow-auto p-6 bg-slate-50">
+        <div class="max-w-5xl mx-auto space-y-4">
+          <div class="mb-4">
+            <h2 class="text-base font-bold text-slate-900">Tables d'Association et de Jonction N:M</h2>
+            <p class="text-xs text-slate-500">Mappage des relations plusieurs-à-plusieurs normalisées de la spécification S3000L.</p>
+          </div>
+
+          @for (join of modelData().joinTables | keyvalue; track join.key) {
+            <div class="bg-white rounded-2xl shadow-xs border border-slate-200 p-5 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center font-bold text-xs">
+                    N:M
+                  </span>
+                  <div>
+                    <h3 class="text-sm font-bold text-slate-900 font-mono">{{ join.value.tableName }}</h3>
+                    <div class="text-xs text-slate-500">{{ join.value.name }}</div>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[11px] font-mono">Join Table</span>
+              </div>
+
+              @if (join.value.documentation) {
+                <p class="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100 leading-relaxed">
+                  {{ join.value.documentation }}
+                </p>
+              }
+
+              <!-- Schéma de liaison -->
+              <div class="flex items-center justify-center gap-4 py-3 bg-slate-50/60 rounded-xl border border-slate-200 font-mono text-xs">
+                <div class="p-2 rounded-lg bg-white border border-slate-200 text-center shadow-2xs">
+                  <div class="font-bold text-slate-800">{{ join.value.leftEntity }}</div>
+                  <div class="text-[10px] text-slate-400">colonne: {{ join.value.leftColumn }}</div>
+                </div>
+
+                <div class="flex items-center gap-1 text-emerald-600 font-bold">
+                  <span>&larr;</span>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">clé composite ({{ join.value.leftColumn }}, {{ join.value.rightColumn }})</span>
+                  <span>&rarr;</span>
+                </div>
+
+                <div class="p-2 rounded-lg bg-white border border-slate-200 text-center shadow-2xs">
+                  <div class="font-bold text-slate-800">{{ join.value.rightEntity }}</div>
+                  <div class="text-[10px] text-slate-400">colonne: {{ join.value.rightColumn }}</div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- =================================================================================== -->
+    <!-- 4. VUE ÉNUMÉRATIONS & TYPES SIMPLES                                                -->
+    <!-- =================================================================================== -->
+    @if (activeViewMode() === 'types') {
+      <div class="flex-1 overflow-auto p-6 bg-slate-50">
+        <div class="max-w-6xl mx-auto space-y-8">
+          <!-- Section Enums -->
+          <div>
+            <h2 class="text-base font-bold text-slate-900 mb-1">Énumérations SQL & S3000L</h2>
+            <p class="text-xs text-slate-500 mb-4">Valeurs énumérées autorisées dans le modèle de données.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              @for (en of modelData().enums | keyvalue; track en.key) {
+                <div class="bg-white rounded-2xl shadow-xs border border-slate-200 p-4 flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-1">
+                      <h3 class="text-xs font-bold text-slate-900 font-mono">{{ en.value.name }}</h3>
+                      <span class="text-[10px] px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 font-mono">ENUM</span>
+                    </div>
+                    <div class="text-[11px] font-mono text-slate-500 mb-2">Table: {{ en.value.tableName }}</div>
+                    @if (en.value.docs) {
+                      <p class="text-xs text-slate-600 italic mb-3">{{ en.value.docs }}</p>
+                    }
+                  </div>
+
+                  <div class="flex flex-wrap gap-1.5 pt-2 border-t border-slate-100">
+                    @for (val of en.value.values; track val) {
+                      <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-800 text-[11px] font-mono font-medium">
+                        {{ val }}
+                      </span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Section Simple Types -->
+          <div>
+            <h2 class="text-base font-bold text-slate-900 mb-1">Types Simples & Contraintes XSD</h2>
+            <p class="text-xs text-slate-500 mb-4">Types dérivés avec règles de validation et expressions régulières.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              @for (st of modelData().simpleTypes | keyvalue; track st.key) {
+                <div class="bg-white rounded-2xl shadow-xs border border-slate-200 p-4 space-y-2">
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-bold text-slate-900 font-mono">{{ st.value.name }}</h3>
+                    <span class="px-1.5 py-0.2 rounded border text-[10px] font-mono" [ngClass]="getSqlTypeBadgeClasses(st.value.sqlType)">
+                      {{ st.value.sqlType }}
+                    </span>
+                  </div>
+                  @if (st.value.docs) {
+                    <p class="text-xs text-slate-600">{{ st.value.docs }}</p>
+                  }
+                  <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100 font-mono text-xs space-y-1">
+                    @for (entry of st.value.constraints | keyvalue; track entry.key) {
+                      <div class="flex items-center justify-between text-[11px]">
+                        <span class="text-slate-500">{{ entry.key }} :</span>
+                        <code class="text-slate-800 font-bold">{{ entry.value }}</code>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- =================================================================================== -->
+    <!-- 5. VUE SCRIPT SQL DDL                                                              -->
+    <!-- =================================================================================== -->
+    @if (activeViewMode() === 'ddl') {
+      <div class="flex-1 overflow-auto p-6 bg-slate-900 text-slate-100">
+        <div class="max-w-5xl mx-auto space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+            <div>
+              <h2 class="text-base font-bold text-white font-mono">Script DDL PostgreSQL / ANSI SQL</h2>
+              <p class="text-xs text-slate-400">Génération automatique des tables, types ENUM et contraintes de clés étrangères.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                (click)="copyToClipboard(generatedFullSqlDdl())"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm transition-colors cursor-pointer"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                <span>{{ isCopied() ? 'Copié !' : 'Copier tout le DDL' }}</span>
+              </button>
+              <button
+                type="button"
+                (click)="downloadSqlFile()"
+                class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors cursor-pointer"
+              >
+                Télécharger .sql
+              </button>
+            </div>
+          </div>
+
+          <pre class="font-mono text-xs leading-relaxed text-emerald-400 bg-slate-950 p-6 rounded-2xl border border-slate-800 overflow-x-auto shadow-2xl"><code>{{ generatedFullSqlDdl() }}</code></pre>
+        </div>
+      </div>
+    }
+
+    <!-- =================================================================================== -->
+    <!-- 6. VUE JSON BRUT (IRModelJSON)                                                     -->
+    <!-- =================================================================================== -->
+    @if (activeViewMode() === 'json') {
+      <div class="flex-1 overflow-auto p-6 bg-slate-950 text-slate-100">
+        <div class="max-w-5xl mx-auto space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-base font-bold text-white font-mono">Objet Réponse API JSON (IRModelJSON)</h2>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  {{ jsonPreviewData().totalLines | number }} lignes
+                </span>
+              </div>
+              <p class="text-xs text-slate-400 mt-0.5">Structure de données volumineuse consommée par le visualiseur (aperçu optimisé 500 lignes).</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                (click)="downloadJsonModel()"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shadow-sm transition-colors cursor-pointer"
+              >
+                <span>Télécharger JSON ({{ jsonPreviewData().totalLines | number }} lignes)</span>
+              </button>
+              <button
+                type="button"
+                (click)="copyJsonToClipboard()"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm transition-colors cursor-pointer"
+              >
+                <span>{{ isCopied() ? 'Copié !' : 'Copier JSON intégral' }}</span>
+              </button>
+            </div>
+          </div>
+
+          <pre class="font-mono text-xs leading-relaxed text-amber-300 bg-slate-900 p-6 rounded-2xl border border-slate-800 overflow-x-auto shadow-2xl"><code>{{ jsonPreviewData().preview }}</code></pre>
+        </div>
+      </div>
+    }
+  </main>
+
+  <!-- Modal de Test / Import d'un JSON API Personnalisé -->
+  @if (showImportModal()) {
+    <div
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150"
+      (click)="showImportModal.set(false)"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-150"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900">Tester une réponse API IRModelJSON personnalisée</h3>
+            <p class="text-xs text-slate-500">Collez le JSON retourné par votre API pour générer instantanément le schéma de base de données.</p>
+          </div>
+          <button
+            type="button"
+            (click)="showImportModal.set(false)"
+            class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div class="p-5 flex-1 overflow-y-auto space-y-3">
+          @if (importError()) {
+            <div class="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs font-mono">
+              Erreur : {{ importError() }}
+            </div>
+          }
+
+          <textarea
+            [(ngModel)]="customJsonInput"
+            rows="16"
+            class="w-full font-mono text-xs p-3 bg-slate-950 text-emerald-400 rounded-xl border border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="Collez ici votre objet IRModelJSON..."
+          ></textarea>
+        </div>
+
+        <div class="px-5 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+          <button
+            type="button"
+            (click)="resetToMock()"
+            class="text-xs text-slate-600 hover:text-slate-900 cursor-pointer"
+          >
+            Recharger le mock S3000L par défaut
+          </button>
+
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              (click)="showImportModal.set(false)"
+              class="px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200 rounded-lg cursor-pointer"
+            >
+              Annuler
+            </button>
+            <button
+              type="button"
+              (click)="applyCustomJson()"
+              class="px-4 py-1.5 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm cursor-pointer"
+            >
+              Générer le Schéma
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

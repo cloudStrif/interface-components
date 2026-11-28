@@ -9,12 +9,23 @@ import { LoraComponent } from './components/lora/lora.component';
 import { SupportItemsComponent } from './components/support-items/support-items.component';
 import { DynamicFormsDemoComponent } from './components/dynamic-forms-demo/dynamic-forms-demo.component';
 import { OrgChartDemoComponent } from './components/org-chart-demo/org-chart-demo.component';
+import { SchemaViewerComponent } from './components/schema-viewer/schema-viewer.component';
 
 export const routes: Routes = [
   {
     // Route racine : vérification auth → redirection vers projet actif
     path: '',
     component: SbdDemoComponent,
+  },
+  {
+    // Page dédiée Visualiseur de Schéma BDD & Modèle IR (accessible directement)
+    path: 'schema',
+    component: SchemaViewerComponent,
+  },
+  {
+    path: 'db-schema',
+    redirectTo: 'schema',
+    pathMatch: 'full'
   },
   {
     // Page dédiée Organigramme Adaptatif Optimus UI (accessible directement)
@@ -57,6 +68,8 @@ export const routes: Routes = [
       { path: 'lora', component: LoraComponent },
       // Support Items — Pièces de rechange, GSE, outillage, documentation
       { path: 'support-items', component: SupportItemsComponent },
+      // Visualiseur de Schéma BDD & Modèle IR
+      { path: 'schema', component: SchemaViewerComponent },
       // Démo Dynamic Form avec Checkbox Groups
       { path: 'forms-demo', component: DynamicFormsDemoComponent },
     ]
